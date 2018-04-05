@@ -1,0 +1,32 @@
+{
+  "name": "testing-clasp",
+  "version": "0.0.0",
+  "description": "for now just testing...",
+  "main": "app.js",
+  "repository": "",
+  "author": "Zach",
+  "dependencies": {},
+  "scripts": {
+    "buildBabelOnly": "npx babel ~/workspace/closeout-email-utilities/src --out-dir ~/workspace/closeout-email-utilities/lib/",
+    "build": "~/workspace/node_modules/.bin/webpack -p --config ./webpack.config.js",
+    "test": "mocha ~/workspace/closeout-email-utilities/test/",
+    "clasplogin": "clasp login --no-localhost",
+    "clasplogout": "clasp logout",
+    "clasppull": "npm run clasplogin && cd ~/workspace/closeout-email-utilities && clasp pull && cd ~/workspace && npm run clasplogout",
+    "clasppush": "npm run clasplogin && cd ~/workspace/closeout-email-utilities && clasp push && cd ~/workspace && npm run clasplogout"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.4",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-google-apps-script": "0.0.3",
+    "babel-register": "^6.26.0",
+    "gas-webpack-plugin": "^0.2.1",
+    "mocha": "^5.0.5",
+    "should": "^13.2.1",
+    "webpack": "^4.4.1",
+    "webpack-cli": "^2.0.13"
+  }
+}
