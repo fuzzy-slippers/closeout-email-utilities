@@ -7,13 +7,12 @@
   "author": "Zach",
   "dependencies": {},
   "scripts": {
-    "buildBabelOnly": "npx babel ~/workspace/closeout-email-utilities/src --out-dir ~/workspace/closeout-email-utilities/lib/",
     "build": "~/workspace/node_modules/.bin/webpack -p --config ./webpack.config.js",
     "test": "mocha ~/workspace/closeout-email-utilities/test/",
     "clasplogin": "clasp login --no-localhost",
     "clasplogout": "clasp logout",
-    "clasppull": "npm run clasplogin && cd ~/workspace/closeout-email-utilities && clasp pull && cd ~/workspace && npm run clasplogout",
-    "clasppush": "npm run clasplogin && cd ~/workspace/closeout-email-utilities && clasp push && cd ~/workspace && npm run clasplogout"
+    "clasppull": "npm run clasplogin && cd ~/workspace/closeout-email-utilities/dist && clasp pull && cd ~/workspace/closeout-email-utilities/ && npm run clasplogout",
+    "clasppush": "npm run clasplogin && cd ~/workspace/closeout-email-utilities/dist && clasp push && cd ~/workspace/closeout-email-utilities/ && npm run clasplogout"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
