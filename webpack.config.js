@@ -1,5 +1,9 @@
 const path = require("path");
 const webpack = require("webpack");
+//filename hashing - only needed because was seeing the same bundle coming out in the filesystem even after code changes
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+
+/* Note: bundle file has to be output with extension .gs, prevents webpack from rewriting all the function mames */
 
 module.exports = {
   entry: [path.join(__dirname, 'src/include-in-webpack.js')],
@@ -11,7 +15,7 @@ module.exports = {
     }],
   },
   output: {
-    filename: 'CombinedWebpackCode.gs',
+    filename: 'CombinedWebpackCode.[hash].gs',
     libraryTarget: 'this',
     path: path.join(__dirname, 'dist'),
   },

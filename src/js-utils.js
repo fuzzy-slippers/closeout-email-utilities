@@ -14,9 +14,13 @@ module.exports = {
     return (jsDateObj.getMonth() + 1) + "/" + jsDateObj.getDate() + "/" + jsDateObj.getFullYear(); // i.e. 2/4/2018
   },
   
-  
-  // helper function to strip html tags (not perfect for all HTML as many have pointed out online, but good enough for our simple html samples) - from https://stackoverflow.com/questions/5002111/javascript-how-to-strip-html-tags-from-string
-  stripTagsFromHtmlString(htmlString) { return htmlString.replace(/<\/?[^>]+(>|$)/g, "") },
+/**
+ * helper function to strip html tags (not perfect for all HTML as many have pointed out online, but good enough for our simple html email templates eRA staff configure like we are using it for) - from https://stackoverflow.com/questions/5002111/javascript-how-to-strip-html-tags-from-string 
+ *
+ * @param {string} the html or pseudo html as one long string, that contains html style tags <p></p> or </br>
+ * @return {string} the same html string is returned in plain text format (all tags removed so that it can be used for the plain text version of an email)
+ */  
+stripTagsFromHtmlString(htmlString) { return htmlString.replace(/<\/?[^>]+(>|$)/g, "") },
   
   
   //provides non-mutating (functional programming) way to replace an array element with a new item - returns a new array with the change, leaving the old array unchanged

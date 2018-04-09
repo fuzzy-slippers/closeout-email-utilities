@@ -12,4 +12,13 @@ describe("#stripTagsFromHtmlString()", function() {
     });  
 
 });
+
+describe("#convertMsDateTimeToMMDDYYYYString()", function() {
+      
+    it("should given a valid date in integer format 1512104400000 (milliseconds since the unix epoch) return a short date string of '12/1/2017'  ", function () {
+     const testIntegerDateEqualToDecFirstTwoThousandSeventeen = 1512104400000;
+     jsUtils.convertMsDateTimeToMMDDYYYYString(testIntegerDateEqualToDecFirstTwoThousandSeventeen).should.be.eql("12/1/2017");
+    });  
+
+});
    
