@@ -57,3 +57,6 @@ typings/
 # dotenv environment variables file
 .env
 
+# webpack generated dist directory/compiled files (ZF added)
+dist/
+
