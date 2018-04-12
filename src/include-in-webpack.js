@@ -8,6 +8,6 @@ global.jsUtils = jsUtils;
 //  global.testUsingLodash = testUsingLodash;
 /**End of include-in-webpack.js**/
 
-const testUsingAlasql = require("./test-using-alasql.js");
-global.testUsingAlasql = testUsingAlasql;
+const alasqlUtils = require("./alasql-utils.js");
+global.alasqlUtils = alasqlUtils;
 /**End of include-in-webpack.js**/
