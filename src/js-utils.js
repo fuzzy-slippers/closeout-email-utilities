@@ -3,6 +3,21 @@
 module.exports = {
 
 
+//NEEDS UNIT TESTS!!!!!!!
+// converts a two dimentional array with a header row into an array of objects (like the original data returned from KR APIs) - source https://stackoverflow.com/questions/22917269/javascript-convert-two-dimensional-array-to-array-of-objects-using-the-first-r
+convertFromTwoDimArrWithHeaderToObjArr(twoDimArr) {
+  var keys = twoDimArr.shift();
+  var objects = twoDimArr.map(function(values) {
+      return keys.reduce(function(o, k, i) {
+          o[k] = values[i];
+          return o;
+      }, {});
+  });
+  return objects;
+},
+
+
+
 /**
  * function to take a Kuali API format integer date (millisecond from unix epoch as opposed to Unix seconds from epoch) and convert to a string format like "2/4/2018" - similar if not identical to JS "short date" format
  *
