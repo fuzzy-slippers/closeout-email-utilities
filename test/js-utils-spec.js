@@ -4,21 +4,15 @@ const should = require("should");
 
 var jsUtils = require("../src/js-utils.js");
 
-describe("#stripTagsFromHtmlString()", function() {
-      
-    it("should given a paragraph statement <p>sometext</p>, return just the sometext inside the tags", function () {
-     const testString = "<p>sometext</p>";
-     jsUtils.stripTagsFromHtmlString(testString).should.be.eql("sometext");
-    });  
+describe("js-utils", function() {
+
+  // describe("#convertFromTwoDimArrWithHeaderToObjArr()", function() {
+  //   it("should given an array [['col1', 'col2'], [1,2], ['A', 'B']] return a 1d array of objects with the header row as property names [{col1: 1, col2: 2}, {col1: 'A', col2: 'B'}]", function () {
+  //   const test2dArr = [["col1", "col2"], [1,2], ["A", "B"]];
+  //   const expectedResult = [{col1: 1, col2: 2}, {col1: "A", col2: "B"}];
+  //   jsUtils.convertFromTwoDimArrWithHeaderToObjArr(test2dArr).should.be.eql(expectedResult);
+  //   });  
+  // });
 
 });
 
-describe("#convertMsDateTimeToMMDDYYYYString()", function() {
-      
-    it("should given a valid date in integer format 1512104400000 (milliseconds since the unix epoch) return a short date string of '12/1/2017'  ", function () {
-     const testIntegerDateEqualToDecFirstTwoThousandSeventeen = 1512104400000;
-     jsUtils.convertMsDateTimeToMMDDYYYYString(testIntegerDateEqualToDecFirstTwoThousandSeventeen).should.be.eql("12/1/2017");
-    });  
-
-});
-   
