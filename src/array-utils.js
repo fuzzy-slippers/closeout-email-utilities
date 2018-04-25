@@ -1,5 +1,9 @@
 /**Start of array-utils.js**/
 
+const core_Set = require('core-js/library/fn/set');
+const core_Array_from = require('core-js/library/fn/array/from');
+const core_Array_fill = require('core-js/library/fn/array/fill');
+
 module.exports = {
     
     /**
@@ -25,8 +29,8 @@ module.exports = {
      */
     unionArrs: (...arrays) => {
       const valuesFromAllArrays = [].concat(...arrays);
-      const setVersionValuesFromAllArrays = new Set(valuesFromAllArrays);
-      const uniqueValuesInArrayForm = [...setVersionValuesFromAllArrays];
+      const setVersionValuesFromAllArrays = new core_Set(valuesFromAllArrays);
+      const uniqueValuesInArrayForm = core_Array_from(setVersionValuesFromAllArrays);
       return uniqueValuesInArrayForm;
     },
     
@@ -45,7 +49,7 @@ module.exports = {
         const oneDArrComprehensiveHeaderRow = module.exports.unionArrs(...twoDArrHeadersKeys);
         //generate the data rows - two dim array of object values (at this point without the header which will be added at the end)
         //used below to make sure all rows are the same length - we create an empty array filled with null values the same length as the header row above
-        const arrWithAllNullsSameLengthAsHeaderRow = Array(oneDArrComprehensiveHeaderRow.length).fill(null); 
+        const arrWithAllNullsSameLengthAsHeaderRow = Array(oneDArrComprehensiveHeaderRow.length).core_Array_fill(null); 
         //map over each object in the original object array and transform it from an object into an array of its values (fill with nulls to make each row a uniform length)                            
         const twoDArrDataRows = objArr.map(currObj => {
           //convert object propery values to an array of values
