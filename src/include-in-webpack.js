@@ -5,4 +5,7 @@ global.jsUtils = jsUtils;
 
 const alasqlUtils = require("./alasql-utils.js");
 global.alasqlUtils = alasqlUtils;
+
+const queriesLib = require("./queries.js");
+global.queriesLib = queriesLib;
 /**End of include-in-webpack.js**/

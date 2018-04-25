@@ -38,25 +38,50 @@ module.exports = {
     },
     
     
-    //DELETE LATER
-    testAlasqlWorking()
-    {
-        alasql("CREATE TABLE cities (city string, population number)");
-        alasql("INSERT INTO cities VALUES ('Rome',2863223),('Paris',2249975),('Berlin',3517424),('Madrid',3041579)");
-        var res = alasql("SELECT * FROM cities WHERE population < 3500000 ORDER BY population DESC");
-        return res;
-    },
+                        // //DELETE LATER
+                        // testAlasqlWorking()
+                        // {
+                        //     alasql("CREATE TABLE cities (city string, population number)");
+                        //     alasql("INSERT INTO cities VALUES ('Rome',2863223),('Paris',2249975),('Berlin',3517424),('Madrid',3041579)");
+                        //     var res = alasql("SELECT * FROM cities WHERE population < 3500000 ORDER BY population DESC");
+                        //     return res;
+                        // },
     
-    
-    //DELETE LATER
-    testAlasqlWorking2(twoDimArrPassedIn)
+    /**
+     * transform single 2d array of data into revised 2d array based on single SQL SELECT statement (Note: table name referenced in SQL query should always be "tmptbl1")
+     * for example you can pass in data from a sheet with null values and a sql SELECT statement excluding nulls and it will only return 2d data with the results (to use to update another sheet/tab)  
+     * NOTE: this function only designed for SELECT statements against single tables (with or without where clauses, group by, etc - INSERT/UPDATE/DELETE use other function!)
+     *
+     * @param {object} 2d array of data (with first row as column headers) as a starting point (that the query will be run against)
+     * @param {string} valid alasql SELECT SQL statement to run against that original 2d array data loaded as a alasql formatted table  
+     * @return {object} 2d array exported from the table after the SQL statement has been run against that table/data
+     */
+    selectFromTwoDimArr(twoDimArrWHeader, sqlToTransformData)
     {
-        var mybase = this.createNewDatabase_();
-        this.addTablePopulatedByTwoDimArrWithHeaderRowData_(mybase, "testtabledata", twoDimArrPassedIn)
-        var res = mybase.exec("SELECT * FROM testtabledata WHERE Col1 > 12");
-        return res;
+        const tempDb = this.createNewDatabase_();
+        this.addTablePopulatedByTwoDimArrWithHeaderRowData_(tempDb, "tmptbl1", twoDimArrWHeader);
+        const resultObjArr = tempDb.exec(sqlToTransformData);
+        const resultTwoDimArr = arrayUtils.convertOneDimObjArrToTwoDimArrWithHeaderRow(resultObjArr); 
+        return resultTwoDimArr;
     }
     
-    
+    // /** TODO:
+    //  * perform single INSERT/UPDATE/DELETE action against  (Note: table name referenced in SQL query should always be "tmptbl1")
+    //  * for example you can pass in data from a sheet with null values and a sql SELECT statement excluding nulls and it will only return 2d data with the results (to use to update another sheet/tab)  
+    //  * NOTE: this function only designed for SELECT statements against single tables (with or without where clauses, group by, etc - INSERT/UPDATE/DELETE use other function!)
+    //  *
+    //  * @param {object} 2d array of data (with first row as column headers) as a starting point (that the query will be run against)
+    //  * @param {string} valid alasql SELECT SQL statement to run against that original 2d array data loaded as a alasql formatted table  
+    //  * @return {object} 2d array exported from the table after the SQL statement has been run against that table/data
+    //  */
+    // insertUpdDelFromTwoDimArr(twoDimArrWHeader, sqlInsertUpdDelStmt)
+    // {
+    //     const tempDb = this.createNewDatabase_();
+    //     this.addTablePopulatedByTwoDimArrWithHeaderRowData_(tempDb, "tmptbl1", twoDimArrWHeader);
+    //     const rowsAffected = tempDb.exec(sqlInsertUpdDelStmt);
+    //     const resultObjArr = tempDb.exec("SELECT * FROM tmptbl1;");
+    //     const resultTwoDimArr = arrayUtils.convertOneDimObjArrToTwoDimArrWithHeaderRow(resultObjArr); 
+    //     return resultTwoDimArr;
+    // },    
 
 }

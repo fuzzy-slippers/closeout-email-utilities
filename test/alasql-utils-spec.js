@@ -51,6 +51,32 @@ describe("alasql-utils", function() {
     }); 
   
   });
+  
+    describe("#selectFromTwoDimArr()", function() {
+
+    it("should if passed test 2d array and just a select * sql statement, it should return the original data", function () {
+      const origTwoDimArr = [["column1", "column2"], ["avocado", "orange"]];
+      const testSqlStmt = "SELECT * FROM tmptbl1;";
+      alasqlUtils.selectFromTwoDimArr(origTwoDimArr, testSqlStmt).should
+      .deepEqual([["column1", "column2"], ["avocado", "orange"]]);      
+    });
+    it("should if passed test 2d array with null in first column and a sql statement with WHERE excluding nulls, return 2d array with null rows removed", function () {
+      const origTwoDimArr = [["column1", "column2"], ["avocado", "orange"], [null, "watermelon"], ["pineapple", null]];
+      const testSqlStmt = "SELECT * FROM tmptbl1 WHERE column1 IS NOT NULL;";
+      alasqlUtils.selectFromTwoDimArr(origTwoDimArr, testSqlStmt).should
+      .deepEqual([["column1", "column2"], ["avocado", "orange"],  ["pineapple", null]]);      
+    });
+    // it("should if passed test 2d array and a valid insert statement, the returned data should have one more row than the original", function () {
+    //   const origTwoDimArr = [["column1", "column2"], ["avocado", "orange"], [null, "watermelon"], ["pineapple", null]];
+    //   const testSqlStmt = "insert into tmptbl1 values ('SPIKE', 'FRI');SELECT * FROM tmptbl1;";
+    //   const retVal = alasqlUtils.selectFromTwoDimArr(origTwoDimArr, testSqlStmt);
+    //   console.log(`retVal: ${JSON.stringify(retVal)}`);
+    //   retVal.length.should.not.eql(origTwoDimArr.length);
+    //   retVal.length.should.eql(4);      
+    // });
+    
+   
+  });
 
 });
    

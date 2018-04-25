@@ -58,5 +58,7 @@ typings/
 .env
 
 # webpack generated dist directory/compiled files (ZF added)
-dist/
+dist/.clasp.json
+dist/appsscript.json
+dist/CombinedWebpackCode*.*.*
 
