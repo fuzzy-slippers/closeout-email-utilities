@@ -11,6 +11,9 @@ const jsUtils = require("./js-utils.js");
 //add the imported modules to global, just like normal (except with this manual step - all subfunctions should be accessible)
 global.jsUtils = jsUtils;
 
+const arrayUtils = require("./array-utils.js");
+global.arrayUtils = arrayUtils;
+
 const alasqlUtils = require("./alasql-utils.js");
 global.alasqlUtils = alasqlUtils;
 

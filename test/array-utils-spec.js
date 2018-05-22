@@ -25,6 +25,31 @@ describe("array-utils", function() {
     });     
   });
   
+  describe("#duplicateArrayAllElementsReplacedWith()", function() {
+    it("should if passed an array with 5 elements & to replace with nulls, it should return an array with 5 null arr elements", function() {
+        arrayUtils.duplicateArrayReplaceAllElementsWith([1, 2, 3, 4, 5], null)
+        .should.be.eql([null, null, null, null, null]);
+    });   
+    it("should if passed an empty array return back an empty array", function() {
+        arrayUtils.duplicateArrayReplaceAllElementsWith([], null).should.be.eql([]);
+    }); 
+    it("should if passed an array with 5 elements to replace with nulls, the original array should not be affected (non-mutating)", function() {
+        var originalArrShouldNotBeChanged = [1, 2, 3, 4, 5];
+        const resultGetsDiscarded = arrayUtils.duplicateArrayReplaceAllElementsWith(originalArrShouldNotBeChanged, null);
+        originalArrShouldNotBeChanged.should.be.eql([1, 2, 3, 4, 5]);
+    });         
+    it("should if passed an array with 5 elements & to replace with strings, it should return an array with all 5 matching the str", function() {
+        arrayUtils.duplicateArrayReplaceAllElementsWith([1, 2, 3, 4, 5], "replacewithme")
+        .should.be.eql(["replacewithme", "replacewithme", "replacewithme", "replacewithme", "replacewithme"]);
+    });
+    it("should if passed an array created with the array constructor to create a 4 element array using Array(4), return an array with all elements replaced with the string specified", function() {
+        const testArrayCreatedWithConstructorLengthFour = new Array(4);
+        console.log(`testArrayCreatedWithConstructorLengthFour: ${JSON.stringify(testArrayCreatedWithConstructorLengthFour)}`);
+        arrayUtils.duplicateArrayReplaceAllElementsWith(testArrayCreatedWithConstructorLengthFour, "replaceConstructorArrElements")
+        .should.be.eql(["replaceConstructorArrElements", "replaceConstructorArrElements", "replaceConstructorArrElements", "replaceConstructorArrElements"]);
+    });     
+  });  
+
   describe("#convertOneDimObjArrToTwoDimArrWithHeaderRow()", function() {
     it(`should convert a 1d array [{prop1: "dog", prop2: "food"}, {prop1: "cat" prop2: "salmon"}] to [["prop1", "prop2"], ["dog", "food"], ["cat", "salmon"]]`, function () {
      const test1dObjArr = [{prop1: "dog", prop2: "food"}, {prop1: "cat", prop2: "salmon"}];
@@ -47,7 +72,6 @@ describe("array-utils", function() {
      .should.be.eql([["1","2","3"],["a", null, null],["b","z", null],["c","y","A"]]);
     });    
   });  
-  
 
 });
 

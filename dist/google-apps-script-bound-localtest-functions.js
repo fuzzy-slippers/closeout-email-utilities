@@ -1,9 +1,23 @@
 function testBoundSheetLibraryFunctions() {
   Logger.log("data in this test sheet");
   Logger.log(BoundSheetUtils.readDataInSheetByNameWithHeader("testdata"));
+  
+  //testing GAS converting 2d array test data to object array
+  var sheetDataTwoDArr = BoundSheetUtils.readDataInSheetByNameWithHeader("testdata");
+  Logger.log("sheetDataTwoDArr: ");
+  Logger.log(sheetDataTwoDArr);
+
+  var sheetDataObjArr = arrayUtils.convertFromTwoDimArrWithHeaderToObjArr(sheetDataTwoDArr);
+  Logger.log("sheetDataObjArr: ");
+  Logger.log(sheetDataObjArr);  
+  
+  var convertedBackTwoDArr = arrayUtils.convertOneDimObjArrToTwoDimArrWithHeaderRow(sheetDataObjArr);
+  Logger.log("convertedBackTwoDArr: ");
+  Logger.log(convertedBackTwoDArr);    
+  
   Logger.log("loading that data into alasql - then doing a where clause on only rows where the first column is more than 12 (*updated*): ");
-//  Logger.log(alasqlUtils.testAlasqlWorking2(BoundSheetUtils.readDataInSheetByNameWithHeader("testdata")));
-  Logger.log(queriesLib.testSelect(BoundSheetUtils.readDataInSheetByNameWithHeader("testdata")));
+  //Logger.log(alasqlUtils.testAlasqlWorking2(BoundSheetUtils.readDataInSheetByNameWithHeader("testdata")));
+  //Logger.log(queriesLib.testSelect(BoundSheetUtils.readDataInSheetByNameWithHeader("testdata")));
 }
 
 
