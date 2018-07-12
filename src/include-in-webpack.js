@@ -7,9 +7,10 @@ global.core = core;
 // global.Set = Set;
 // require('core-js/fn/array/');
 
-const jsUtils = require("./js-utils.js");
 //add the imported modules to global, just like normal (except with this manual step - all subfunctions should be accessible)
-global.jsUtils = jsUtils;
+
+// const jsUtils = require("./js-utils.js");
+// global.jsUtils = jsUtils;
 
 const arrayUtils = require("./array-utils.js");
 global.arrayUtils = arrayUtils;
@@ -19,4 +20,15 @@ global.alasqlUtils = alasqlUtils;
 
 const queriesLib = require("./queries.js");
 global.queriesLib = queriesLib;
+
+const apiUtils = require("./api-utils.js");
+global.apiUtils = apiUtils;
+
+
+const missingNoticeDates = require("./time-and-money/missing-notice-dates.js");
+global.missingNoticeDates = missingNoticeDates;
+
+const googleAppsScriptWrappers = require("./google-apps-script-wrappers/google-apps-script-wrappers.js");
+global.googleAppsScriptWrappers = googleAppsScriptWrappers;
+
 /**End of include-in-webpack.js**/

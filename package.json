@@ -11,7 +11,7 @@
   },
   "scripts": {
     "build": "npm run cleanwebpackbundles && ~/workspace/closeout-email-utilities/node_modules/.bin/webpack -p --config ./webpack.config.js",
-    "test": "mocha ~/workspace/closeout-email-utilities/test/",
+    "test": "mocha ~/workspace/closeout-email-utilities/test/ --recursive",
     "clasplogin": "clasp login --no-localhost",
     "clasplogout": "clasp logout",
     "clasppull": "npm run clasplogin && cd ~/workspace/closeout-email-utilities/dist && clasp pull && cd ~/workspace/closeout-email-utilities/ && npm run clasplogout",
@@ -27,6 +27,7 @@
     "clean-webpack-plugin": "^0.1.19",
     "core-js": "^2.5.5",
     "mocha": "^5.0.5",
+    "rewire": "^4.0.1",
     "should": "^13.2.1",
     "webpack": "^4.4.1",
     "webpack-cli": "^2.0.13",

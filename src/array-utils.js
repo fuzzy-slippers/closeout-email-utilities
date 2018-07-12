@@ -42,7 +42,7 @@ module.exports = {
      * @param {object[]} an array of any length that should have every element overwritten
      * @param {object} the string, number, null, etc to fill every character of the array with
      */
-//    duplicateArrayReplaceAllElementsWith: (arr, replaceArrElementsWith) => arr.map(currArrElem => replaceArrElementsWith)
+                                                                    //    duplicateArrayReplaceAllElementsWith: (arr, replaceArrElementsWith) => arr.map(currArrElem => replaceArrElementsWith)
     duplicateArrayReplaceAllElementsWith: (arr, replaceArrElementsWith) => Array.apply(null, arr).map(currArrElem => replaceArrElementsWith)
     ,  
     
@@ -88,7 +88,23 @@ module.exports = {
       // if the array length is 0 or undefined, return back an empty array
       else
         return [];
-    }    
+    },
+    
+    /**
+     * if passed an array returns the last element or undefined if not an array with elements - just for code readability/convenience
+     * 
+     * @param {object[]} an array to search for the last element of
+     * @return {obj} the value of the last element in the array (if a 1d array, just the element not an array)
+     */     
+     //the queries.findMaxPrimaryKeyInAllDataRows returns an array with a single column of max_prim_key and single data row with the max primary key value - returning just the number in the 2nd row (array row position 1), first column (0th array column position) which is the max primary key as this function returns just the numeric primary key value
+     lastArrElement: (arr) => {
+        //make sure array passed in is 1) not undefined 2) is an array and 3) has at least one element - otherwise return undefined
+        if (arr && Array.isArray(arr) && arr.length > 0)
+          return arr.slice(-1)[0];
+        else 
+          return undefined;
+     }
+       
     
 
 }

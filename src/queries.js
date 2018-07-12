@@ -15,6 +15,8 @@ module.exports = {
   testSelect: (twoDArrWHeader) => alasqlUtils.selectFromTwoDimArr(twoDArrWHeader, "SELECT * FROM tmptbl1 WHERE Col1 > 12")
   ,
   
+  findMaxPrimaryKeyInAllDataRows: (twoDArrWHeader) => alasqlUtils.selectFromTwoDimArr(twoDArrWHeader, "SELECT MAX(_primaryKey) AS max_prim_key FROM tmptbl1")
+  
   
   
   

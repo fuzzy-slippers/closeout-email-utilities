@@ -72,6 +72,20 @@ describe("array-utils", function() {
      .should.be.eql([["1","2","3"],["a", null, null],["b","z", null],["c","y","A"]]);
     });    
   });  
+  
+  describe("#lastArrElement()", function() {
+    
+    it("should if passed an array like [1,2,3] return the last element 3", function () {
+      arrayUtils.lastArrElement([1,2,3]).should.eql(3);
+    }); 
+    
+    it("should if passed an empty array [], obj or undefined, return undefined", function () {
+      should.not.exist(arrayUtils.lastArrElement([])); 
+      should.not.exist(arrayUtils.lastArrElement(undefined));
+      should.not.exist(arrayUtils.lastArrElement({prop1: "some obj"}));
+    }); 
+    
+  });  
 
 });
 
