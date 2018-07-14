@@ -38,8 +38,12 @@ module.exports = {
         //later may want to improve so that we can handle gaps in primary keys (wait until the 3rd error on the 3rd primary key past the last one for example, but for now stopping on first error)
         const newApiCallsTwoDimArrWHeader = module.exports.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys(prevSheetMaxPrimaryKeyVal);
                                                             console.log(`newApiCallsTwoDimArrWHeader: ${JSON.stringify(newApiCallsTwoDimArrWHeader)}`);
-        
-                            googleAppsScriptWrappers.updNamedSheetWArrWHeaderRow(GOOGLE_SHEET_TAB_NAME, newApiCallsTwoDimArrWHeader);
+        //4. filter on just the rows/records where the noticeDate is NULL/missing                                                    
+        const justRowsNullNoticeDatesTwoDimArrWHeader = queries.returnRowsWithNullNoticeDates(newApiCallsTwoDimArrWHeader);
+                                                            console.log(`justRowsNullNoticeDatesTwoDimArrWHeader: ${JSON.stringify(justRowsNullNoticeDatesTwoDimArrWHeader)}`);
+                            
+                            //temporary, testing on GAS side...show the data in the google sheet
+                            googleAppsScriptWrappers.updNamedSheetWArrWHeaderRow(GOOGLE_SHEET_TAB_NAME, justRowsNullNoticeDatesTwoDimArrWHeader);
     },
     
 
@@ -47,14 +51,20 @@ module.exports = {
     
 
     /**
-     * determine the max _primaryKey column value in a data set
+     * determine the max _primaryKey column value in a data set - if the data set is empty, use a google apps script property to pull the cached last highest primary key value instead (otherwise we can get into the situation where we lose track of which of where in the 20,000 possible primary keys we have already checked and which we havent)
      * 
      * @param {object[][]} two dim array with header row (one column must be named _primaryKey) to search through for the max primary key val
-     * @return {number} the single numeric value of the max _primaryKey in the data set
+     * @return {number} the single numeric value of the max _primaryKey in the data set or cached/GAS property from last run if the data set is empty
      */     
      //the queries.findMaxPrimaryKeyInAllDataRows returns an array with a single column of max_prim_key and single data row with the max primary key value - returning just the number in the 2nd row (array row position 1), first column (0th array column position) which is the max primary key as this function returns just the numeric primary key value
-     findMaxPrimaryKeyValueInData: (twoDimArrWHeader) => queries.findMaxPrimaryKeyInAllDataRows(twoDimArrWHeader)[1][0],
-     
+     findMaxPrimaryKeyValueInData: (twoDimArrWHeader) => {
+        // make sure the data set is not empty, in which case find the highest/max primary key in the data
+        queries.findMaxPrimaryKeyInAllDataRows(twoDimArrWHeader)[1][0]
+        // otherwise if the data set passed in was empty, use the cached/GAS property last _primaryKey we validated the data for
+        
+        // update the latest primary key value cached/GAS property so that in the future if there are blank data sets we have the most up to date record of the last highest primary key we have validated on
+
+     },
     
     /**
      * based on the most recent primary key on the previous data, query the next higher primary key over and over, assembling the data together until we hit an error indicating a primary key value does not exist in KR with our last API call, return the combined data gathered up to that point
@@ -66,10 +76,10 @@ module.exports = {
         
         //may want to make this functional (recursive) in the future, for now using do...while loop
         const arrApiCallsJsObjs = []; 
-                                        // console.log(`arrApiCallsJsObjs before do loop: ${JSON.stringify(arrApiCallsJsObjs)}`);
+                                                                        // console.log(`arrApiCallsJsObjs before do loop: ${JSON.stringify(arrApiCallsJsObjs)}`);
                 
         do {
-                                                    // console.log(`arrApiCallsJsObjs: ${JSON.stringify(arrApiCallsJsObjs)}`);            
+                                                                        // console.log(`arrApiCallsJsObjs: ${JSON.stringify(arrApiCallsJsObjs)}`);            
             
             // the first time when no api calls have been made yet use the passed in primary key ("previous" from the data in the existing spreadsheet) as a starting point, every other time, we should be able to get the primary key value from the last element in the array (primary key property on that object)
             if (arrApiCallsJsObjs.length === 0) 
@@ -79,12 +89,14 @@ module.exports = {
                 
                                                                     // console.log(`arrApiCallsJsObjs inside loop: ${JSON.stringify(arrApiCallsJsObjs)}`);
                                                                     // console.log(`arrayUtils.lastArrElement(arrApiCallsJsObjs) inside loop: ${JSON.stringify(arrayUtils.lastArrElement(arrApiCallsJsObjs))}`);
-                                                                    // console.log(`module.exports.isErrorObj(arrayUtils.lastArrElement(arrApiCallsJsObjs)) inside loop: ${JSON.stringify(module.exports.isErrorObj(arrayUtils.lastArrElement(arrApiCallsJsObjs)))}`);
+                                                                    // console.log(`apiUtils.isErrorObj(arrayUtils.lastArrElement(arrApiCallsJsObjs)) inside loop: ${JSON.stringify(apiUtils.isErrorObj(arrayUtils.lastArrElement(arrApiCallsJsObjs)))}`);
         }
-        // continue until the last object added to the array above is an error object, indicating that we have reached a primary key that has not been assigned yet to a record
-        while (!module.exports.isErrorObj(arrayUtils.lastArrElement(arrApiCallsJsObjs)));
+        // continue until the last object added to the array above is an error object, indicating that we have reached a primary key that has not been assigned yet in KR and therefore there is no more data to retrieve that is newer than what is already in the spreadsheet
+        while (!(arrayUtils.lastArrElement(arrApiCallsJsObjs)).hasOwnProperty("Error"));
         
-                                        // console.log(`arrApiCallsJsObjs after loop: ${JSON.stringify(arrApiCallsJsObjs)}`);
+        //NOTE: need to switch back to isErrorObj utility function instead of .hasOwnProperty for readability and maintainability of error object criteria but for now having trouble getting it to recognise that function for some unknown reason after moving it from this module to the api-utils module - where clause should really be:  while (!apiUtils.isErrorObj(arrayUtils.lastArrElement(arrApiCallsJsObjs));
+        
+                                                                    // console.log(`arrApiCallsJsObjs after loop: ${JSON.stringify(arrApiCallsJsObjs)}`);
         
         //remove the last element from the array which was found to be an error object (hit the end of valid records by primary key value)
         arrApiCallsJsObjs.pop();
@@ -93,13 +105,6 @@ module.exports = {
         return arrayUtils.convertOneDimObjArrToTwoDimArrWithHeaderRow(arrApiCallsJsObjs);
     },     
     
-    /**
-     * checks if the passed in object is the result of an API call that threw an error (we are expecting all API calls that return an error to have an Error property on th object to indicate an error of some sort was thrown)
-     * 
-     * @param {object} a javascript object representing either 1) the data result of an API call..converted from JSON to a js object or 2) an API call error returned, and converted from JSON about the error to a js object with an Error property
-     * @return {boolean} the result of trying to detect if either true: the js object represents a failed API call/error or false: it's valid data in the js object
-     */
-    isErrorObj: (jsObj) => jsObj.hasOwnProperty("Error"),     
      
 
     /**

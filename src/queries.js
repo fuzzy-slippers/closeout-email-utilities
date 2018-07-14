@@ -14,8 +14,23 @@ module.exports = {
   */
   testSelect: (twoDArrWHeader) => alasqlUtils.selectFromTwoDimArr(twoDArrWHeader, "SELECT * FROM tmptbl1 WHERE Col1 > 12")
   ,
-  
-  findMaxPrimaryKeyInAllDataRows: (twoDArrWHeader) => alasqlUtils.selectFromTwoDimArr(twoDArrWHeader, "SELECT MAX(_primaryKey) AS max_prim_key FROM tmptbl1")
+
+  /**
+  * Find the _primaryKey value the is the highest (max) in a whole dataset with a _primaryKey column 
+  *
+  * @param {string[][]} the original data to query against - must have column headers as the first row and have one column with header "_primaryKey"
+  * @return {string[][]} a 2d array with just a header row with a single generated column header "max_prim_key" and a single row that contains one column with the highest (max) _primaryKey found in all rows of the passed in data set
+  */  
+  findMaxPrimaryKeyInAllDataRows: (twoDArrWHeader) => alasqlUtils.selectFromTwoDimArr(twoDArrWHeader, "SELECT MAX(_primaryKey) AS max_prim_key FROM tmptbl1"),
+
+
+  /**
+  * filter on just the rows in the passed in data with a noticeDate column that have a null noticeDate
+  *
+  * @param {string[][]} the original data to query against - must have column headers as the first row and have one column with header "_primaryKey"
+  * @return {string[][]} a 2d array with just a header row with a single generated column header "max_prim_key" and a single row that contains one column with the highest (max) _primaryKey found in all rows of the passed in data set
+  */    
+  returnRowsWithNullNoticeDates: (twoDArrWHeader) => alasqlUtils.selectFromTwoDimArr(twoDArrWHeader, "SELECT * AS max_prim_key FROM tmptbl1 WHERE noticeDate IS NULL")
   
   
   

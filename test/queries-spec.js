@@ -20,6 +20,13 @@ describe("queries", function() {
       queries.findMaxPrimaryKeyInAllDataRows([["Col1", "Col2", "_primaryKey"], ["A","AA", 2], ["B", "BB", 7], ["C", "CC", 1]]).should.be.eql([["max_prim_key"], [7]]);
     });  
   });
+  
+  describe("#returnRowsWithNullNoticeDates()", function() {
+    it("should given an array with a header and 3 data rows with a noticeDate column, return just the two rows with null notice dates", function () {
+      queries.returnRowsWithNullNoticeDates([["Col1", "Col2", "noticeDate"], ["A","AA", null], ["B", "BB", "tomorrow"], ["C", "CC", null]]).should.be.eql([["Col1", "Col2", "noticeDate"], ["A","AA", null], ["C", "CC", null]]);
+    });  
+  });
+  
 
 });
 

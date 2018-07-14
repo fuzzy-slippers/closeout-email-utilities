@@ -51,30 +51,17 @@ describe("missing-notice-dates", function() {
     });  
   });  
   
-  describe("#isErrorObj()", function() {
-    it("should given a js object with a few properties and no Error property return false", function () {
-      const sampleObj = {};
-      sampleObj.testProp1 = "A";
-      sampleObj.testProp1 = 1;      
-      missingNoticeDates.isErrorObj(sampleObj).should.eql(false);
-    });  
-  });   
-  
-  describe("#isErrorObj()", function() {
-    it("should given a js object an Error property which is an array return true", function () {
-      const sampleObj = {};
-      sampleObj.Error = ["whateverArrElem"];  
-      missingNoticeDates.isErrorObj(sampleObj).should.eql(true);
-    });  
-  });  
-  
-  describe("#isErrorObj()", function() {
-    it("should given a js object an Error property which is a string return true", function () {
-      const sampleObj = {};
-      sampleObj.Error = "whateverString";  
-      missingNoticeDates.isErrorObj(sampleObj).should.eql(true);
+  describe("#findMaxPrimaryKeyValueInData()", function() {
+    it("should given an empty array, return the cached largest primary key (should be numeric) and since we can check the GAS property directly, the function return should match it", function () {
+      missingNoticeDates.findMaxPrimaryKeyValueInData([]).should.be.Number();
     });  
   });    
+  
+  describe("#findMaxPrimaryKeyValueInData()", function() {
+    it("should given an empty array, should return a number that matches the cached largest primary key (since we can check the GAS property directly, we can tell if it is)", function () {
+      missingNoticeDates.findMaxPrimaryKeyValueInData([]).should.eql("?????STILL NEED CODE??????");
+    });  
+  });  
   
   describe("#apiCallOnNextHigherPrimaryKey()", function() {
     it("should given a passed in previous primary key of 1 return the mocked up object data for primary key 2", function () {
