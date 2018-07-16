@@ -7,7 +7,7 @@ const rewire = require("rewire");
 const missingNoticeDates = rewire("../../src/time-and-money/missing-notice-dates.js");
 missingNoticeDates.__set__("apiUtils", {
     apiGetCallKr: function (relativeApiUri) {
-                                                          console.log(`inside rewiring of missingNoticeDates calls of apiUtils.apiGetCallKr, relativeApiUri detected as: ${relativeApiUri}`)      
+                                                          //console.log(`inside rewiring of missingNoticeDates calls of apiUtils.apiGetCallKr, relativeApiUri detected as: ${relativeApiUri}`)      
       switch (relativeApiUri) {
       case "/award/api/v1/award-amount-transactions/" + "1":
         return JSON.parse('{"testCol1":"A","_primaryKey":"1"}');
@@ -25,6 +25,17 @@ missingNoticeDates.__set__("apiUtils", {
         return JSON.parse('{"Error":{"errors":["not found for key 773753"]}}');
       }
     }
+});
+
+// using rewire to mock out the responses from the getScriptProperty function called inside the googleAppsScriptWrappers module & just mock a setScriptProperty function that does nothing (so that no errors are thrown)
+const googleAppsScriptWrappers = require("../../src/google-apps-script-wrappers/google-apps-script-wrappers.js");
+missingNoticeDates.__set__("googleAppsScriptWrappers", {
+    getScriptProperty: function (key) {
+      return 7;  // for our simple test purposes, pretend the last highest primary key is always 7
+    },
+    setScriptProperty: function (key, value) {
+      return true; // for our simple test purposes, mock out function to always return true...we just dont want it to throw an error because the script properies classes dont exist
+    },    
 });
 
           //ARRAY-UTILS IMPORT TEMPORARY FOR CONVERSION OF TEST DATA - REMOVE LATER
@@ -49,17 +60,13 @@ describe("missing-notice-dates", function() {
     it("should given an array with a _primaryKey column and several values, return the numeric value of the largest primary key in all the data rows", function () {
       missingNoticeDates.findMaxPrimaryKeyValueInData([["_primaryKey"], [1], [2], [3], [5], [4]]).should.be.eql(5);
     });  
-  });  
-  
-  describe("#findMaxPrimaryKeyValueInData()", function() {
+
     it("should given an empty array, return the cached largest primary key (should be numeric) and since we can check the GAS property directly, the function return should match it", function () {
       missingNoticeDates.findMaxPrimaryKeyValueInData([]).should.be.Number();
     });  
-  });    
-  
-  describe("#findMaxPrimaryKeyValueInData()", function() {
-    it("should given an empty array, should return a number that matches the cached largest primary key (since we can check the GAS property directly, we can tell if it is)", function () {
-      missingNoticeDates.findMaxPrimaryKeyValueInData([]).should.eql("?????STILL NEED CODE??????");
+
+    it("should given an empty array return the last primary key value stored in the script property data store (which we mocked out in this case to always return 7 since we can't access the real GAS script data store from our test scripts", function () {
+      missingNoticeDates.findMaxPrimaryKeyValueInData([]).should.eql(7);
     });  
   });  
   
@@ -79,9 +86,7 @@ describe("missing-notice-dates", function() {
     it("should given a passed in previous max primary key of 1 return the mocked up 2d array with header row data for primary key 2 but stop at the mocked up error on primary key 3", function () {
       missingNoticeDates.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys(1).should.be.eql([["testCol1", "_primaryKey"], ["B", "2"]]);
     });  
-  });  
-  
-  describe("#gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys()", function() {
+
     it("should given a passed in previous max primary key of 773750 return the mocked up data for primary key 773751 and 773752 but stop at the mocked up error on primary key 773753", function () {
       missingNoticeDates.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys(773750)
       .should.be.eql(

@@ -57,15 +57,89 @@ describe("alasql-utils", function() {
     it("should if passed test 2d array and just a select * sql statement, it should return the original data", function () {
       const origTwoDimArr = [["column1", "column2"], ["avocado", "orange"]];
       const testSqlStmt = "SELECT * FROM tmptbl1;";
-      alasqlUtils.selectFromTwoDimArr(origTwoDimArr, testSqlStmt).should
+      alasqlUtils.selectFromTwoDimArr(testSqlStmt, origTwoDimArr, ).should
       .deepEqual([["column1", "column2"], ["avocado", "orange"]]);      
     });
     it("should if passed test 2d array with null in first column and a sql statement with WHERE excluding nulls, return 2d array with null rows removed", function () {
       const origTwoDimArr = [["column1", "column2"], ["avocado", "orange"], [null, "watermelon"], ["pineapple", null]];
       const testSqlStmt = "SELECT * FROM tmptbl1 WHERE column1 IS NOT NULL;";
-      alasqlUtils.selectFromTwoDimArr(origTwoDimArr, testSqlStmt).should
+      alasqlUtils.selectFromTwoDimArr(testSqlStmt, origTwoDimArr).should
       .deepEqual([["column1", "column2"], ["avocado", "orange"],  ["pineapple", null]]);      
     });
+    
+    it("should if passed 2 2d arrays (1 row each) and a join sql statement doing an inner join both to get the rows expected where the keys match", function () {
+      const firstTwoDimArr = [["keyvalue", "column2"], [1, "orange"]];
+      const secondTwoDimArr = [["keyvalue", "altcolumn2"], [1, "apple"]];    
+      const testSqlStmt = `SELECT * FROM tmptbl1 INNER JOIN tmptbl2 ON tmptbl1.keyvalue = tmptbl2.keyvalue;`;
+      alasqlUtils.selectFromTwoDimArr(testSqlStmt, firstTwoDimArr, secondTwoDimArr).should
+      .deepEqual([["keyvalue", "column2", "altcolumn2"], 
+                  [1, "orange", "apple"]]);      
+    });    
+    
+    it("should if passed 2 2d arrays (3 rows each) and a join sql statement doing an inner join both to get the rows expected where the keys match", function () {
+      const firstTwoDimArr = [["keyvalue", "column2"], 
+                              [1, "orange"], 
+                              [2, "watermelon"], 
+                              [3, "avocado"]];
+      const secondTwoDimArr = [["keyvalue", "altcolumn2"], 
+                                [1, "apple"], 
+                                [2, "cantaloupe"], 
+                                [5, null]];    
+      const testSqlStmt = `SELECT * FROM tmptbl1 INNER JOIN tmptbl2 ON tmptbl1.keyvalue = tmptbl2.keyvalue;`;
+      alasqlUtils.selectFromTwoDimArr(testSqlStmt, firstTwoDimArr, secondTwoDimArr).should
+      .deepEqual([["keyvalue", "column2", "altcolumn2"], 
+                  [1, "orange", "apple"],  
+                  [2, "watermelon", "cantaloupe"]
+                  ]);      
+    });         
+    
+    it("should if passed 3 2d arrays and a join sql statement doing an inner join on all 3 to get the rows expected where the keys match", function () {
+      const firstTwoDimArr = [["keyvalue", "column2"], [1, "orange"], [2, "watermelon"], [3, "avocado"]];
+      const secondTwoDimArr = [["keyvalue", "altcolumn2"], [1, "apple"], [2, "cantaloupe"], [5, null]];    
+      const thirdTwoDimArr = [["keyvalue", "alt2column2"], [1, "pear"], [2, "honeydew"]];      
+      const testSqlStmt = `SELECT * FROM tmptbl1 INNER JOIN tmptbl2 ON tmptbl1.keyvalue = tmptbl2.keyvalue 
+                                                INNER JOIN tmptbl3 ON tmptbl2.keyvalue = tmptbl3.keyvalue;`;
+      alasqlUtils.selectFromTwoDimArr(testSqlStmt, firstTwoDimArr, secondTwoDimArr, thirdTwoDimArr).should
+      .deepEqual([["keyvalue", "column2", "altcolumn2", "alt2column2"], 
+                  [1, "orange", "apple", "pear"],  
+                  [2, "watermelon", "cantaloupe", "honeydew"]
+                  ]);      
+    });  
+    
+    //note found a bug in alasql where the ORDER BY does not work on a UNION statement...but using a subselect of the results and then an ORDER BY of that top select, it works as a workaround
+    it("should if passed 3 2d arrays and a union sql statement return the distinct combined dataset (did this as a subselect then with an outer select with an order by)", function () {
+      const firstTwoDimArr = [["column1", "column2"], [1, "orange"], [2, "watermelon"]];
+      const secondTwoDimArr = [["column1", "column2"], [1, "orange"], [2, "watermelon"], [5, null]];    
+      const thirdTwoDimArr = [["column1", "column2"], [1, "pear"]];      
+      const testSqlStmt = `SELECT column1, column2 FROM 
+                            (SELECT column1, column2 FROM tmptbl1 UNION SELECT column1, column2 FROM tmptbl2 UNION SELECT column1, column2 FROM tmptbl3) 
+                            ORDER BY column1 desc, column2 asc;`;
+      alasqlUtils.selectFromTwoDimArr(testSqlStmt, firstTwoDimArr, secondTwoDimArr, thirdTwoDimArr).should
+      .deepEqual([["column1", "column2"],
+                  [5, null],    
+                  [2, "watermelon"],
+                  [1, "orange"],
+                  [1, "pear"],
+                  ]);      
+    });  
+    
+    it("should if passed 2 2d arrays, the first with 3 columns and the second with 2 and a union sql statement return all 3 columns but undefined when no value in the third column in the second 2d array (did this as a subselect then with an outer select with an order by)", function () {
+      const firstTwoDimArr = [["column1", "column2", "column3"], [1, "orange", "banana"], [2, "watermelon", undefined]];
+      const secondTwoDimArr = [["column1", "column2"], [1, "orange"], [2, "watermelon"], [5, null]];    
+      const testSqlStmt = `SELECT column1, column2, column3 FROM
+                            (SELECT column1, column2, column3 FROM tmptbl1 UNION SELECT column1, column2, undefined as column3 FROM tmptbl2) 
+                            ORDER BY column1, column2, column3 asc;`;
+      alasqlUtils.selectFromTwoDimArr(testSqlStmt, firstTwoDimArr, secondTwoDimArr).should
+      .deepEqual([["column1", "column2", "column3"],
+                  [1, "orange", undefined],
+                  [1, "orange", "banana"],    
+                  [2, "watermelon", undefined],                  
+                  [5, null, undefined],
+                  ]);      
+    });       
+    
+    
+    // not using yet (may never need the way we are just passing the data to load)
     // it("should if passed test 2d array and a valid insert statement, the returned data should have one more row than the original", function () {
     //   const origTwoDimArr = [["column1", "column2"], ["avocado", "orange"], [null, "watermelon"], ["pineapple", null]];
     //   const testSqlStmt = "insert into tmptbl1 values ('SPIKE', 'FRI');SELECT * FROM tmptbl1;";

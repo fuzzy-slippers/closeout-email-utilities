@@ -58,11 +58,21 @@ module.exports = {
      */     
      //the queries.findMaxPrimaryKeyInAllDataRows returns an array with a single column of max_prim_key and single data row with the max primary key value - returning just the number in the 2nd row (array row position 1), first column (0th array column position) which is the max primary key as this function returns just the numeric primary key value
      findMaxPrimaryKeyValueInData: (twoDimArrWHeader) => {
-        // make sure the data set is not empty, in which case find the highest/max primary key in the data
-        queries.findMaxPrimaryKeyInAllDataRows(twoDimArrWHeader)[1][0]
-        // otherwise if the data set passed in was empty, use the cached/GAS property last _primaryKey we validated the data for
         
-        // update the latest primary key value cached/GAS property so that in the future if there are blank data sets we have the most up to date record of the last highest primary key we have validated on
+        // make sure the data set is not empty (had data rows)
+        if (twoDimArrWHeader.length > 0)
+        {
+            //in which case find the highest/max primary key in the data 
+            const maxPrimKeyValueInDataSetFoundThisTime = queries.findMaxPrimaryKeyInAllDataRows(twoDimArrWHeader)[1][0];
+            //update the GAS script level property store with the max primary key for this API endpoint for the next time this is called and data is blank - updates the latest primary key value cached/GAS property so that in the future if there are blank data sets we have the most up to date record of the last highest primary key we have validated on
+            googleAppsScriptWrappers.setScriptProperty("MAX_PRIMARY_KEY_" + "/award/api/v1/award-amount-transactions/", maxPrimKeyValueInDataSetFoundThisTime);
+            //and return that primary key value
+            return maxPrimKeyValueInDataSetFoundThisTime;
+        }
+        else {
+            // otherwise if the data set passed in was an empty (0 rows), use the cached/GAS property last _primaryKey to send back as the max primary key to start querying from
+            return googleAppsScriptWrappers.getScriptProperty("MAX_PRIMARY_KEY_" + "/award/api/v1/award-amount-transactions/");
+        }          
 
      },
     

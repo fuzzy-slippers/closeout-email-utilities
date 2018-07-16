@@ -27,6 +27,49 @@ describe("queries", function() {
     });  
   });
   
+  
+  // describe("#unionWithExtraColumnsInFirstTablePreserved()", function() {
+  //   it("should given the two tables return the union of the two tables but with any additional column names and values in the first table in the results", function () {
+  //     queries.unionWithExtraColumnsInFirstTablePreserved([["Col1", "Col2", "Col3"], ["A","AA", ""], ["B", "BB", "tomorrow"], ["C", "CC", ""]],
+  //                                                         [["Col1", "Col2"], ["A","AA"], ["B", "BB"], ["C", "CC"]],
+  //                                                         [["Col1", "Col2"], ["A","AA"], ["B", "BB"], ["C", "CC"]])
+  //                                                         .should.be.eql([["Col1", "Col2", "Col3"], ["A","AA", ""], ["B", "BB", "tomorrow"], ["C", "CC", ""]]);
+  //   });  
+  // });  
+  
+  describe("#unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreserved()", function() {
+    it("should given the two tables and the first table assumed to have a unique _primaryKey column return the union of the two tables but with any additional column names and values in the first table in the results", function () {
+      const retVal = queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreserved(
+                                                          [["_primaryKey", "Col2", "Col3"], 
+                                                           [1,"AA", ""], 
+                                                           [2, "BB", "tomorrow"], 
+                                                           [3, "CC", ""], 
+                                                           [4, "DD", "The Next Day"]
+                                                          ],
+                                                          [
+                                                            ["_primaryKey", "Col2"], 
+                                                            [1,"AA"], 
+                                                            [2, "BB"], 
+                                                            [3, "CC"]
+                                                          ],
+                                                          [
+                                                            ["_primaryKey", "Col2"], 
+                                                            [1,"AA"], 
+                                                            [2, "BB"], 
+                                                            [3, "CC"], 
+                                                            [5, "EE"]
+                                                          ]);
+    //since we don't know the order rows will be returned, just checking that the result contains these rows in some order
+    retVal.should.containEql(["_primaryKey", "Col2", "Col3"]);
+    retVal.should.containEql([1,"AA", ""]);
+    retVal.should.containEql([2, "BB", "tomorrow"]);
+    retVal.should.containEql([3, "CC", ""]);
+    retVal.should.containEql([4, "DD", "The Next Day"]);      
+    retVal.should.containEql([5, "EE", null]);                                                     
+    });                                     
+    
+  });  
 
 });
 
+//[["_primaryKey", "Col2", "Col3"], [1,"AA", ""], [2, "BB", "tomorrow"], [3, "CC", ""], [4, "DD", "The Next Day"], 

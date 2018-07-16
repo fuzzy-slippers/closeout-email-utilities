@@ -48,18 +48,26 @@ module.exports = {
                         // },
     
     /**
-     * transform single 2d array of data into revised 2d array based on single SQL SELECT statement (Note: table name referenced in SQL query should always be "tmptbl1")
+     * transform a 2d array of data (or up to 3 2d arrays of data if doing a join or union, etc) into a revised 2d array based on single SQL SELECT statement (Note: table name referenced in SQL query should always be "tmptbl1", "tmptbl2" and "tmptbl3" as these are the hard coded table names when adding the data to the database)
      * for example you can pass in data from a sheet with null values and a sql SELECT statement excluding nulls and it will only return 2d data with the results (to use to update another sheet/tab)  
-     * NOTE: this function only designed for SELECT statements against single tables (with or without where clauses, group by, etc - INSERT/UPDATE/DELETE use other function!)
+     * NOTE: this function only designed for SELECT statements againts passed in data tables (with or without where clauses, group by, etc - not designed for INSERT/UPDATE/DELETE but does start fresh with the data passed in each time so may not need these)
      *
+     * @param {string} valid alasql SELECT SQL statement to run against that original 2d array data loaded as a alasql formatted table(s) 
      * @param {object} 2d array of data (with first row as column headers) as a starting point (that the query will be run against)
-     * @param {string} valid alasql SELECT SQL statement to run against that original 2d array data loaded as a alasql formatted table  
+     * @param {object} optional 2d array of data (with first row as column headers) if joining/union on a second table 
+     * @param {object} optional 2d array of data (with first row as column headers) if joining/union on a third table  
      * @return {object} 2d array exported from the table after the SQL statement has been run against that table/data
      */
-    selectFromTwoDimArr(twoDimArrWHeader, sqlToTransformData)
+    selectFromTwoDimArr(sqlToTransformData, twoDimArrWHeader, secondTblTwoDimArrWHeader, thirdTblTwoDimArrWHeader)
     {
         const tempDb = this.createNewDatabase_();
         this.addTablePopulatedByTwoDimArrWithHeaderRowData_(tempDb, "tmptbl1", twoDimArrWHeader);
+        //only attempt to create/load second table if data is passed in for it - optional two do select against more than one table
+        if (secondTblTwoDimArrWHeader)
+            this.addTablePopulatedByTwoDimArrWithHeaderRowData_(tempDb, "tmptbl2", secondTblTwoDimArrWHeader);
+        //only attempt to create/load third table if data is passed in for it - optional two do select against more than one table
+        if (thirdTblTwoDimArrWHeader)
+            this.addTablePopulatedByTwoDimArrWithHeaderRowData_(tempDb, "tmptbl3", thirdTblTwoDimArrWHeader);            
         const resultObjArr = tempDb.exec(sqlToTransformData);
         const resultTwoDimArr = arrayUtils.convertOneDimObjArrToTwoDimArrWithHeaderRow(resultObjArr); 
         return resultTwoDimArr;
