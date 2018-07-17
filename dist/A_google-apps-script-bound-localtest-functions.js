@@ -52,7 +52,7 @@ function startPointRefreshTimeAndMoneyMissingNoticeDateSheet() {
 
 
 
-/* old one */
+/* old one
 
 function testBoundSheetLibraryFunctions() {
   Logger.log("data in this test sheet");
@@ -118,7 +118,7 @@ function testBoundSheetLibraryFunctions() {
   //  BoundSheetUtils.updNamedSheetWArrWHeaderRow("testdata", twoDimArrResultsQueryOnSheetData);
     
 }
-
+ */
 
 //works, just commenting for now so that the dropdown in google apps will default to the above test
 // function testGoogleAppsScriptLibAccessability()

@@ -74,7 +74,6 @@ describe("array-utils", function() {
   });  
   
   describe("#lastArrElement()", function() {
-    
     it("should if passed an array like [1,2,3] return the last element 3", function () {
       arrayUtils.lastArrElement([1,2,3]).should.eql(3);
     }); 
@@ -84,8 +83,21 @@ describe("array-utils", function() {
       should.not.exist(arrayUtils.lastArrElement(undefined));
       should.not.exist(arrayUtils.lastArrElement({prop1: "some obj"}));
     }); 
+  });
+  
+  describe("#replaceAllOccurancesInTwoDimArr()", function() {
+    it("should if passed an array like [[1,2,3],[4,5,6],[7,8,9]] and to replace 5 with the string replaced should return [[1,2,3],[4,'replaced',6],[7,8,9]]", function () {
+      arrayUtils.replaceAllOccurancesInTwoDimArr([[1,2,3],[4,5,6],[7,8,9]], 5, "replaced").should.be.eql([[1,2,3],[4,"replaced",6],[7,8,9]]);
+    }); 
     
-  });  
+    it(`should if passed an array like [[1,0,3],[4,0,6],[7,0,9]] and to replace 0 with the string replaced should return [[1,"replaced",3],[4,"replaced",6],[7,"replaced",9]`, function () {
+      arrayUtils.replaceAllOccurancesInTwoDimArr([[1,0,3],[4,0,6],[7,0,9]], 0, "replaced").should.be.eql([[1,"replaced",3],[4,"replaced",6],[7,"replaced",9]]);
+    });     
+    
+    it("should if passed an emtpy array (and some replacments) return an empty array", function () {
+      arrayUtils.replaceAllOccurancesInTwoDimArr([], "does not matter", "also does not matter").should.be.eql([]);
+    }); 
+  });    
 
 });
 

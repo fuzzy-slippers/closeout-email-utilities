@@ -15,14 +15,15 @@ module.exports = {
      * @return {object} returns a one dimentional array of objects with the property names coming from the passed in array header
      */
     convertFromTwoDimArrWithHeaderToObjArr: (twoDimArr) => {
-      var keys = twoDimArr.shift();
-      var objects = twoDimArr.map(function(values) {
-          return keys.reduce(function(o, k, i) {
-              o[k] = values[i];
+      const copyOfTwoDimArrNoHeaderRow = twoDimArr.slice(1);
+      const headerRow = twoDimArr[0];
+      const oneDimArrObjs = copyOfTwoDimArrNoHeaderRow.map(function(colName) {
+          return headerRow.reduce(function(o, k, i) {
+              o[k] = colName[i];
               return o;
           }, {});
       });
-      return objects;
+      return oneDimArrObjs;
     },
     
     /**
@@ -103,8 +104,27 @@ module.exports = {
           return arr.slice(-1)[0];
         else 
           return undefined;
-     }
-       
+     },
+     
+    /**
+     * goes through all elements in a two dimentional array and replace all occurances of a certain value specified with the replacement value specified
+     * 
+     * @param {object[][]} a two dimentional array to search through
+     * @param {object} the object/value of the array element(s) to search for (to be replaced)
+     * @param {object} the object/value to replace those array elements with
+     * @return {object[][]} the two dimentional array passed in with the elements specified replaced
+     */     
+     replaceAllOccurancesInTwoDimArr: (twoDimArr, replaceThis, withThis) => {
+        return twoDimArr.map( function(row) {
+            return row.map( function( cell ) { 
+                if (Object.is(cell, replaceThis))
+                  return withThis;
+                else
+                  return cell;
+            } );
+        } );
+     }     
+
     
 
 }

@@ -27,6 +27,23 @@ describe("queries", function() {
     });  
   });
   
+ 
+   describe("#orderByColumnWithName()", function() {
+    it("should given an array with a header that contains a single column (name sortOn specified) and 3 rows, return two Dim Array with Header data sorted by the numeric values, nulls at the end", function () {
+      queries.orderByColumnWithName("sortOn", [["Col1", "Col2", "sortOn"], ["A","AA", 2], ["B", "BB", 1], ["C", "CC", null]])
+      .should.be.eql([["Col1", "Col2", "sortOn"], ["C", "CC", null], ["B", "BB", 1], ["A","AA", 2]]);
+    });  
+    
+    it("should given an array with a header that contains a single column (name sortLetters) and 3 rows, return two Dim Array with Header data sorted by the alphabetic values, nulls at the end", function () {
+      queries.orderByColumnWithName("sortLetters", [["Col1", "Col2", "sortLetters"], ["A","AA", "Z"], ["B", "BB", null], ["C", "CC", "Y"]])
+      .should.be.eql([["Col1", "Col2", "sortLetters"], ["B", "BB", null], ["C", "CC", "Y"], ["A","AA", "Z"]]);
+    });
+    
+    it("should handle being passed an empty array - in that case without header rows", function () {
+      queries.orderByColumnWithName("does_not_matter", []).should.be.eql([]);
+    });     
+  }); 
+  
   
   // describe("#unionWithExtraColumnsInFirstTablePreserved()", function() {
   //   it("should given the two tables return the union of the two tables but with any additional column names and values in the first table in the results", function () {
@@ -37,9 +54,9 @@ describe("queries", function() {
   //   });  
   // });  
   
-  describe("#unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreserved()", function() {
+  describe("#unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted()", function() {
     it("should given the two tables and the first table assumed to have a unique _primaryKey column return the union of the two tables but with any additional column names and values in the first table in the results", function () {
-      const retVal = queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreserved(
+      const retVal = queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted(
                                                           [["_primaryKey", "Col2", "Col3"], 
                                                            [1,"AA", ""], 
                                                            [2, "BB", "tomorrow"], 
@@ -66,10 +83,75 @@ describe("queries", function() {
     retVal.should.containEql([3, "CC", ""]);
     retVal.should.containEql([4, "DD", "The Next Day"]);      
     retVal.should.containEql([5, "EE", null]);                                                     
-    });                                     
+    });   
+    
+    it("should handle being passed an empty array for first data set - in that case without header rows and returned unioned data from the second two data sets", function () {
+       queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted([], [["_primaryKey", "colB"],[1,2]], [["_primaryKey", "colB"],[1,2],[3,4]])
+       .should.eql([["_primaryKey", "colB"],[1,2],[3,4]]);
+    });     
     
   });  
+  
+  describe("#unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings()", function() {
+    it("should given the two tables and the first table assumed to have a unique _primaryKey column return the union of the two tables but with any additional column names and values in the first table in the results", function () {
+      queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings(
+                                                          [["_primaryKey", "Col2", "Col3"], 
+                                                           [1,"AA", ""], 
+                                                           [2, "BB", "tomorrow"], 
+                                                           [3, "CC", ""], 
+                                                           [4, "DD", "The Next Day"]
+                                                          ],
+                                                          [
+                                                            ["_primaryKey", "Col2"], 
+                                                            [1,"AA"], 
+                                                            [2, "BB"], 
+                                                            [3, "CC"]
+                                                          ],
+                                                          [
+                                                            ["_primaryKey", "Col2"], 
+                                                            [1,"AA"], 
+                                                            [2, "BB"], 
+                                                            [3, "CC"], 
+                                                            [5, "EE"]
+                                                          ])
+                                                          .should.eql(
+                                                          [["_primaryKey", "Col2", "Col3"], 
+                                                           [1,"AA", ""], 
+                                                           [2, "BB", "tomorrow"], 
+                                                           [3, "CC", ""], 
+                                                           [4, "DD", "The Next Day"],
+                                                           [5, "EE", '']
+                                                          ]);
+    });
+    
+    it("should handle being passed an empty array for second data set - in that case without header rows and returned unioned data from the first and third data sets", function () {
+       queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings([["_primaryKey", "colB", "colC"],[1,2,3]], [], [["_primaryKey", "colB"],[1,2],[3,4]])
+       .should.eql([["_primaryKey", "colB", "colC"],[1,2,3],[3,4,""]]);
+    });   
+    
+    it("should handle being passed an empty array for all three data sets - in that case without header rows - returns empty array", function () {
+       queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings([], [], [])
+       .should.eql([]);
+    });   
+
+    it("should handle being passed all but the first data set as empty - in that case returns the first data set", function () {
+       queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings([["_primaryKey", "colA"], ['', '']], [], [])
+       .should.eql([["_primaryKey", "colA"], ['', '']]);
+    });     
+    
+    it("should handle being passed all but the second data set as empty - in that case returns the second data set", function () {
+       queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings([], [["_primaryKey", "colA"], ["Z", "Y"]], [])
+       .should.eql([["_primaryKey", "colA"], ["Z", "Y"]]);
+    });    
+    
+    it("should handle being passed all but the third data set as empty - in that case returns the third data set", function () {
+       queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings([], [], [["_primaryKey", "colA"], [1, 2]])
+       .should.eql([["_primaryKey", "colA"], [1, 2]]);
+    });      
+    
+     
+    
+  });   
 
 });
 
-//[["_primaryKey", "Col2", "Col3"], [1,"AA", ""], [2, "BB", "tomorrow"], [3, "CC", ""], [4, "DD", "The Next Day"], 

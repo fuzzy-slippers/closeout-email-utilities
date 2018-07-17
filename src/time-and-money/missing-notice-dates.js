@@ -30,20 +30,34 @@ module.exports = {
         //1. read data from sheet (maybe later re-query all these ones and alasql filter on ones still missing notice dates and then re-update sheet) - or this could be separate operation so they could be scheduled at different frequencies
         const prevSheetDataTwoDimArrWHeader = googleAppsScriptWrappers.readDataInSheetWHeaderRowByName(GOOGLE_SHEET_TAB_NAME);
                                                             console.log(`prevSheetDataTwoDimArrWHeader: ${JSON.stringify(prevSheetDataTwoDimArrWHeader)}`);
-        
+        const copySheetDataTwoDimArrWHeader = JSON.parse(JSON.stringify(prevSheetDataTwoDimArrWHeader)); 
+                                                            console.log(`1 - copySheetDataTwoDimArrWHeader: ${JSON.stringify(copySheetDataTwoDimArrWHeader)}`);
+                                                            console.log(`1 - prevSheetDataTwoDimArrWHeader: ${JSON.stringify(prevSheetDataTwoDimArrWHeader)}`);        
         //2. determine the highest primary key in the google sheet data read in (before the update)
         const prevSheetMaxPrimaryKeyVal = module.exports.findMaxPrimaryKeyValueInData(prevSheetDataTwoDimArrWHeader);
                                                             console.log(`prevSheetMaxPrimaryKeyVal: ${prevSheetMaxPrimaryKeyVal}`);
+                                                            console.log(`2 - copySheetDataTwoDimArrWHeader: ${JSON.stringify(copySheetDataTwoDimArrWHeader)}`);    
+                                                            console.log(`2 - prevSheetDataTwoDimArrWHeader: ${JSON.stringify(prevSheetDataTwoDimArrWHeader)}`);                                                             
         //3. query data by increasing primary key values until we hit an error with the message that that primary key is not found 
         //later may want to improve so that we can handle gaps in primary keys (wait until the 3rd error on the 3rd primary key past the last one for example, but for now stopping on first error)
         const newApiCallsTwoDimArrWHeader = module.exports.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys(prevSheetMaxPrimaryKeyVal);
                                                             console.log(`newApiCallsTwoDimArrWHeader: ${JSON.stringify(newApiCallsTwoDimArrWHeader)}`);
+                                                            console.log(`3 - copySheetDataTwoDimArrWHeader: ${JSON.stringify(copySheetDataTwoDimArrWHeader)}`);
+                                                            console.log(`3 - prevSheetDataTwoDimArrWHeader: ${JSON.stringify(prevSheetDataTwoDimArrWHeader)}`);                                                             
         //4. filter on just the rows/records where the noticeDate is NULL/missing                                                    
         const justRowsNullNoticeDatesTwoDimArrWHeader = queries.returnRowsWithNullNoticeDates(newApiCallsTwoDimArrWHeader);
+                                                            console.log(`4 - copySheetDataTwoDimArrWHeader: ${JSON.stringify(copySheetDataTwoDimArrWHeader)}`);
+                                                            console.log(`4 - prevSheetDataTwoDimArrWHeader: ${JSON.stringify(prevSheetDataTwoDimArrWHeader)}`);                                                             
+                                                            console.log(`right before passing as first data set param, prevSheetDataTwoDimArrWHeader: ${JSON.stringify(prevSheetDataTwoDimArrWHeader)}`);
                                                             console.log(`justRowsNullNoticeDatesTwoDimArrWHeader: ${JSON.stringify(justRowsNullNoticeDatesTwoDimArrWHeader)}`);
-                            
+                                                            
+        //5. append the new results to the original array read from sheet (will have to union the columns that match, then join in the rest of the columns in the existing sheet)
+        const combinationOfExistingDataPlusNewApiResults = queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings(copySheetDataTwoDimArrWHeader, justRowsNullNoticeDatesTwoDimArrWHeader);
+                                                            console.log(`combinationOfExistingDataPlusNewApiResults: ${JSON.stringify(combinationOfExistingDataPlusNewApiResults)}`);
+                                                            console.log(`5 - copySheetDataTwoDimArrWHeader: ${JSON.stringify(copySheetDataTwoDimArrWHeader)}`);
+                                                            console.log(`5 - prevSheetDataTwoDimArrWHeader: ${JSON.stringify(prevSheetDataTwoDimArrWHeader)}`);                             
                             //temporary, testing on GAS side...show the data in the google sheet
-                            googleAppsScriptWrappers.updNamedSheetWArrWHeaderRow(GOOGLE_SHEET_TAB_NAME, justRowsNullNoticeDatesTwoDimArrWHeader);
+                            googleAppsScriptWrappers.updNamedSheetWArrWHeaderRow(GOOGLE_SHEET_TAB_NAME, combinationOfExistingDataPlusNewApiResults);
     },
     
 
@@ -58,7 +72,6 @@ module.exports = {
      */     
      //the queries.findMaxPrimaryKeyInAllDataRows returns an array with a single column of max_prim_key and single data row with the max primary key value - returning just the number in the 2nd row (array row position 1), first column (0th array column position) which is the max primary key as this function returns just the numeric primary key value
      findMaxPrimaryKeyValueInData: (twoDimArrWHeader) => {
-        
         // make sure the data set is not empty (had data rows)
         if (twoDimArrWHeader.length > 0)
         {
@@ -73,7 +86,6 @@ module.exports = {
             // otherwise if the data set passed in was an empty (0 rows), use the cached/GAS property last _primaryKey to send back as the max primary key to start querying from
             return googleAppsScriptWrappers.getScriptProperty("MAX_PRIMARY_KEY_" + "/award/api/v1/award-amount-transactions/");
         }          
-
      },
     
     /**

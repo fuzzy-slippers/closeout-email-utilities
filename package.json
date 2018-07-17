@@ -15,7 +15,7 @@
     "clasplogin": "clasp login --no-localhost",
     "clasplogout": "clasp logout",
     "clasppull": "npm run clasplogin && cd ~/workspace/closeout-email-utilities/dist && clasp pull && cd ~/workspace/closeout-email-utilities/ && npm run clasplogout",
-    "clasppush": "npm run build && npm run clasplogin && cd ~/workspace/closeout-email-utilities/dist && clasp push && cd ~/workspace/closeout-email-utilities/ && npm run clasplogout",
+    "clasppush": "npm run test && clear && npm run build && npm run clasplogin && cd ~/workspace/closeout-email-utilities/dist && clasp push && cd ~/workspace/closeout-email-utilities/ && npm run clasplogout",
     "cleanwebpackbundles": "rm ~/workspace/closeout-email-utilities/dist/CombinedWebpackCode.*.*s -f"
   },
   "devDependencies": {

@@ -2,6 +2,7 @@
  * @module queries
  */
 const alasqlUtils = require("./alasql-utils.js");
+const arrayUtils = require("./array-utils.js");
 
 module.exports = {
 
@@ -32,6 +33,16 @@ module.exports = {
   */    
   returnRowsWithNullNoticeDates: (twoDArrWHeader) => alasqlUtils.selectFromTwoDimArr("SELECT * AS max_prim_key FROM tmptbl1 WHERE noticeDate IS NULL", twoDArrWHeader),
   
+  /**
+  * sort (order by) the data passed in based on the column name specified (order by using ASC ordering) with any rows with a null value in the column to sort on appearing first in the results
+  *
+  * @param {string} the column name to sort/order by on 
+  * @param {string[][]} the original data sort - must have column headers as the first row and have one column with header name that matches the first parameter
+  * @return {string[][]} a 2d array with a header row - data sorted based on the column name specified
+  */    
+  orderByColumnWithName: (colToSortOn, twoDArrWHeader) => alasqlUtils.selectFromTwoDimArr(`SELECT * FROM tmptbl1 ORDER BY ${colToSortOn} ASC`, twoDArrWHeader),
+   
+  
   
   /**
   * does a union on the 2d array with header data sets passed in (currently up to 3 tables supported) but also makes sure that if the same row is in the first table but with extra data columns on the right side and the second or third table also has that data but without the righthand columns, that it will return just one row matching the more complete row from the first table with the extra data in the righthand columns
@@ -41,15 +52,24 @@ module.exports = {
   * @param {string[][]} Optional, third 2d array with a header row - this one should also have the same columns or less columns than the first data set/table but the names of the columns all matching column names of at least part of the ones in the first data set
   * @return {string[][]} a 2d array with a header row/column names matching the first data set - if a row was from the second or third data set, the extra columns not in those data sets will all show a blank string and as mentioned times when rows match between the columns in the first data set and the other data sets, data will be returned only once matching the first data set row with the extra data
   */    
-  unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreserved: (twoDArrWHeader, secondTwoDArrWHeader, thirdTwoDArrWHeader) => {
-    //since the third table is optional, if it's not passed in, use an empty array in it's place, which in a UNION is equivalent to not adding it since it will never union in blank rows
-    const thirdTwoDArrWHeaderEmptyArrIfNotPassedIn = (thirdTwoDArrWHeader ? thirdTwoDArrWHeader : []);    
-    //due to a bug in AlaSQL that causes the second and third tables in a union statement to be blank if using SELECT *, but not if you list out the column names, had to do this dynamically based on the column names in the first 2d array and converting them with join to 'col1', 'col2', etc
-    const columnNamesFirstTable = twoDArrWHeader[0].join(", ");
-    
-    
-    const columnNamesSecondTable = secondTwoDArrWHeader[0].join(", ");
+  unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted: (twoDArrWHeader = [], secondTwoDArrWHeader = [], thirdTwoDArrWHeader = []) => {
+    //if any of the arrays are undefined/not passed in, use an empty array in it's place, which in a UNION is equivalent to not adding it
+    const thirdTwoDArrWHeaderEmptyArrIfNotPassedIn = (thirdTwoDArrWHeader.length > 0 ? thirdTwoDArrWHeader : []);    
+    //due to a bug in AlaSQL that causes the second and third tables in a union statement to be blank if using SELECT *, but not if you list out the column names, had to do this dynamically based on the column names in the first 2d array and converting them with join to format 'col1', 'col2', etc - 
+    // however if data for that table is an empty array, we needed to get the column name list from somewhere else (using * causes the unions to return blank rows) so found that can use the header rows from the second or third table data instead as long as those are not blank
+    const columnNamesFirstTable =   (twoDArrWHeader.length > 0 ? twoDArrWHeader[0].join(", ") : 
+                                                              secondTwoDArrWHeader.length > 0 ? secondTwoDArrWHeader[0].join(", ") : 
+                                                              thirdTwoDArrWHeader.length > 0 ? thirdTwoDArrWHeader[0].join(", ") : "*"
+                                    );
+    const columnNamesSecondTable = (secondTwoDArrWHeader.length > 0 ? secondTwoDArrWHeader[0].join(", ") : 
+                                                              thirdTwoDArrWHeader.length > 0 ? thirdTwoDArrWHeader[0].join(", ") : "*"
+                                    );
                                                     console.log(`columnNamesFirstTable: ${columnNamesFirstTable}`);
+                                                    console.log(`columnNamesSecondTable: ${columnNamesSecondTable}`);
+                                                    console.log(`first table data passed into unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted: ${JSON.stringify(twoDArrWHeader)}`);
+                                                    console.log(`second table data passed into unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted: ${JSON.stringify(secondTwoDArrWHeader)}`);
+                                                    
+                                                    
     //return alasqlUtils.selectFromTwoDimArr(`SELECT ${columnNamesFirstTable} FROM tmptbl1 UNION SELECT ${columnNamesFirstTable} FROM tmptbl2 UNION SELECT ${columnNamesFirstTable} FROM tmptbl3`, twoDArrWHeader, secondTwoDArrWHeader, thirdTwoDArrWHeaderEmptyArrIfNotPassedIn);
     return alasqlUtils.selectFromTwoDimArr(`
       
@@ -79,18 +99,27 @@ module.exports = {
           SELECT ${columnNamesSecondTable} FROM tmptbl1 F
 
 
-  
-  
-  
-
-    
-      
-      
-
-     
        
-       `, twoDArrWHeader, secondTwoDArrWHeader, thirdTwoDArrWHeaderEmptyArrIfNotPassedIn);
+       `, twoDArrWHeader , secondTwoDArrWHeader, thirdTwoDArrWHeaderEmptyArrIfNotPassedIn);
+  },
+  
+  /**
+  * does a union on the 2d array with header data sets passed in (currently up to 3 tables supported) but also makes sure that if the same row is in the first table but with extra data columns on the right side and the second or third table also has that data but without the righthand columns, that it will return just one row matching the more complete row from the first table with the extra data in the righthand columns
+  * the difference with the unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted is that the results are sorted and all nulls in the returned dat aare replace with blank strings
+  * @param {string[][]} a 2d array with a header row - the potentially largest one that may have extra additional columns with data (that will be preserved if there is a match against a row in the second or third dataset but without the extra column data)
+  * @param {string[][]} a second 2d array with a header row - this one should have the same columns or less columns than the first data set/table but the names of the columns all matching column names of at least part of the ones in the first data set
+  * @param {string[][]} Optional, third 2d array with a header row - this one should also have the same columns or less columns than the first data set/table but the names of the columns all matching column names of at least part of the ones in the first data set
+  * @return {string[][]} a 2d array with a header row/column names matching the first data set - if a row was from the second or third data set, the extra columns not in those data sets will all show a blank string and as mentioned times when rows match between the columns in the first data set and the other data sets, data will be returned only once matching the first data set row with the extra data
+  */    
+  unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings: (twoDArrWHeader, secondTwoDArrWHeader, thirdTwoDArrWHeader) => {
+                                                    console.log(`first table data passed into unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings: ${JSON.stringify(twoDArrWHeader)}`);
+
+    const initialQueryResults = module.exports.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted(twoDArrWHeader, secondTwoDArrWHeader, thirdTwoDArrWHeader);
+    const sortedQueryResults = module.exports.orderByColumnWithName("_primaryKey", initialQueryResults);
+    return arrayUtils.replaceAllOccurancesInTwoDimArr(sortedQueryResults, null, "");
   }
+  
+  
 
 
 /* working top part:
