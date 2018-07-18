@@ -21,7 +21,7 @@ module.exports = {
      * @return {object} is a js object of the JSON returned by the API GET call with properties or a js object with an Error property if there were any errors encountered (however all errors are caught so the program execution continues)
      */  
     apiGetCallKr: (relativeUriPath) => {
-        console.log(`node - top of get_award_amount_transaction_by_pri_key()`);
+        console.log(`apiGetCallKr(${relativeUriPath}) called...`);
         //we want to handle when an API call returns an error gracefully - uncaught errors halt the program operation - instead catch the error but then return back the JSON returned with the error object
         try {
             //call the API with the primary key after the slash (no url variables needed for API calls with the primary key specified)
