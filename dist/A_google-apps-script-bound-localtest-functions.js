@@ -1,3 +1,4 @@
+//TODO - change name to functionsToSchedule.js
 /** Bound Functions in Google Apps Script ES3 Javascript - The only functions that can be called from google scripts menu or GAS scheduled triggers
  *  attempting to keep these to mostly stubs...
  * 
@@ -14,5 +15,14 @@ function  updateSheetAdditionalMissingNoticeDate() {
   var startTime = "updateSheetAdditionalMissingNoticeDate started at " + new Date();
   Logger.log(startTime);console.log(startTime);  
   missingNoticeDates.addAdditionalFlaggedEmptyTimeAndMoneyNoticeDatesToSheet("TNMBlankNoticeDates");
+}
+
+
+/**
+ * entry/starting point for new google sheet - just testing for now 
+ */
+function testHelloWorld() {
+  Logger.log("hello world");
+  console.log("hello world");
 }
 

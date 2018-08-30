@@ -16,6 +16,7 @@ module.exports = {
     isErrorObj: (jsObj) => jsObj.hasOwnProperty("Error"),    
 
     /**
+     * DEPRICATED - 
      * utility function that calls the wrapped callKrGetApiWithWait method and converts the results from JSON into a js object (or return a js object with an Error property if there was any kind of error with the API call or parsing the results as JSON)
      * 
      * @return {object} is a js object of the JSON returned by the API GET call with properties or a js object with an Error property if there were any errors encountered (however all errors are caught so the program execution continues)
@@ -49,6 +50,25 @@ module.exports = {
     },
     
     
+    /**
+     * similar to apiGetCallKr but all returned data will have column/property names that are in the format [api_endpoint_name].[property name] to help with joins so we can distinguish between columns from different API endpoint data sets
+     * 
+     * // returns [{"award-types.code":1,"award-types.description":"Grant","award-types._primaryKey":"1"}]
+     * apiUtils.apiGetCallKrWDotEndpointNames("/award/api/v1/award-types/");
+     * 
+     * @return {object} is a js object of the JSON returned by the API GET call with properties (but with enpoint names and dots prepended to property names) or a js object with an Error property if there were any errors encountered (however all errors are caught so the program execution continues)
+     * 
+     */  
+    apiGetCallKrWDotEndpointNames: (relativeUriPath) => {
+      const apiGetCallKrRetVal = module.exports.apiGetCallKr(relativeUriPath);
+        //console.log(`apiGetCallKrRetVal: ${JSON.stringify(apiGetCallKrRetVal)}`)
+        // if the API call returns an error, do not attempt to add the endpoint dot name to the error object
+        if (module.exports.isErrorObj(apiGetCallKrRetVal))
+            return apiGetCallKrRetVal;
+        else
+            return apiGetCallKrRetVal;
+        
+    },    
     
 // Note: although it would logically be better to have the below functions inside the library for each validation, etc like the getAwardAmountTransactionByPrimaryKey inside missing-notice-dates
 // due to a quirk that when testing these specific api call with url functions we cant mock out the api call function if the module its in is required/imported, rather than in the module being tested - so combining them into a big module so the API call function apiGetCallKr cant be overwridden when testing any of the specific functions for each specific API url

@@ -73,6 +73,18 @@ describe("api-utils", function() {
       apiUtils.isErrorObj(sampleObj).should.eql(true);
     });  
   });
+  
+  describe("#apiGetCallKrWDotEndpointNames()", function() {
+    it("should if given a valid Uri like /award/api/v1/award-types/ return an object (array) generated from the JSON data returned with the array position 1 object having a award_types._primaryKey property (endpoint name plus dot prepended to all property names returned)", function () {
+      const retArr = apiUtils.apiGetCallKrWDotEndpointNames("/award/api/v1/award-types/");
+      console.log(`********************************** retArr is: ${JSON.stringify(retArr)} *************`)
+      //retArr[0].should.have.property("award-types._primaryKey");
+    }); 
+    
+    it("should if given a totally invalid url like /fakeApiUrl/ return an Error object (no enpoint names/dots prepended to Error properties returned)", function () {
+      apiUtils.apiGetCallKrWDotEndpointNames("/fakeApiUrl/").should.have.property("Error");
+    }); 
+  }); 
 
     
   });  
