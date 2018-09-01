@@ -3,17 +3,11 @@
  */
  
 const googleAppsScriptWrappers = require("../src/google-apps-script-wrappers/google-apps-script-wrappers.js");
+const objUtils = require("../src/obj-utils.js");
 
 
 module.exports = {
     
-    /**
-     * checks if the passed in object is the result of an API call that threw an error (we are expecting all API calls that return an error to have an Error property on th object to indicate an error of some sort was thrown)
-     * 
-     * @param {object} a javascript object representing either 1) the data result of an API call..converted from JSON to a js object or 2) an API call error returned, and converted from JSON about the error to a js object with an Error property
-     * @return {boolean} the result of trying to detect if either true: the js object represents a failed API call/error or false: it's valid data in the js object
-     */
-    isErrorObj: (jsObj) => jsObj.hasOwnProperty("Error"),    
 
     /**
      * DEPRICATED - 
@@ -52,18 +46,18 @@ module.exports = {
     
     /**
      * similar to apiGetCallKr but all returned data will have column/property names that are in the format [api_endpoint_name].[property name] to help with joins so we can distinguish between columns from different API endpoint data sets
-     * 
+     * @example
      * // returns [{"award-types.code":1,"award-types.description":"Grant","award-types._primaryKey":"1"}]
      * apiUtils.apiGetCallKrWDotEndpointNames("/award/api/v1/award-types/");
      * 
-     * @return {object} is a js object of the JSON returned by the API GET call with properties (but with enpoint names and dots prepended to property names) or a js object with an Error property if there were any errors encountered (however all errors are caught so the program execution continues)
+     * @return {object} is a js object (or array of objects) of the JSON returned by the API GET call with properties (but with enpoint names and dots prepended to property names) or a js object with an Error property if there were any errors encountered (however all errors are caught so the program execution continues)
      * 
      */  
     apiGetCallKrWDotEndpointNames: (relativeUriPath) => {
       const apiGetCallKrRetVal = module.exports.apiGetCallKr(relativeUriPath);
         //console.log(`apiGetCallKrRetVal: ${JSON.stringify(apiGetCallKrRetVal)}`)
         // if the API call returns an error, do not attempt to add the endpoint dot name to the error object
-        if (module.exports.isErrorObj(apiGetCallKrRetVal))
+        if (objUtils.isErrorObj(apiGetCallKrRetVal))
             return apiGetCallKrRetVal;
         else
             return apiGetCallKrRetVal;

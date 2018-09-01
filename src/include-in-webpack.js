@@ -9,8 +9,8 @@ global.core = core;
 
 //add the imported modules to global, just like normal (except with this manual step - all subfunctions should be accessible)
 
-// const jsUtils = require("./js-utils.js");
-// global.jsUtils = jsUtils;
+const objUtils = require("./obj-utils.js");
+global.objUtils = objUtils;
 
 const arrayUtils = require("./array-utils.js");
 global.arrayUtils = arrayUtils;

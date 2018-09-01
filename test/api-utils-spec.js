@@ -48,31 +48,6 @@ describe("api-utils", function() {
     it("should if given a totally invalid primary key like -1 return an error object", function () {
       apiUtils.getAwardAmountTransactionByPrimaryKey(-1).should.have.property("Error");
     }); 
-
-  describe("#isErrorObj()", function() {
-    it("should given a js object with a few properties and no Error property return false", function () {
-      const sampleObj = {};
-      sampleObj.testProp1 = "A";
-      sampleObj.testProp1 = 1;      
-      apiUtils.isErrorObj(sampleObj).should.eql(false);
-    });  
-  });   
-  
-  describe("#isErrorObj()", function() {
-    it("should given a js object an Error property which is an array return true", function () {
-      const sampleObj = {};
-      sampleObj.Error = ["whateverArrElem"];  
-      apiUtils.isErrorObj(sampleObj).should.eql(true);
-    });  
-  });  
-  
-  describe("#isErrorObj()", function() {
-    it("should given a js object an Error property which is a string return true", function () {
-      const sampleObj = {};
-      sampleObj.Error = "whateverString";  
-      apiUtils.isErrorObj(sampleObj).should.eql(true);
-    });  
-  });
   
   describe("#apiGetCallKrWDotEndpointNames()", function() {
     it("should if given a valid Uri like /award/api/v1/award-types/ return an object (array) generated from the JSON data returned with the array position 1 object having a award_types._primaryKey property (endpoint name plus dot prepended to all property names returned)", function () {

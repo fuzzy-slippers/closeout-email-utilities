@@ -5,6 +5,7 @@ const googleAppsScriptWrappers = require("../src/google-apps-script-wrappers/goo
 const apiUtils = require("../src/api-utils.js"); 
 const queries = require("../src/queries.js"); 
 const arrayUtils = require("../src/array-utils.js");
+const objUtils = require("../src/obj-utils.js");
 
 module.exports = {
 
@@ -58,11 +59,11 @@ module.exports = {
                 arrApiCallsJsObjs.push(module.exports.apiCallOnNextHigherPrimaryKey(arrayUtils.lastArrElement(arrApiCallsJsObjs)._primaryKey, relativeUriPath));
                                                                     // console.log(`arrApiCallsJsObjs inside loop: ${JSON.stringify(arrApiCallsJsObjs)}`);
                                                                     // console.log(`arrayUtils.lastArrElement(arrApiCallsJsObjs) inside loop: ${JSON.stringify(arrayUtils.lastArrElement(arrApiCallsJsObjs))}`);
-                                                                    // console.log(`apiUtils.isErrorObj(arrayUtils.lastArrElement(arrApiCallsJsObjs)) inside loop: ${JSON.stringify(apiUtils.isErrorObj(arrayUtils.lastArrElement(arrApiCallsJsObjs)))}`);
+                                                                    // console.log(`objUtils.isErrorObj(arrayUtils.lastArrElement(arrApiCallsJsObjs)) inside loop: ${JSON.stringify(objUtils.isErrorObj(arrayUtils.lastArrElement(arrApiCallsJsObjs)))}`);
         }
         // continue until the last object added to the array above is an error object, indicating that we have reached a primary key that has not been assigned yet in KR and therefore there is no more data to retrieve that is newer than what is already in the spreadsheet
         while (!(arrayUtils.lastArrElement(arrApiCallsJsObjs)).hasOwnProperty("Error"));
-        //NOTE: need to switch back to isErrorObj utility function instead of .hasOwnProperty for readability and maintainability of error object criteria but for now having trouble getting it to recognise that function for some unknown reason after moving it from this module to the api-utils module - where clause should really be:  while (!apiUtils.isErrorObj(arrayUtils.lastArrElement(arrApiCallsJsObjs));
+        //NOTE: need to switch back to isErrorObj utility function instead of .hasOwnProperty for readability and maintainability of error object criteria but for now having trouble getting it to recognise that function for some unknown reason after moving it from this module to the api-utils module - where clause should really be:  while (!objUtils.isErrorObj(arrayUtils.lastArrElement(arrApiCallsJsObjs));
                                                                     // console.log(`arrApiCallsJsObjs after loop: ${JSON.stringify(arrApiCallsJsObjs)}`);
         //remove the last element from the array which was found to be an error object (hit the end of valid records by primary key value)
         arrApiCallsJsObjs.pop();
