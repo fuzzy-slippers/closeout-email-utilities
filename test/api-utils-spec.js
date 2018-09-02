@@ -35,25 +35,25 @@ describe("api-utils", function() {
     }); 
   });  
   
-  // describe("#apiGetCallKrWPrependedApiNames()", function() {
-  //   it("should if given a valid Uri like /award/api/v1/award-types/ return an object array generated from the JSON data and all objs should have prepended column names", function () {
-  //     const retArr = apiUtils.apiGetCallKrWPrependedApiNames("/award/api/v1/award-types/");
-  //     retArr[0].should.have.property("award-types._primaryKey");
-  //     retArr[0].should.have.property("award-types.code");
-  //     retArr[1].should.have.property("award-types.description");
-  //   }); 
+  describe("#apiGetCallKrWPrependedApiNames()", function() {
+    it("should if given a valid Uri like /award/api/v1/award-types/ return an object array generated from the JSON data and all objs should have prepended column names", function () {
+      const retArr = apiUtils.apiGetCallKrWPrependedApiNames("/award/api/v1/award-types/");
+      retArr[0].should.have.property("award-types._primaryKey");
+      retArr[0].should.have.property("award-types.code");
+      retArr[1].should.have.property("award-types.description");
+    }); 
     
-  //   it("should if given a valid Uri returning a single object rather than an array like /award/api/v1/award-amount-transactions/773750 a single object with the column names from the API name (not primary key specified) prepended", function () {
-  //     const retObj = apiUtils.apiGetCallKrWPrependedApiNames("/award/api/v1/award-amount-transactions/773750");
-  //     retObj.should.have.property("award-amount-transactions._primaryKey");
-  //     retObj.should.have.property("award-amount-transactions.awardAmountTransactionId");
-  //     retObj.should.have.property("award-amount-transactions.noticeDate");
-  //   });     
+    it("should if given a valid Uri returning a single object rather than an array like /award/api/v1/award-amount-transactions/773750 a single object with the column names from the API name (not primary key specified) prepended", function () {
+      const retObj = apiUtils.apiGetCallKrWPrependedApiNames("/award/api/v1/award-amount-transactions/773750");
+      retObj.should.have.property("award-amount-transactions._primaryKey");
+      retObj.should.have.property("award-amount-transactions.awardAmountTransactionId");
+      retObj.should.have.property("award-amount-transactions.noticeDate");
+    });     
     
-  //   it("should if given a totally invalid url like /fakeApiUrl/ return an error object (no prepended column names)", function () {
-  //     apiUtils.apiGetCallKr("/fakeApiUrl/").should.have.property("Error");
-  //   }); 
-  // });    
+    it("should if given a totally invalid url like /fakeApiUrl/ return an error object (no prepended column names)", function () {
+      apiUtils.apiGetCallKr("/fakeApiUrl/").should.have.property("Error");
+    }); 
+  });    
   
    describe("#extractApiEndpointNameFromUri()", function() {
     it("should if given a relative Uri with multiple slashes including a trailing slash return just the name at the end between the last slashes", function () {
@@ -100,8 +100,6 @@ describe("api-utils", function() {
     it("should if given a totally invalid primary key like -1 return an error object", function () {
       apiUtils.getAwardAmountTransactionByPrimaryKey(-1).should.have.property("Error");
     }); 
-  
-
     
   });  
   

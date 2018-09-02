@@ -44,7 +44,7 @@ describe("array-utils", function() {
     });
     it("should if passed an array created with the array constructor to create a 4 element array using Array(4), return an array with all elements replaced with the string specified", function() {
         const testArrayCreatedWithConstructorLengthFour = new Array(4);
-        console.log(`testArrayCreatedWithConstructorLengthFour: ${JSON.stringify(testArrayCreatedWithConstructorLengthFour)}`);
+                                  //console.log(`testArrayCreatedWithConstructorLengthFour: ${JSON.stringify(testArrayCreatedWithConstructorLengthFour)}`);
         arrayUtils.duplicateArrayReplaceAllElementsWith(testArrayCreatedWithConstructorLengthFour, "replaceConstructorArrElements")
         .should.be.eql(["replaceConstructorArrElements", "replaceConstructorArrElements", "replaceConstructorArrElements", "replaceConstructorArrElements"]);
     });     

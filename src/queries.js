@@ -64,13 +64,11 @@ module.exports = {
     const columnNamesSecondTable = (secondTwoDArrWHeader.length > 0 ? secondTwoDArrWHeader[0].join(", ") : 
                                                               thirdTwoDArrWHeader.length > 0 ? thirdTwoDArrWHeader[0].join(", ") : "*"
                                     );
-                                                    console.log(`columnNamesFirstTable: ${columnNamesFirstTable}`);
-                                                    console.log(`columnNamesSecondTable: ${columnNamesSecondTable}`);
-                                                    console.log(`first table data passed into unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted: ${JSON.stringify(twoDArrWHeader)}`);
-                                                    console.log(`second table data passed into unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted: ${JSON.stringify(secondTwoDArrWHeader)}`);
-                                                    
-                                                    
-    //return alasqlUtils.selectFromTwoDimArr(`SELECT ${columnNamesFirstTable} FROM tmptbl1 UNION SELECT ${columnNamesFirstTable} FROM tmptbl2 UNION SELECT ${columnNamesFirstTable} FROM tmptbl3`, twoDArrWHeader, secondTwoDArrWHeader, thirdTwoDArrWHeaderEmptyArrIfNotPassedIn);
+                                                                      // console.log(`columnNamesFirstTable: ${columnNamesFirstTable}`);
+                                                                      // console.log(`columnNamesSecondTable: ${columnNamesSecondTable}`);
+                                                                      // console.log(`first table data passed into unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted: ${JSON.stringify(twoDArrWHeader)}`);
+                                                                      // console.log(`second table data passed into unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted: ${JSON.stringify(secondTwoDArrWHeader)}`);
+                                                                      //return alasqlUtils.selectFromTwoDimArr(`SELECT ${columnNamesFirstTable} FROM tmptbl1 UNION SELECT ${columnNamesFirstTable} FROM tmptbl2 UNION SELECT ${columnNamesFirstTable} FROM tmptbl3`, twoDArrWHeader, secondTwoDArrWHeader, thirdTwoDArrWHeaderEmptyArrIfNotPassedIn);
     return alasqlUtils.selectFromTwoDimArr(`
       
 

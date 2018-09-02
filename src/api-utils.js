@@ -58,14 +58,12 @@ module.exports = {
      * 
      */  
     apiGetCallKrWPrependedApiNames: (relativeUriPath) => {
-      const apiGetCallKrRetVal = module.exports.apiGetCallKr(relativeUriPath);
-        //console.log(`apiGetCallKrRetVal: ${JSON.stringify(apiGetCallKrRetVal)}`)
-        // if the API call returns an error, do not attempt to add the endpoint dot name to the error object
-        if (objUtils.isErrorObj(apiGetCallKrRetVal))
-            return apiGetCallKrRetVal;
-        else
-            return apiGetCallKrRetVal;
-        
+        //use apiGetCallKr to actually make the API call and format the data returned (depending on the API called will either be a js object or an array of js objects)
+        const apiGetCallKrRetObjOrArr = module.exports.apiGetCallKr(relativeUriPath);
+        //get the endpoint name from the API path (for example "award-types" from "award/api/v1/award-types/")
+        const endpointName = module.exports.extractApiEndpointNameFromUri(relativeUriPath);
+        //use the prependAllObjKeys function to add the endpoint name (with a period separator) on the left side of every object property (column name) returned from the API
+        return objUtils.prependAllArrOfObjKeys(apiGetCallKrRetObjOrArr, endpointName.concat("."));
     },    
     
     /**

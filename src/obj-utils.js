@@ -43,7 +43,7 @@ module.exports = {
      * prepends a string to every key/property name to the left hand side of the key/property name of every property/key in every object inside an array of objects or the single object passed in
      * @example
      * // returns [{"award-contact.name": 0, "award-contact.mobile":"444-444-4444"}{"award-contact.name": 1}]
-     * objUtils.prependAllObjKeys([{"name": 0, "mobile":"444-444-4444"}, {"name":1}], "award-contact.");
+     * objUtils.prependAllArrOfObjKeys([{"name": 0, "mobile":"444-444-4444"}, {"name":1}], "award-contact.");
      * 
      * @param {object} an array of js objects or a standalone js object
      * @return {object} the original object or array of objects with the property/key names for all objects and all properties updated to prepend the string preface on the left hand side of each key/property name
