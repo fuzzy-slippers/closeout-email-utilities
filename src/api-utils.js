@@ -2,6 +2,8 @@
  * * @module api-utils
  */
  
+const url = require('url');
+ 
 const googleAppsScriptWrappers = require("../src/google-apps-script-wrappers/google-apps-script-wrappers.js");
 const objUtils = require("../src/obj-utils.js");
 
@@ -10,9 +12,10 @@ module.exports = {
     
 
     /**
-     * DEPRICATED - 
+     * DEPRICATED (ZF) - use apiGetCallKrWDotEndpointNames for most if not all situations as we want all sheet columns to have the API endpoint name prepended before the column name for good joins and no overwriting column names that are the same from different API endpoints 
      * utility function that calls the wrapped callKrGetApiWithWait method and converts the results from JSON into a js object (or return a js object with an Error property if there was any kind of error with the API call or parsing the results as JSON)
      * 
+     * @param {string} the relative path of the API endpoint/URI to call (list of endpoints at https://umd-sbx.kuali.co/res/apidocs/)
      * @return {object} is a js object of the JSON returned by the API GET call with properties or a js object with an Error property if there were any errors encountered (however all errors are caught so the program execution continues)
      */  
     apiGetCallKr: (relativeUriPath) => {
@@ -50,10 +53,11 @@ module.exports = {
      * // returns [{"award-types.code":1,"award-types.description":"Grant","award-types._primaryKey":"1"}]
      * apiUtils.apiGetCallKrWDotEndpointNames("/award/api/v1/award-types/");
      * 
+     * @param {string} the relative path of the API endpoint/URI to call (list of endpoints at https://umd-sbx.kuali.co/res/apidocs/)
      * @return {object} is a js object (or array of objects) of the JSON returned by the API GET call with properties (but with enpoint names and dots prepended to property names) or a js object with an Error property if there were any errors encountered (however all errors are caught so the program execution continues)
      * 
      */  
-    apiGetCallKrWDotEndpointNames: (relativeUriPath) => {
+    apiGetCallKrWPrependedApiNames: (relativeUriPath) => {
       const apiGetCallKrRetVal = module.exports.apiGetCallKr(relativeUriPath);
         //console.log(`apiGetCallKrRetVal: ${JSON.stringify(apiGetCallKrRetVal)}`)
         // if the API call returns an error, do not attempt to add the endpoint dot name to the error object
@@ -63,6 +67,28 @@ module.exports = {
             return apiGetCallKrRetVal;
         
     },    
+    
+    /**
+     * pulls out the just the endpoint name from a partial or full URL string passed in
+     * @example
+     * // returns "award-types"
+     * apiUtils.apiGetCallKrWDotEndpointNames("/award/api/v1/award-types/");
+     * 
+     * @param {string} an API endpoint (uri) either relative or full as a string/path
+     * @return {string} is a js object (or array of objects) of the JSON returned by the API GET call with properties (but with enpoint names and dots prepended to property names) or a js object with an Error property if there were any errors encountered (however all errors are caught so the program execution continues)
+     * 
+     */      
+    extractApiEndpointNameFromUri(partialOrFullUriString) {
+        //utilize the older node built in url (url.parse) module (imported/required above)
+        const whatwgUrlObject = url.parse(partialOrFullUriString);
+        //pull out just the "pathname" portion which is everything between the domain and query params like /category/articlename.html
+        const onlyPathPortion = whatwgUrlObject.pathname;
+        //use a regular expression that does not match "/" or any numbers, only matching words formed of letters and "-" chars (all KR endpoint names are letters and "-"s only)
+        var regex = /[a-zA-Z\-]+/g;
+        var arrRegexMatchesNonNumericWDashes = onlyPathPortion.match(regex);
+        //once numbers and empty strings at the end are filterd out, the last portion of the path should be the endpoint name
+        return arrRegexMatchesNonNumericWDashes[arrRegexMatchesNonNumericWDashes.length - 1];
+    },
     
 // Note: although it would logically be better to have the below functions inside the library for each validation, etc like the getAwardAmountTransactionByPrimaryKey inside missing-notice-dates
 // due to a quirk that when testing these specific api call with url functions we cant mock out the api call function if the module its in is required/imported, rather than in the module being tested - so combining them into a big module so the API call function apiGetCallKr cant be overwridden when testing any of the specific functions for each specific API url
