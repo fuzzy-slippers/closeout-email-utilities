@@ -57,46 +57,47 @@ latestByPrimaryKey.__set__("googleAppsScriptWrappers", {
 describe("latest-by-primary-key", function() {
   
   describe("#findMaxPrimaryKeyValueInData()", function() {
-    it("should given an array with a _primaryKey column and several values, return the numeric value of the largest primary key in all the data rows", function () {
-      latestByPrimaryKey.findMaxPrimaryKeyValueInData([["_primaryKey"], [1], [2], [3], [5], [4]], "/award/api/v1/award-amount-transactions/").should.be.eql(5);
+    it("should given an array with a column award-amount-transactions._primaryKey and several values, return the numeric value of the largest primary key in all the data rows", function () {
+      latestByPrimaryKey.findMaxPrimaryKeyValueInData("award-amount-transactions._primaryKey", [["award-amount-transactions._primaryKey"], [1], [2], [3], [5], [4]], "/award/api/v1/award-amount-transactions/")
+      .should.be.eql(5);
     });  
 
-    it("should given an empty array, return the cached largest primary key (should be numeric) and since we can check the GAS property directly, the function return should match it", function () {
-      latestByPrimaryKey.findMaxPrimaryKeyValueInData([], "/award/api/v1/award-amount-transactions/").should.be.Number();
+    it("should given empty data (empty data array), return the cached largest primary key (should be numeric) and since we can check the GAS property directly, the function return should match it", function () {
+      latestByPrimaryKey.findMaxPrimaryKeyValueInData("doesNotMatterDataEmpty", [], "/award/api/v1/award-amount-transactions/").should.be.Number();
     });  
 
-    it("should given an empty array return the last primary key value stored in the script property data store (which we mocked out in this case to always return 7 since we can't access the real GAS script data store from our test scripts", function () {
-      latestByPrimaryKey.findMaxPrimaryKeyValueInData([], "/award/api/v1/award-amount-transactions/").should.eql(7);
+    it("should given empty data (empty data array), return the last primary key value stored in the script property data store (which we mocked out in this case to always return 7 since we can't access the real GAS script data store from our test scripts", function () {
+      latestByPrimaryKey.findMaxPrimaryKeyValueInData("doesNotMatterDataEmpty", [], "/award/api/v1/award-amount-transactions/").should.eql(7);
     });  
   });  
   
   describe("#apiCallOnNextHigherPrimaryKey()", function() {
     it("should given a passed in previous primary key of 1 return the mocked up object data for primary key 2", function () {
-      const jsObjVersionOfApiDataForPrimaryKey2 = JSON.parse('{"testCol1":"B","_primaryKey":"2"}');
+      const jsObjVersionOfApiDataForPrimaryKey2 = JSON.parse('{"award-amount-transactions.testCol1":"B","award-amount-transactions._primaryKey":"2"}');
       latestByPrimaryKey.apiCallOnNextHigherPrimaryKey(1, "/award/api/v1/award-amount-transactions/").should.be.eql(jsObjVersionOfApiDataForPrimaryKey2);
     }); 
     
-    it("should given a passed in previous primary key of a string value of 1 return the mocked up object data for primary key 2 and not 21", function () {
-      const jsObjVersionOfApiDataForPrimaryKey2 = JSON.parse('{"testCol1":"B","_primaryKey":"2"}');
-      latestByPrimaryKey.apiCallOnNextHigherPrimaryKey("1", "/award/api/v1/award-amount-transactions/").should.be.eql(jsObjVersionOfApiDataForPrimaryKey2);
-    });     
+    // it("should given a passed in previous primary key of a string value of 1 return the mocked up object data for primary key 2 and not 21", function () {
+    //   const jsObjVersionOfApiDataForPrimaryKey2 = JSON.parse('{"award-amount-transactions.testCol1":"B","award-amount-transactions._primaryKey":"2"}');
+    //   latestByPrimaryKey.apiCallOnNextHigherPrimaryKey("1", "/award/api/v1/award-amount-transactions/").should.be.eql(jsObjVersionOfApiDataForPrimaryKey2);
+    // });     
   });    
   
   describe("#gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys()", function() {
-    it("should given a passed in previous max primary key of 1 return the mocked up 2d array with header row data for primary key 2 but stop at the mocked up error on primary key 3", function () {
-      latestByPrimaryKey.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys(1, "/award/api/v1/award-amount-transactions/").should.be.eql([["testCol1", "_primaryKey"], ["B", "2"]]);
-    });  
+    // it("should given a passed in previous max primary key of 1 return the mocked up 2d array with header row data for primary key 2 but stop at the mocked up error on primary key 3", function () {
+    //   latestByPrimaryKey.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys(1, "/award/api/v1/award-amount-transactions/").should.be.eql([["award-amount-transactions.testCol1", "award-amount-transactions._primaryKey"], ["B", "2"]]);
+    // });  
 
-    it("should given a passed in previous max primary key of 773750 return the mocked up data for primary key 773751 and 773752 but stop at the mocked up error on primary key 773753", function () {
-      latestByPrimaryKey.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys(773750, "/award/api/v1/award-amount-transactions/")
-      .should.be.eql(
-          [
-            ["awardAmountTransactionId","comments","documentNumber","noticeDate","awardNumber","transactionTypeCode","_primaryKey"],
-            [773751,null,"2455782",1525233600000,"029053-00001",4,"773751"],
-            [773752,null,"2455803",1525233600000,"029054-00001",4,"773752"]   
-          ]
-        );
-    });  
+    // it("should given a passed in previous max primary key of 773750 return the mocked up data for primary key 773751 and 773752 but stop at the mocked up error on primary key 773753", function () {
+    //   latestByPrimaryKey.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys(773750, "/award/api/v1/award-amount-transactions/")
+    //   .should.be.eql(
+    //       [
+    //         ["award-amount-transactions.awardAmountTransactionId","award-amount-transactions.comments","award-amount-transactions.documentNumber","award-amount-transactions.noticeDate","award-amount-transactions.awardNumber","award-amount-transactions.transactionTypeCode","award-amount-transactions._primaryKey"],
+    //         [773751,null,"2455782",1525233600000,"029053-00001",4,"773751"],
+    //         [773752,null,"2455803",1525233600000,"029054-00001",4,"773752"]   
+    //       ]
+    //     );
+    // });  
   });   
 
 
