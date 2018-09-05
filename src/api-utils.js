@@ -67,6 +67,7 @@ module.exports = {
         const apiGetCallKrRetObjOrArr = module.exports.apiGetCallKrNoPrefixes(relativeUriPath);
         //get the endpoint name from the API path (for example "award-types" from "award/api/v1/award-types/")
         const endpointName = module.exports.extractApiEndpointNameFromUri(relativeUriPath);
+        console.log(`apiGetCallKr called with relativeUriPath: ${JSON.stringify(relativeUriPath)} - determined that endpointName is: ${JSON.stringify(endpointName)} and therefore the objUtils.prependAllArrOfObjKeys(apiGetCallKrRetObjOrArr, endpointName.concat(".") will be ${JSON.stringify(objUtils.prependAllArrOfObjKeys(apiGetCallKrRetObjOrArr, endpointName.concat(".")))}`);
         //use the prependAllObjKeys function to add the endpoint name (with a period separator) on the left side of every object property (column name) returned from the API
         return objUtils.prependAllArrOfObjKeys(apiGetCallKrRetObjOrArr, endpointName.concat("."));
     },

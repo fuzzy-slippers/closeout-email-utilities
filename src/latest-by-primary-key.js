@@ -47,24 +47,22 @@ module.exports = {
      */
     gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys: (maxPreviouslyUsedPrimaryKey, relativeUriPath) => {
         
+        const endPointName = apiUtils.extractApiEndpointNameFromUri(relativeUriPath)
+        
         //may want to make this functional (recursive) in the future, for now using do...while loop
         const arrApiCallsJsObjs = []; 
                                                                         // console.log(`arrApiCallsJsObjs before do loop: ${JSON.stringify(arrApiCallsJsObjs)}`);
         do {
                                                                         // console.log(`arrApiCallsJsObjs: ${JSON.stringify(arrApiCallsJsObjs)}`);            
-            // the first time when no api calls have been made yet use the passed in primary key ("previous" from the data in the existing spreadsheet) as a starting point, every other time, we should be able to get the primary key value from the last element in the array (primary key property on that object)
+            // the first time when no api calls have been made yet use the passed in primary key ("previous" from the data in the existing spreadsheet) as a starting point
             if (arrApiCallsJsObjs.length === 0) 
                 arrApiCallsJsObjs.push(module.exports.apiCallOnNextHigherPrimaryKey(maxPreviouslyUsedPrimaryKey, relativeUriPath));
-            else
-                arrApiCallsJsObjs.push(module.exports.apiCallOnNextHigherPrimaryKey(arrayUtils.lastArrElement(arrApiCallsJsObjs)._primaryKey, relativeUriPath));
-                                                                    // console.log(`arrApiCallsJsObjs inside loop: ${JSON.stringify(arrApiCallsJsObjs)}`);
-                                                                    // console.log(`arrayUtils.lastArrElement(arrApiCallsJsObjs) inside loop: ${JSON.stringify(arrayUtils.lastArrElement(arrApiCallsJsObjs))}`);
-                                                                    // console.log(`apiUtils.isErrorObj(arrayUtils.lastArrElement(arrApiCallsJsObjs)) inside loop: ${JSON.stringify(apiUtils.isErrorObj(arrayUtils.lastArrElement(arrApiCallsJsObjs)))}`);
+            else  
+                //every other time, we should be able to get the primary key value from the last element in the array (primary key property on that object - the function only works to find the latest primary key value...if we wanted to find the latest value of some other column name we would need to update the function)
+                arrApiCallsJsObjs.push(module.exports.apiCallOnNextHigherPrimaryKey(arrayUtils.lastArrElement(arrApiCallsJsObjs)[`${endPointName}._primaryKey`], relativeUriPath));
         }
         // continue until the last object added to the array above is an error object, indicating that we have reached a primary key that has not been assigned yet in KR and therefore there is no more data to retrieve that is newer than what is already in the spreadsheet
-        while (!(arrayUtils.lastArrElement(arrApiCallsJsObjs)).hasOwnProperty("Error"));
-        //NOTE: need to switch back to isErrorObj utility function instead of .hasOwnProperty for readability and maintainability of error object criteria but for now having trouble getting it to recognise that function for some unknown reason after moving it from this module to the api-utils module - where clause should really be:  while (!apiUtils.isErrorObj(arrayUtils.lastArrElement(arrApiCallsJsObjs));
-                                                                    // console.log(`arrApiCallsJsObjs after loop: ${JSON.stringify(arrApiCallsJsObjs)}`);
+        while (!apiUtils.isErrorObj(arrayUtils.lastArrElement(arrApiCallsJsObjs)));
         //remove the last element from the array which was found to be an error object (hit the end of valid records by primary key value)
         arrApiCallsJsObjs.pop();
         //convert from a 1d array of js objects to a 2d array with a header row as that is the useful format of the data (alasql queries, google sheets, etc)

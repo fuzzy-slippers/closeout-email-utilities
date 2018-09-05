@@ -19,7 +19,7 @@ module.exports = {
         //1. read data from sheet (maybe later re-query all these ones and alasql filter on ones still missing notice dates and then re-update sheet) - or this could be separate operation so they could be scheduled at different frequencies
         const prevSheetDataTwoDimArrWHeader = googleAppsScriptWrappers.readDataInSheetWHeaderRowByName(sheetNameToUpdate);
         //2. determine the highest primary key in the google sheet data read in (before the update)
-        const prevSheetMaxPrimaryKeyVal = latestByPrimaryKey.findMaxPrimaryKeyValueInData(prevSheetDataTwoDimArrWHeader, "/award/api/v1/award-amount-transactions/");
+        const prevSheetMaxPrimaryKeyVal = latestByPrimaryKey.findMaxPrimaryKeyValueInData("award-amount-transactions._primaryKey", prevSheetDataTwoDimArrWHeader, "/award/api/v1/award-amount-transactions/");
         //3. query data by increasing primary key values until we hit an error with the message that that primary key is not found 
         //note: later may want to improve so that we can handle gaps in primary keys (wait until the 3rd error on the 3rd primary key past the last one for example, but for now stopping on first error)
         const newApiCallsTwoDimArrWHeader = latestByPrimaryKey.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys(prevSheetMaxPrimaryKeyVal, "/award/api/v1/award-amount-transactions/");
