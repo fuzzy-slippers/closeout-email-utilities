@@ -26,54 +26,80 @@ describe("api-utils", function() {
 
   describe("#apiGetCallKr()", function() {
     it("should if given a valid Uri like /award/api/v1/award-types/ return an object (array) generated from the JSON data returned with the array position 1 object having a _primaryKey property", function () {
-      const retArr = apiUtils.apiGetCallKr("/award/api/v1/award-types/");
-                                          // console.log(`retArr is: ${JSON.stringify(retArr)}`);
-                                          // console.log(`retArr[0] is: ${JSON.stringify(retArr[0])}`);      
+      const retArr = apiUtils.apiGetCallKrNoPrefixes("/award/api/v1/award-types/");
       retArr[0].should.have.property("_primaryKey");
     }); 
     
     it("should if given a totally invalid url like /fakeApiUrl/ return an error object", function () {
-      apiUtils.apiGetCallKr("/fakeApiUrl/").should.have.property("Error");
+      apiUtils.apiGetCallKrNoPrefixes("/fakeApiUrl/").should.have.property("Error");
     }); 
   });  
+  
+  describe("#apiGetCallKr()", function() {
+    it("should if given a valid Uri like /award/api/v1/award-types/ return an object array generated from the JSON data and all objs should have prepended column names", function () {
+      const retArr = apiUtils.apiGetCallKr("/award/api/v1/award-types/");
+      retArr[0].should.have.property("award-types._primaryKey");
+      retArr[0].should.have.property("award-types.code");
+      retArr[1].should.have.property("award-types.description");
+    }); 
+    
+    it("should if given a valid Uri returning a single object rather than an array like /award/api/v1/award-amount-transactions/773750 a single object with the column names from the API name (not primary key specified) prepended", function () {
+      const retObj = apiUtils.apiGetCallKr("/award/api/v1/award-amount-transactions/773750");
+      retObj.should.have.property("award-amount-transactions._primaryKey");
+      retObj.should.have.property("award-amount-transactions.awardAmountTransactionId");
+      retObj.should.have.property("award-amount-transactions.noticeDate");
+    });     
+    
+    it("should if given a totally invalid url like /fakeApiUrl/ return an error object (no prepended column names)", function () {
+      apiUtils.apiGetCallKr("/fakeApiUrl/").should.have.property("Error");
+    }); 
+  });    
+  
+   describe("#extractApiEndpointNameFromUri()", function() {
+    it("should if given a relative Uri with multiple slashes including a trailing slash return just the name at the end between the last slashes", function () {
+      apiUtils.extractApiEndpointNameFromUri("/a/b/c/d/e/f/uri-endpoint-name/").should.equal("uri-endpoint-name");
+    });  
+    
+    it("should if given a relative Uri with multiple slashes but NOT including a trailing slash return just the name at the end", function () {
+      apiUtils.extractApiEndpointNameFromUri("/a/b/c/d/e/f/uri-endpoint-name-no-slash").should.equal("uri-endpoint-name-no-slash");
+    }); 
+    
+    it("should if given a relative Uri with multiple slashes and a number at the end (like specifying a primary key) return the endpoint name", function () {
+      apiUtils.extractApiEndpointNameFromUri("/a/b/c/d/e/f/uri-endpoint-name/123456789").should.equal("uri-endpoint-name");
+    });   
+    
+    it("should if given a relative Uri with multiple slashes and filtering by request variables with no trailing slash returns just the endpoint name", function () {
+      apiUtils.extractApiEndpointNameFromUri("/a/b/c/d/e/f/uri-endpoint-name?someFilter=1").should.equal("uri-endpoint-name");
+    });  
+  
+    it("should if given a relative Uri with multiple slashes and filtering by request variables WITH trailing slash returns just the endpoint name", function () {
+      apiUtils.extractApiEndpointNameFromUri("/a/b/c/d/e/f/uri-endpoint-name/?someFilter=1").should.equal("uri-endpoint-name");
+    });     
+     
+    it("should if given a relative uri /award/api/v1/award-types/ return just award-types", function () {
+      apiUtils.extractApiEndpointNameFromUri("/award/api/v1/award-types/").should.equal("award-types");
+    }); 
+    
+    it("should if given a real sample relative url /award/api/v1/award-amount-transactions/773750 return just award-amount-transactions", function () {
+      apiUtils.extractApiEndpointNameFromUri("/award/api/v1/award-amount-transactions/773750").should.equal("award-amount-transactions");
+    }); 
+    
+    it("should if given a full (including domain, etc) uri https://umd-sbx.kuali.co/res/award/api/v1/award-types/ return just award-types", function () {
+      apiUtils.extractApiEndpointNameFromUri("https://umd-sbx.kuali.co/res/award/api/v1/award-types/").should.equal("award-types");
+    });     
+  }); 
   
   
   describe("#getAwardAmountTransactionByPrimaryKey()", function() {
     
     it("should if passed the _primaryKey 773750, return a valid js object (not raw JSON) with a awardAmountTransactionId property of 773750", function () {
                                       // console.log(`missingNoticeDates.getAwardAmountTransactionByPrimaryKey(773750) is returning: ${JSON.stringify(apiUtils.getAwardAmountTransactionByPrimaryKey("773750"))}\n`)
-      apiUtils.getAwardAmountTransactionByPrimaryKey("773750").should.have.property("awardAmountTransactionId", 773750);
+      apiUtils.getAwardAmountTransactionByPrimaryKey("773750").should.have.property("award-amount-transactions.awardAmountTransactionId", 773750);
     }); 
     
     it("should if given a totally invalid primary key like -1 return an error object", function () {
       apiUtils.getAwardAmountTransactionByPrimaryKey(-1).should.have.property("Error");
     }); 
-
-  describe("#isErrorObj()", function() {
-    it("should given a js object with a few properties and no Error property return false", function () {
-      const sampleObj = {};
-      sampleObj.testProp1 = "A";
-      sampleObj.testProp1 = 1;      
-      apiUtils.isErrorObj(sampleObj).should.eql(false);
-    });  
-  });   
-  
-  describe("#isErrorObj()", function() {
-    it("should given a js object an Error property which is an array return true", function () {
-      const sampleObj = {};
-      sampleObj.Error = ["whateverArrElem"];  
-      apiUtils.isErrorObj(sampleObj).should.eql(true);
-    });  
-  });  
-  
-  describe("#isErrorObj()", function() {
-    it("should given a js object an Error property which is a string return true", function () {
-      const sampleObj = {};
-      sampleObj.Error = "whateverString";  
-      apiUtils.isErrorObj(sampleObj).should.eql(true);
-    });  
-  });
-
     
   });  
   

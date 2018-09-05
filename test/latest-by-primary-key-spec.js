@@ -57,16 +57,16 @@ latestByPrimaryKey.__set__("googleAppsScriptWrappers", {
 describe("latest-by-primary-key", function() {
   
   describe("#findMaxPrimaryKeyValueInData()", function() {
-    it("should given an array with a _primaryKey column and several values, return the numeric value of the largest primary key in all the data rows", function () {
-      latestByPrimaryKey.findMaxPrimaryKeyValueInData([["_primaryKey"], [1], [2], [3], [5], [4]], "/award/api/v1/award-amount-transactions/").should.be.eql(5);
+    it("should given an array with a column award-amount-transactions._primaryKey and several values, return the numeric value of the largest primary key in all the data rows", function () {
+      latestByPrimaryKey.findMaxPrimaryKeyValueInData("award-amount-transactions._primaryKey", [["award-amount-transactions._primaryKey"], [1], [2], [3], [5], [4]], "/award/api/v1/award-amount-transactions/")
     });  
 
-    it("should given an empty array, return the cached largest primary key (should be numeric) and since we can check the GAS property directly, the function return should match it", function () {
-      latestByPrimaryKey.findMaxPrimaryKeyValueInData([], "/award/api/v1/award-amount-transactions/").should.be.Number();
+    it("should given empty data (empty data array), return the cached largest primary key (should be numeric) and since we can check the GAS property directly, the function return should match it", function () {
+      latestByPrimaryKey.findMaxPrimaryKeyValueInData("doesNotMatterDataEmpty", [], "/award/api/v1/award-amount-transactions/").should.be.Number();
     });  
 
-    it("should given an empty array return the last primary key value stored in the script property data store (which we mocked out in this case to always return 7 since we can't access the real GAS script data store from our test scripts", function () {
-      latestByPrimaryKey.findMaxPrimaryKeyValueInData([], "/award/api/v1/award-amount-transactions/").should.eql(7);
+    it("should given empty data (empty data array), return the last primary key value stored in the script property data store (which we mocked out in this case to always return 7 since we can't access the real GAS script data store from our test scripts", function () {      
+      latestByPrimaryKey.findMaxPrimaryKeyValueInData("doesNotMatterDataEmpty", [], "/award/api/v1/award-amount-transactions/").should.eql(7);
     });  
   });  
   

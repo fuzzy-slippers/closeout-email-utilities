@@ -17,12 +17,13 @@ module.exports = {
   ,
 
   /**
-  * Find the _primaryKey value the is the highest (max) in a whole dataset with a _primaryKey column 
+  * Find the max value in the column specified- the highest (max) in a whole dataset for that column 
   *
-  * @param {string[][]} the original data to query against - must have column headers as the first row and have one column with header "_primaryKey"
-  * @return {string[][]} a 2d array with just a header row with a single generated column header "max_prim_key" and a single row that contains one column with the highest (max) _primaryKey found in all rows of the passed in data set
+  * @param {string} the column name to use to look for the max value (ignore the other columns)
+  * @param {string[][]} the original data to query against - must have column headers as the first row and have one column with a header that matches the name specified in colToFindMax param
+  * @return {string[][]} a 2d array with just a header row with a single generated column header "max_col_val" and a single row that contains one column with the highest (max) value found in all rows of the passed in data set for the column name specied in the colToFindMax param
   */  
-  findMaxPrimaryKeyInAllDataRows: (twoDArrWHeader) => alasqlUtils.selectFromTwoDimArr("SELECT MAX(_primaryKey) AS max_prim_key FROM tmptbl1", twoDArrWHeader),
+  findMaxColValInAllDataRows: (colToFindMax, twoDArrWHeader) => alasqlUtils.selectFromTwoDimArr(`SELECT MAX([${colToFindMax}]) AS max_col_val FROM tmptbl1`, twoDArrWHeader),
 
 
   /**
@@ -64,13 +65,11 @@ module.exports = {
     const columnNamesSecondTable = (secondTwoDArrWHeader.length > 0 ? secondTwoDArrWHeader[0].join(", ") : 
                                                               thirdTwoDArrWHeader.length > 0 ? thirdTwoDArrWHeader[0].join(", ") : "*"
                                     );
-                                                    console.log(`columnNamesFirstTable: ${columnNamesFirstTable}`);
-                                                    console.log(`columnNamesSecondTable: ${columnNamesSecondTable}`);
-                                                    console.log(`first table data passed into unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted: ${JSON.stringify(twoDArrWHeader)}`);
-                                                    console.log(`second table data passed into unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted: ${JSON.stringify(secondTwoDArrWHeader)}`);
-                                                    
-                                                    
-    //return alasqlUtils.selectFromTwoDimArr(`SELECT ${columnNamesFirstTable} FROM tmptbl1 UNION SELECT ${columnNamesFirstTable} FROM tmptbl2 UNION SELECT ${columnNamesFirstTable} FROM tmptbl3`, twoDArrWHeader, secondTwoDArrWHeader, thirdTwoDArrWHeaderEmptyArrIfNotPassedIn);
+                                                                      // console.log(`columnNamesFirstTable: ${columnNamesFirstTable}`);
+                                                                      // console.log(`columnNamesSecondTable: ${columnNamesSecondTable}`);
+                                                                      // console.log(`first table data passed into unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted: ${JSON.stringify(twoDArrWHeader)}`);
+                                                                      // console.log(`second table data passed into unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted: ${JSON.stringify(secondTwoDArrWHeader)}`);
+                                                                      //return alasqlUtils.selectFromTwoDimArr(`SELECT ${columnNamesFirstTable} FROM tmptbl1 UNION SELECT ${columnNamesFirstTable} FROM tmptbl2 UNION SELECT ${columnNamesFirstTable} FROM tmptbl3`, twoDArrWHeader, secondTwoDArrWHeader, thirdTwoDArrWHeaderEmptyArrIfNotPassedIn);
     return alasqlUtils.selectFromTwoDimArr(`
       
 

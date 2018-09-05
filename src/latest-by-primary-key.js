@@ -14,17 +14,18 @@ module.exports = {
     /**
      * determine the max _primaryKey column value in a data set - if the data set is empty, use a google apps script property to pull the cached last highest primary key value instead (otherwise we can get into the situation where we lose track of which of where in the 20,000 possible primary keys we have already checked and which we havent)
      * 
+     * @param {string} the name of the column to scan for the max numeric value (looks like alaSQL can only handle MAX on numeric values)
      * @param {object[][]} two dim array with header row (one column must be named _primaryKey) to search through for the max primary key val
      * @param {string} the relative KR api endpoint, such as "/award/api/v1/award-amount-transactions/" used as part of the property name so we can keep track of the latest _primaryKey for each of the various endpoints as they will all have different latest primary keys at any given moment
      * @return {number} the single numeric value of the max _primaryKey in the data set or cached/GAS property from last run if the data set is empty
      */     
      //the queries.findMaxPrimaryKeyInAllDataRows returns an array with a single column of max_prim_key and single data row with the max primary key value - returning just the number in the 2nd row (array row position 1), first column (0th array column position) which is the max primary key as this function returns just the numeric primary key value
-     findMaxPrimaryKeyValueInData: (twoDimArrWHeader, relativeUriPath) => {
+     findMaxPrimaryKeyValueInData: (colToFindMax, twoDimArrWHeader, relativeUriPath) => {
         // make sure the data set is not empty (had data rows)
         if (twoDimArrWHeader.length > 0)
         {
             //in which case find the highest/max primary key in the data 
-            const maxPrimKeyValueInDataSetFoundThisTime = queries.findMaxPrimaryKeyInAllDataRows(twoDimArrWHeader)[1][0];
+            const maxPrimKeyValueInDataSetFoundThisTime = queries.findMaxColValInAllDataRows(colToFindMax, twoDimArrWHeader)[1][0];
             //update the GAS script level property store with the max primary key for this API endpoint for the next time this is called and data is blank - updates the latest primary key value cached/GAS property so that in the future if there are blank data sets we have the most up to date record of the last highest primary key we have validated on
             googleAppsScriptWrappers.setScriptProperty("MAX_PRIMARY_KEY_" + relativeUriPath, maxPrimKeyValueInDataSetFoundThisTime);
             //and return that primary key value
@@ -80,6 +81,7 @@ module.exports = {
      * @return {object} the js object version of the API call results (either a js object with valid data or a js object with Error properties)
      */
     apiCallOnNextHigherPrimaryKey: (previouslyUsedPrimaryKey, relativeUriPath) => apiUtils.apiGetCallKr(relativeUriPath + (Number(previouslyUsedPrimaryKey) + 1)), 
+    
      
 
 };     

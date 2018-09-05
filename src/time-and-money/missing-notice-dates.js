@@ -23,7 +23,9 @@ module.exports = {
         //3. query data by increasing primary key values until we hit an error with the message that that primary key is not found 
         //note: later may want to improve so that we can handle gaps in primary keys (wait until the 3rd error on the 3rd primary key past the last one for example, but for now stopping on first error)
         const newApiCallsTwoDimArrWHeader = latestByPrimaryKey.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys(prevSheetMaxPrimaryKeyVal, "/award/api/v1/award-amount-transactions/");
-        //4. filter on just the rows/records where the noticeDate is NULL/missing                                                    
+        //4a. join in document statuses on those records that do not yet have it
+        //4b. filter on just rows where the document status is FINAL
+        //4c. filter on just the rows/records where the noticeDate is NULL/missing        
         const justRowsNullNoticeDatesTwoDimArrWHeader = queries.returnRowsWithNullNoticeDates(newApiCallsTwoDimArrWHeader);
         //5. append the new results to the original array read from sheet (will have to union the columns that match, then join in the rest of the columns in the existing sheet)
         const combinationOfExistingDataPlusNewApiResults = queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings(prevSheetDataTwoDimArrWHeader, justRowsNullNoticeDatesTwoDimArrWHeader);

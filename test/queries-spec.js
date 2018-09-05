@@ -15,10 +15,13 @@ describe("queries", function() {
     });  
   });  
 
-  describe("#findMaxPrimaryKeyInAllDataRows()", function() {
-    it("should given an array with a header and 3 data rows with a _primaryKey column, return a header row of max_prim_key and one data row/column with the largest _primaryKey value out of all rows", function () {
-      queries.findMaxPrimaryKeyInAllDataRows([["Col1", "Col2", "_primaryKey"], ["A","AA", 2], ["B", "BB", 7], ["C", "CC", 1]]).should.be.eql([["max_prim_key"], [7]]);
+  describe("#findMaxColumnValInAllDataRows()", function() {
+    it("should given a passed in column name of endpoint-name._primaryKey and an array with a header and 3 data rows with a endpoint-name._primaryKey column, return a header row of max_col_val and one data row/column with the largest endpoint-name._primaryKey value out of all rows", function () {
+      queries.findMaxColValInAllDataRows("endpoint-name._primaryKey", [["Col1", "Col2", "endpoint-name._primaryKey"], ["A","AA", 2], ["B", "BB", 7], ["C", "CC", 1]]).should.be.eql([["max_col_val"], [7]]);
     });  
+    it("should given a passed in column name of just Col1 and an array with a header and 3 data rows with a Col1 column, return a header row of max_col_val and one data row/column with the largest Col1 value out of all rows", function () {
+      queries.findMaxColValInAllDataRows("Col1", [["Col1", "Col2", "endpoint-name._primaryKey"], [99,"AA", 2], [100, "BB", 7], [98, "CC", 1]]).should.be.eql([["max_col_val"], [100]]);
+    });      
   });
   
   describe("#returnRowsWithNullNoticeDates()", function() {
