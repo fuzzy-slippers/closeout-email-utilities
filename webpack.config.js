@@ -8,6 +8,7 @@ const CleanWebpackPlugin = require("clean-webpack-plugin");
 module.exports = {
   entry: [path.join(__dirname, 'src/include-in-webpack.js')],
   module: {
+    noParse: [/dtrace-provider$/, /safe-json-stringify$/, /mv/],
     rules: [{
       exclude: /node_modules/,
       test: /\.js$/,
@@ -22,5 +23,8 @@ module.exports = {
   resolve: {
     extensions: [".js", ".json"],
     modules: ["src", "node_modules"],
+  },
+  node: {
+    fs: 'empty'
   }
 };

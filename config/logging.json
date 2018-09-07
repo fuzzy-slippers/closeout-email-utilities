@@ -1,0 +1,15 @@
+{
+  "name": "alasql-gas-engine",
+  "streams": [
+    {
+      "level": "info",
+      "stream": "process.stdout"            
+    },
+    {
+      "level": "error",
+      "path": "process.stderr"   
+    }
+  ]
+}
+    
+    

@@ -1,11 +1,15 @@
 /** utility functions that are in between the wrapped google apps script global API function calls and using the data - converts the data into valid js objects from raw json and handles errors
  * * @module api-utils
  */
- 
 const url = require('url');
  
 const googleAppsScriptWrappers = require("../src/google-apps-script-wrappers/google-apps-script-wrappers.js");
 const objUtils = require("../src/obj-utils.js");
+const logger = require("../src/log-utils.js");
+
+//child logger based on logger imported above
+const log = logger.child({ filename: __filename });
+
 
 module.exports = {
     
@@ -25,7 +29,7 @@ module.exports = {
      * @return {object} is a js object of the JSON returned by the API GET call with properties or a js object with an Error property if there were any errors encountered (however all errors are caught so the program execution continues)
      */  
     apiGetCallKrNoPrefixes: (relativeUriPath) => {
-        console.log(`apiGetCallKr(${relativeUriPath}) called...`);
+        log.info(`apiGetCallKr(${relativeUriPath}) called...`);
         //we want to handle when an API call returns an error gracefully - uncaught errors halt the program operation - instead catch the error but then return back the JSON returned with the error object
         try {
             //call the API with the primary key after the slash (no url variables needed for API calls with the primary key specified)
@@ -67,7 +71,7 @@ module.exports = {
         const apiGetCallKrRetObjOrArr = module.exports.apiGetCallKrNoPrefixes(relativeUriPath);
         //get the endpoint name from the API path (for example "award-types" from "award/api/v1/award-types/")
         const endpointName = module.exports.extractApiEndpointNameFromUri(relativeUriPath);
-        console.log(`apiGetCallKr called with relativeUriPath: ${JSON.stringify(relativeUriPath)} - determined that endpointName is: ${JSON.stringify(endpointName)} and therefore the objUtils.prependAllArrOfObjKeys(apiGetCallKrRetObjOrArr, endpointName.concat(".") will be ${JSON.stringify(objUtils.prependAllArrOfObjKeys(apiGetCallKrRetObjOrArr, endpointName.concat(".")))}`);
+        log.info(`apiGetCallKr called with relativeUriPath: ${JSON.stringify(relativeUriPath)} - determined that endpointName is: ${JSON.stringify(endpointName)} and therefore the objUtils.prependAllArrOfObjKeys(apiGetCallKrRetObjOrArr, endpointName.concat(".") will be ${JSON.stringify(objUtils.prependAllArrOfObjKeys(apiGetCallKrRetObjOrArr, endpointName.concat(".")))}`);
         //use the prependAllObjKeys function to add the endpoint name (with a period separator) on the left side of every object property (column name) returned from the API
         return objUtils.prependAllArrOfObjKeys(apiGetCallKrRetObjOrArr, endpointName.concat("."));
     },

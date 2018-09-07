@@ -1,5 +1,5 @@
 {
-  "name": "testing-clasp",
+  "name": "alasql-gas-engine",
   "version": "0.0.0",
   "description": "for now just testing...",
   "main": "app.js",
@@ -7,11 +7,12 @@
   "author": "Zach",
   "dependencies": {
     "alasql": "^0.4.5",
+    "bunyan": "^1.8.12",
     "lodash": "^4.17.5"
   },
   "scripts": {
     "build": "npm run cleanwebpackbundles && ~/workspace/closeout-email-utilities/node_modules/.bin/webpack -p --config ./webpack.config.js",
-    "test": "mocha ~/workspace/closeout-email-utilities/test/ --recursive",
+    "test": "LOG_LEVEL=debug mocha ~/workspace/closeout-email-utilities/test/ --recursive",
     "clasplogin": "clasp login --no-localhost",
     "clasplogout": "clasp logout",
     "clasppull": "npm run clasplogin && cd ~/workspace/closeout-email-utilities/dist && clasp pull && cd ~/workspace/closeout-email-utilities/ && npm run clasplogout",

@@ -57,7 +57,7 @@ describe("alasql-utils", function() {
     it("should if passed test 2d array and just a select * sql statement, it should return the original data", function () {
       const origTwoDimArr = [["column1", "column2"], ["avocado", "orange"]];
       const testSqlStmt = "SELECT * FROM tmptbl1;";
-      alasqlUtils.selectFromTwoDimArr(testSqlStmt, origTwoDimArr, ).should
+      alasqlUtils.selectFromTwoDimArr(testSqlStmt, origTwoDimArr).should
       .deepEqual([["column1", "column2"], ["avocado", "orange"]]);      
     });
     it("should if passed test 2d array with null in first column and a sql statement with WHERE excluding nulls, return 2d array with null rows removed", function () {
