@@ -6,28 +6,28 @@ var objUtils = require("../src/obj-utils.js");
 
 describe("obj-utils", function() {
   
-  describe("#isErrorObj()", function() {
+  describe("#hasErrorProperty()", function() {
     it("should given a js object with a few properties and no Error property return false", function () {
       const sampleObj = {};
       sampleObj.testProp1 = "A";
       sampleObj.testProp1 = 1;      
-      objUtils.isErrorObj(sampleObj).should.eql(false);
+      objUtils.hasErrorProperty(sampleObj).should.eql(false);
     });  
   });   
   
-  describe("#isErrorObj()", function() {
+  describe("#hasErrorProperty()", function() {
     it("should given a js object an Error property which is an array return true", function () {
       const sampleObj = {};
       sampleObj.Error = ["whateverArrElem"];  
-      objUtils.isErrorObj(sampleObj).should.eql(true);
+      objUtils.hasErrorProperty(sampleObj).should.eql(true);
     });  
   });  
   
-  describe("#isErrorObj()", function() {
+  describe("#hasErrorProperty()", function() {
     it("should given a js object an Error property which is a string return true", function () {
       const sampleObj = {};
       sampleObj.Error = "whateverString";  
-      objUtils.isErrorObj(sampleObj).should.eql(true);
+      objUtils.hasErrorProperty(sampleObj).should.eql(true);
     });  
   });  
 
@@ -128,6 +128,48 @@ describe("obj-utils", function() {
     it("should if given an error object (object with Error property) return that error object unchanged", function () {
       objUtils.prependAllArrOfObjKeys({"Error":{"errors":["some error"]}}, "doesNotMatter").should.be.eql({"Error":{"errors":["some error"]}});
     });     
+    
+  });  
+  
+  
+  
+  describe("#mergeObjArrIntoSingleObj()", function() {
+    it("should if passed an array with two objects, the first with a property A and the second with a property B, should return a single object with both properties", function () {
+      objUtils.mergeObjArrIntoSingleObj([{A:1}, {B:2}]).should.be.eql({A:1,B:2});
+    }); 
+    
+    it("should if passed an array with three objects, each having 2 properties A&B, C&D, E&F, should return a single object with all 6 properties", function () {
+      objUtils.mergeObjArrIntoSingleObj([{A:1,B:2},{C:3,D:4},{E:5,F:6}]).should.be.eql({A:1,B:2,C:3,D:4,E:5,F:6});
+    });     
+  
+    it("should if passed an array with two objects, both with properties Z, return one object with property Z and the value from the second (right most) object in the array", function () {
+      objUtils.mergeObjArrIntoSingleObj([{Z:1}, {Z:100}]).should.be.eql({Z:100});
+    });   
+  
+    it("should if passed an array with two objects, the first with properties A&B and the second with a properties B&C, should return a single object with props AB and C with the value for B coming from the object later (higher index) in the array", function () {
+      objUtils.mergeObjArrIntoSingleObj([{A:1,B:2}, {B:3,C:4}]).should.be.eql({A:1,B:3,C:4});
+    });  
+    
+    it("should if passed an empty array return an empty object", function () {
+      objUtils.mergeObjArrIntoSingleObj([]).should.be.eql({});
+    });  
+    
+    it("should if passed undefined return undefined", function () {
+      should.equal(objUtils.mergeObjArrIntoSingleObj(undefined), undefined);
+    }); 
+    
+    // may want to include case of what to do when an object not in an array is passed in
+    
+  });
+  
+  describe("#objectAssignSingleObjEs3Friendly()", function() {
+    it("should if passed an two objects, the first with a property A and the second with a property B, should return a single object with both properties", function () {
+      objUtils.objectAssignSingleObjEs3Friendly({A:1}, {B:2}).should.be.eql({A:1,B:2});
+    }); 
+  
+    it("should if passed two objects, both with properties Z, return one object with property Z and the value from the second (right most) object passed in", function () {
+      objUtils.objectAssignSingleObjEs3Friendly({Z:1}, {Z:100}).should.be.eql({Z:100});
+    });   
     
   });  
   

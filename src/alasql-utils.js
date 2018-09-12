@@ -4,6 +4,7 @@
 const alasql = require("alasql/dist/alasql.js");
 global.alasql = alasql;
 const arrayUtils = require("./array-utils.js");
+const log = require("../src/log-utils.js");
 
 module.exports = {
     
@@ -25,6 +26,7 @@ module.exports = {
      * Takes a database object, a proposed table name and two dimentional array data (raw format of google sheets) and 
      */
     addTablePopulatedByTwoDimArrWithHeaderRowData_: (db, tableNameToAdd, twoDimArrDataWithHeader) => {
+        log.trace(`alasql-utils addTablePopulatedByTwoDimArrWithHeaderRowData_(${db},${tableNameToAdd}, ${JSON.stringify(twoDimArrDataWithHeader)}) called...`);
         //alasql expects data as array of objects like [{col1: 1, col2: 2}], convert data in 2d array format that comes directly out of sheets into 1d array of objects format first
         var twoDimArrDataWithHeaderConvertedToObjArr = arrayUtils.convertFromTwoDimArrWithHeaderToObjArr(twoDimArrDataWithHeader);
         //add a new table using the name specified
@@ -36,16 +38,6 @@ module.exports = {
         dbTablesReference[tableNameToAdd].data = twoDimArrDataWithHeaderConvertedToObjArr; 
         return db;
     },
-    
-    
-                        // //DELETE LATER
-                        // testAlasqlWorking()
-                        // {
-                        //     alasql("CREATE TABLE cities (city string, population number)");
-                        //     alasql("INSERT INTO cities VALUES ('Rome',2863223),('Paris',2249975),('Berlin',3517424),('Madrid',3041579)");
-                        //     var res = alasql("SELECT * FROM cities WHERE population < 3500000 ORDER BY population DESC");
-                        //     return res;
-                        // },
     
     /**
      * transform a 2d array of data (or up to 3 2d arrays of data if doing a join or union, etc) into a revised 2d array based on single SQL SELECT statement (Note: table name referenced in SQL query should always be "tmptbl1", "tmptbl2" and "tmptbl3" as these are the hard coded table names when adding the data to the database)
@@ -60,6 +52,7 @@ module.exports = {
      */
     selectFromTwoDimArr(sqlToTransformData, twoDimArrWHeader, secondTblTwoDimArrWHeader, thirdTblTwoDimArrWHeader)
     {
+        log.trace(`alasql-utils selectFromTwoDimArr(${sqlToTransformData}, ${JSON.stringify(twoDimArrWHeader)}, ${JSON.stringify(secondTblTwoDimArrWHeader)}, ${JSON.stringify(thirdTblTwoDimArrWHeader)}) called...`);        
         const tempDb = this.createNewDatabase_();
         this.addTablePopulatedByTwoDimArrWithHeaderRowData_(tempDb, "tmptbl1", twoDimArrWHeader);
         //only attempt to create/load second table if data is passed in for it - optional two do select against more than one table
@@ -72,6 +65,16 @@ module.exports = {
         const resultTwoDimArr = arrayUtils.convertOneDimObjArrToTwoDimArrWithHeaderRow(resultObjArr); 
         return resultTwoDimArr;
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     // /** TODO:
     //  * perform single INSERT/UPDATE/DELETE action against  (Note: table name referenced in SQL query should always be "tmptbl1")

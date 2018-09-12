@@ -3,31 +3,51 @@ process.versions.node = true;
 
 const bunyan = require("bunyan");
 
-const loggingConfig = require("../config/logging.json");
+const logLevel = process.env.LOG_LEVEL || "trace";
 
-const logLevel = process.env.LOG_LEVEL || "info";
+function RawStreamConsoleToMatchDefaultBunyanFormat() {}
+function RawStreamLoggerToMatchDefaultBunyanFormat() {}
 
+/**
+ * attempting to match the default format of Banyun - only reason I needed to create a custom raw stream is because of Webpack/GAS incompatibilities with trying to use streams (see Banyun docs)
+ */
+RawStreamConsoleToMatchDefaultBunyanFormat.prototype.write = function (rec) {
+    console.log(JSON.stringify({"name":rec.name, "hostname":rec.hostname, "pid": rec.pid, level: rec.level, "msg":rec.msg, "time":rec.time, "v":rec.v}));
+},
 
-
-function MyRawStream() {}
-MyRawStream.prototype.write = function (rec) {
-    console.log('[%s] %s: %s',
-        rec.time.toISOString(),
-        bunyan.nameFromLevel[rec.level],
-        rec.msg);
+RawStreamLoggerToMatchDefaultBunyanFormat.prototype.write = function (rec) {
+  if (typeof Logger === "object") {
+    Logger.log(JSON.stringify({"name":rec.name, "hostname":rec.hostname, "pid": rec.pid, level: rec.level, "msg":rec.msg, "time":rec.time, "v":rec.v}));
+  }
 }
 
-
-// main logger
+// main logger - output to stackdriver (GAS) and console (C9 mocha tests, etc)
 const log = bunyan.createLogger({
   "name": "alasql-gas-engine",
     streams: [
         {
-            level: 'info',
-            stream: new MyRawStream(),
+            level: logLevel,
+            stream: new RawStreamConsoleToMatchDefaultBunyanFormat(),
             type: 'raw'
-        }
+        },
+        {
+            level: "info",
+            stream: new RawStreamLoggerToMatchDefaultBunyanFormat(),
+            type: 'raw'
+        }        
     ]
 });
 
+
 module.exports = log;
+
+
+
+
+// MyRawStream.prototype.write = function (rec) {
+//     console.log('[%s] %s: %s',
+//         rec.time.toISOString(),
+//         bunyan.nameFromLevel[rec.level],
+//         rec.msg);
+// }
+

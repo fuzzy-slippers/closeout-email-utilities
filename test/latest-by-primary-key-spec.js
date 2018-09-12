@@ -29,7 +29,7 @@ latestByPrimaryKey.__set__("apiUtils", {
       }
     },
     //call the real versions of the below functions in apiUtils (we don't want to mock these ones)
-    isErrorObj: (jsObj) => nonMockedApiUtils.isErrorObj(jsObj),
+    hasErrorProperty: (jsObj) => nonMockedApiUtils.hasErrorProperty(jsObj),
     extractApiEndpointNameFromUri: (partialOrFullUriString) => nonMockedApiUtils.extractApiEndpointNameFromUri(partialOrFullUriString),
     
     

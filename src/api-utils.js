@@ -5,10 +5,7 @@ const url = require('url');
  
 const googleAppsScriptWrappers = require("../src/google-apps-script-wrappers/google-apps-script-wrappers.js");
 const objUtils = require("../src/obj-utils.js");
-const logger = require("../src/log-utils.js");
-
-//child logger based on logger imported above
-const log = logger.child({ filename: __filename });
+const log = require("../src/log-utils.js");
 
 
 module.exports = {
@@ -19,7 +16,7 @@ module.exports = {
      * @param {object} a javascript object representing either 1) the data result of an API call..converted from JSON to a js object or 2) an API call error returned, and converted from JSON about the error to a js object with an Error property
      * @return {boolean} the result of trying to detect if either true: the js object represents a failed API call/error or false: it's valid data in the js object
      */
-    isErrorObj: (jsObj) => jsObj.hasOwnProperty("Error"),    
+    hasErrorProperty: (jsObj) => jsObj.hasOwnProperty("Error"),    
 
     /**
      * DEPRICATED (ZF) - use apiGetCallKrWDotEndpointNames for most if not all situations as we want all sheet columns to have the API endpoint name prepended before the column name for good joins and no overwriting column names that are the same from different API endpoints 
@@ -29,7 +26,7 @@ module.exports = {
      * @return {object} is a js object of the JSON returned by the API GET call with properties or a js object with an Error property if there were any errors encountered (however all errors are caught so the program execution continues)
      */  
     apiGetCallKrNoPrefixes: (relativeUriPath) => {
-        log.info(`apiGetCallKr(${relativeUriPath}) called...`);
+        log.trace(`api-utils apiGetCallKrNoPrefixes(${relativeUriPath}) called...`);
         //we want to handle when an API call returns an error gracefully - uncaught errors halt the program operation - instead catch the error but then return back the JSON returned with the error object
         try {
             //call the API with the primary key after the slash (no url variables needed for API calls with the primary key specified)
@@ -44,6 +41,7 @@ module.exports = {
             catch (e) {
                 const jsonParseErrorObj = {};
                 jsonParseErrorObj.Error = e;
+                log.error(`api-utils apiGetCallKrNoPrefixes returned error on parsing to JSON step: ${e}`);
                                                     // console.log(`from node - the json.parse step caused an error with the following jsonReturnedByApiCall string: ${returnedByApiCall} so we will be returning (jsonParseErrorObj): ${JSON.stringify(jsonParseErrorObj)}`);
                 return jsonParseErrorObj;
             }
@@ -51,6 +49,7 @@ module.exports = {
         catch(e) {
             const apiCallErrorObj = {};
             apiCallErrorObj.Error = e;
+            log.error(`api-utils apiGetCallKrNoPrefixes returned error on googleAppsScriptWrappers.callKrGetApiWithWait(relativeUriPath) step: ${e}`);            
                                                     // console.log(`from node - there was an error with the api call, here is the error object returned (apiCallErrorObj): ${JSON.stringify(apiCallErrorObj)}`);
             return apiCallErrorObj;
         }
@@ -67,11 +66,11 @@ module.exports = {
      * 
      */  
     apiGetCallKr: (relativeUriPath) => {
+        log.trace(`api-utils apiGetCallKr(${relativeUriPath}) called...`);  
         //use apiGetCallKr to actually make the API call and format the data returned (depending on the API called will either be a js object or an array of js objects)
         const apiGetCallKrRetObjOrArr = module.exports.apiGetCallKrNoPrefixes(relativeUriPath);
         //get the endpoint name from the API path (for example "award-types" from "award/api/v1/award-types/")
         const endpointName = module.exports.extractApiEndpointNameFromUri(relativeUriPath);
-        log.info(`apiGetCallKr called with relativeUriPath: ${JSON.stringify(relativeUriPath)} - determined that endpointName is: ${JSON.stringify(endpointName)} and therefore the objUtils.prependAllArrOfObjKeys(apiGetCallKrRetObjOrArr, endpointName.concat(".") will be ${JSON.stringify(objUtils.prependAllArrOfObjKeys(apiGetCallKrRetObjOrArr, endpointName.concat(".")))}`);
         //use the prependAllObjKeys function to add the endpoint name (with a period separator) on the left side of every object property (column name) returned from the API
         return objUtils.prependAllArrOfObjKeys(apiGetCallKrRetObjOrArr, endpointName.concat("."));
     },
@@ -87,6 +86,7 @@ module.exports = {
      * 
      */      
     extractApiEndpointNameFromUri(partialOrFullUriString) {
+        log.trace(`api-utils extractApiEndpointNameFromUri(${partialOrFullUriString}) called...`);        
         //utilize the older node built in url (url.parse) module (imported/required above)
         const whatwgUrlObject = url.parse(partialOrFullUriString);
         //pull out just the "pathname" portion which is everything between the domain and query params like /category/articlename.html

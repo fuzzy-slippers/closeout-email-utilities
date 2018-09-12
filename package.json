@@ -12,7 +12,8 @@
   },
   "scripts": {
     "build": "npm run cleanwebpackbundles && ~/workspace/closeout-email-utilities/node_modules/.bin/webpack -p --config ./webpack.config.js",
-    "test": "LOG_LEVEL=debug mocha ~/workspace/closeout-email-utilities/test/ --recursive",
+    "test": "LOG_LEVEL=trace mocha ~/workspace/closeout-email-utilities/test/ --recursive",
+    "testandcommitall": "npm run test && git add . && git commit",
     "clasplogin": "clasp login --no-localhost",
     "clasplogout": "clasp logout",
     "clasppull": "npm run clasplogin && cd ~/workspace/closeout-email-utilities/dist && clasp pull && cd ~/workspace/closeout-email-utilities/ && npm run clasplogout",

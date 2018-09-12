@@ -5,6 +5,7 @@ const googleAppsScriptWrappers = require("../src/google-apps-script-wrappers/goo
 const apiUtils = require("../src/api-utils.js"); 
 const queries = require("../src/queries.js"); 
 const arrayUtils = require("../src/array-utils.js");
+const log = require("../src/log-utils.js");
 
 module.exports = {
 
@@ -21,6 +22,7 @@ module.exports = {
      */     
      //the queries.findMaxPrimaryKeyInAllDataRows returns an array with a single column of max_prim_key and single data row with the max primary key value - returning just the number in the 2nd row (array row position 1), first column (0th array column position) which is the max primary key as this function returns just the numeric primary key value
      findMaxPrimaryKeyValueInData: (colToFindMax, twoDimArrWHeader, relativeUriPath) => {
+        log.trace(`latest-by-primary-key findMaxPrimaryKeyValueInData(${colToFindMax}, ${twoDimArrWHeader}, ${relativeUriPath}) called...`);         
         // make sure the data set is not empty (had data rows)
         if (twoDimArrWHeader.length > 0)
         {
@@ -46,7 +48,7 @@ module.exports = {
      * @return {object[][]} a two dimentional array containing a header row and then as many rows of data as we were able to do successful API calls with increasingly higher primary key values this round (depends on whether we were already at the max primary key in the system or not or if there was new data to pull)
      */
     gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys: (maxPreviouslyUsedPrimaryKey, relativeUriPath) => {
-        
+        log.trace(`latest-by-primary-key gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys: (${maxPreviouslyUsedPrimaryKey}, ${relativeUriPath}) called...`);           
         const endPointName = apiUtils.extractApiEndpointNameFromUri(relativeUriPath)
         
         //may want to make this functional (recursive) in the future, for now using do...while loop
@@ -62,7 +64,7 @@ module.exports = {
                 arrApiCallsJsObjs.push(module.exports.apiCallOnNextHigherPrimaryKey(arrayUtils.lastArrElement(arrApiCallsJsObjs)[`${endPointName}._primaryKey`], relativeUriPath));
         }
         // continue until the last object added to the array above is an error object, indicating that we have reached a primary key that has not been assigned yet in KR and therefore there is no more data to retrieve that is newer than what is already in the spreadsheet
-        while (!apiUtils.isErrorObj(arrayUtils.lastArrElement(arrApiCallsJsObjs)));
+        while (!apiUtils.hasErrorProperty(arrayUtils.lastArrElement(arrApiCallsJsObjs)));
         //remove the last element from the array which was found to be an error object (hit the end of valid records by primary key value)
         arrApiCallsJsObjs.pop();
         //convert from a 1d array of js objects to a 2d array with a header row as that is the useful format of the data (alasql queries, google sheets, etc)

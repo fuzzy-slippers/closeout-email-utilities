@@ -24,10 +24,27 @@ describe("queries", function() {
     });      
   });
   
-  describe("#returnRowsWithNullNoticeDates()", function() {
-    it("should given an array with a header and 3 data rows with a noticeDate column, return just the two rows with null notice dates", function () {
-      queries.returnRowsWithNullNoticeDates([["Col1", "Col2", "noticeDate"], ["A","AA", null], ["B", "BB", "tomorrow"], ["C", "CC", null]]).should.be.eql([["Col1", "Col2", "noticeDate"], ["A","AA", null], ["C", "CC", null]]);
+  describe("#filterJustRowsWhereColIsNull()", function() {
+    it("should if given data with the column header not having dot prefixes and a column mayHaveNull that contains null values in some cases, return just those rows that mayHaveNull has null values", function () {
+      queries.filterJustRowsWhereColIsNull("mayHaveNull", [["Col1", "Col2", "mayHaveNull"], ["A","AA", null], ["B", "BB", "tomorrow"], [null, null, null]]).should.be.eql([["Col1", "Col2", "mayHaveNull"], ["A","AA", null], [null, null, null]]);
     });  
+    
+    it("should given an array with a header and 3 data rows with an endpoint-name.noticeDate column, return just the two rows with null notice dates", function () {
+      queries.filterJustRowsWhereColIsNull("endpoint-name.noticeDate", [["endpoint-name.Col1", "endpoint-name.Col2", "endpoint-name.noticeDate"], ["A","AA", null], ["B", "BB", "tomorrow"], ["C", "CC", null]]).should.be.eql([["endpoint-name.Col1", "endpoint-name.Col2", "endpoint-name.noticeDate"], ["A","AA", null], ["C", "CC", null]]);
+    });  
+    
+    it("should given an array with just a header row, returning empty array", function () {
+      queries.filterJustRowsWhereColIsNull("endpoint-name.Col3", [["endpoint-name.Col1", "endpoint-name.Col2", "endpoint-name.Col3"]]).should.be.eql([]);
+    });  
+    
+    it("should given an array with a header and one data row with no null values, just returns the header row (as no rows with null values in the col specified found)", function () {
+      queries.filterJustRowsWhereColIsNull("endpoint-name.Col3", [["endpoint-name.Col1", "endpoint-name.Col2", "endpoint-name.Col3"], ["A","AA", "AAA"]]).should.be.eql([]);
+    });    
+
+    it("should given an array with a header and 4 data rows with an endpoint-name.noticeDate column, return just the one row with the null notice date, not the row with an empty string or the row with endpoint-name.noticeDate with a string value of 'null'", function () {
+      queries.filterJustRowsWhereColIsNull("endpoint-name.noticeDate", [["endpoint-name.Col1", "endpoint-name.Col2", "endpoint-name.noticeDate"], ["A","AA", ""], ["B", "BB", "tomorrow"], ["C", "CC", null], ["D", "DD", "null"]]).should.be.eql([["endpoint-name.Col1", "endpoint-name.Col2", "endpoint-name.noticeDate"], ["C", "CC", null]]);
+    });      
+    
   });
   
  
@@ -48,39 +65,39 @@ describe("queries", function() {
   }); 
   
   
-  // describe("#unionWithExtraColumnsInFirstTablePreserved()", function() {
-  //   it("should given the two tables return the union of the two tables but with any additional column names and values in the first table in the results", function () {
-  //     queries.unionWithExtraColumnsInFirstTablePreserved([["Col1", "Col2", "Col3"], ["A","AA", ""], ["B", "BB", "tomorrow"], ["C", "CC", ""]],
-  //                                                         [["Col1", "Col2"], ["A","AA"], ["B", "BB"], ["C", "CC"]],
-  //                                                         [["Col1", "Col2"], ["A","AA"], ["B", "BB"], ["C", "CC"]])
-  //                                                         .should.be.eql([["Col1", "Col2", "Col3"], ["A","AA", ""], ["B", "BB", "tomorrow"], ["C", "CC", ""]]);
-  //   });  
-  // });  
+                                                  // describe("#unionWithExtraColumnsInFirstTablePreserved()", function() {
+                                                  //   it("should given the two tables return the union of the two tables but with any additional column names and values in the first table in the results", function () {
+                                                  //     queries.unionWithExtraColumnsInFirstTablePreserved([["Col1", "Col2", "Col3"], ["A","AA", ""], ["B", "BB", "tomorrow"], ["C", "CC", ""]],
+                                                  //                                                         [["Col1", "Col2"], ["A","AA"], ["B", "BB"], ["C", "CC"]],
+                                                  //                                                         [["Col1", "Col2"], ["A","AA"], ["B", "BB"], ["C", "CC"]])
+                                                  //                                                         .should.be.eql([["Col1", "Col2", "Col3"], ["A","AA", ""], ["B", "BB", "tomorrow"], ["C", "CC", ""]]);
+                                                  //   });  
+                                                  // });  
   
   describe("#unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted()", function() {
     it("should given the two tables and the first table assumed to have a unique _primaryKey column return the union of the two tables but with any additional column names and values in the first table in the results", function () {
-      const retVal = queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted(
-                                                          [["_primaryKey", "Col2", "Col3"], 
-                                                           [1,"AA", ""], 
-                                                           [2, "BB", "tomorrow"], 
-                                                           [3, "CC", ""], 
-                                                           [4, "DD", "The Next Day"]
+      const retVal = queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted("endpoint-name._primaryKey",
+                                                          [["endpoint-name._primaryKey", "endpoint-name.Col2", "endpoint-name.Col3"], 
+                                                          [1,"AA", ""], 
+                                                          [2, "BB", "tomorrow"], 
+                                                          [3, "CC", ""], 
+                                                          [4, "DD", "The Next Day"]
                                                           ],
                                                           [
-                                                            ["_primaryKey", "Col2"], 
+                                                            ["endpoint-name._primaryKey", "endpoint-name.Col2"], 
                                                             [1,"AA"], 
                                                             [2, "BB"], 
                                                             [3, "CC"]
                                                           ],
                                                           [
-                                                            ["_primaryKey", "Col2"], 
+                                                            ["endpoint-name._primaryKey", "endpoint-name.Col2"], 
                                                             [1,"AA"], 
                                                             [2, "BB"], 
                                                             [3, "CC"], 
                                                             [5, "EE"]
                                                           ]);
     //since we don't know the order rows will be returned, just checking that the result contains these rows in some order
-    retVal.should.containEql(["_primaryKey", "Col2", "Col3"]);
+    retVal.should.containEql(["endpoint-name._primaryKey", "endpoint-name.Col2", "endpoint-name.Col3"]);
     retVal.should.containEql([1,"AA", ""]);
     retVal.should.containEql([2, "BB", "tomorrow"]);
     retVal.should.containEql([3, "CC", ""]);
@@ -89,70 +106,69 @@ describe("queries", function() {
     });   
     
     it("should handle being passed an empty array for first data set - in that case without header rows and returned unioned data from the second two data sets", function () {
-       queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted([], [["_primaryKey", "colB"],[1,2]], [["_primaryKey", "colB"],[1,2],[3,4]])
-       .should.eql([["_primaryKey", "colB"],[1,2],[3,4]]);
+       queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted("endpoint-name._primaryKey", [], [["endpoint-name._primaryKey", "endpoint-name.colB"],[1,2]], [["endpoint-name._primaryKey", "endpoint-name.colB"],[1,2],[3,4]])
+       .should.eql([["endpoint-name._primaryKey", "endpoint-name.colB"],[1,2],[3,4]]);
     });     
     
   });  
   
   describe("#unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings()", function() {
     it("should given the two tables and the first table assumed to have a unique _primaryKey column return the union of the two tables but with any additional column names and values in the first table in the results", function () {
-      queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings(
-                                                          [["_primaryKey", "Col2", "Col3"], 
-                                                           [1,"AA", ""], 
-                                                           [2, "BB", "tomorrow"], 
-                                                           [3, "CC", ""], 
-                                                           [4, "DD", "The Next Day"]
+      queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings("award-amount-transactions._primaryKey",
+                                                          [["award-amount-transactions._primaryKey", "award-amount-transactions.Col2", "award-amount-transactions.Col3"], 
+                                                          [1,"AA", ""], 
+                                                          [2, "BB", "tomorrow"], 
+                                                          [3, "CC", ""], 
+                                                          [4, "DD", "The Next Day"]
                                                           ],
                                                           [
-                                                            ["_primaryKey", "Col2"], 
+                                                            ["award-amount-transactions._primaryKey", "award-amount-transactions.Col2"], 
                                                             [1,"AA"], 
                                                             [2, "BB"], 
                                                             [3, "CC"]
                                                           ],
                                                           [
-                                                            ["_primaryKey", "Col2"], 
+                                                            ["award-amount-transactions._primaryKey", "award-amount-transactions.Col2"], 
                                                             [1,"AA"], 
                                                             [2, "BB"], 
                                                             [3, "CC"], 
                                                             [5, "EE"]
                                                           ])
                                                           .should.eql(
-                                                          [["_primaryKey", "Col2", "Col3"], 
-                                                           [1,"AA", ""], 
-                                                           [2, "BB", "tomorrow"], 
-                                                           [3, "CC", ""], 
-                                                           [4, "DD", "The Next Day"],
-                                                           [5, "EE", '']
+                                                          [["award-amount-transactions._primaryKey", "award-amount-transactions.Col2", "award-amount-transactions.Col3"], 
+                                                          [1,"AA", ""], 
+                                                          [2, "BB", "tomorrow"], 
+                                                          [3, "CC", ""], 
+                                                          [4, "DD", "The Next Day"],
+                                                          [5, "EE", '']
                                                           ]);
     });
     
     it("should handle being passed an empty array for second data set - in that case without header rows and returned unioned data from the first and third data sets", function () {
-       queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings([["_primaryKey", "colB", "colC"],[1,2,3]], [], [["_primaryKey", "colB"],[1,2],[3,4]])
-       .should.eql([["_primaryKey", "colB", "colC"],[1,2,3],[3,4,""]]);
+      queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings("endpoint-name._primaryKey", [["endpoint-name._primaryKey", "endpoint-name.colB", "endpoint-name.colC"],[1,2,3]], [], [["endpoint-name._primaryKey", "endpoint-name.colB"],[1,2],[3,4]])
+      .should.eql([["endpoint-name._primaryKey", "endpoint-name.colB", "endpoint-name.colC"],[1,2,3],[3,4,""]]);
     });   
     
     it("should handle being passed an empty array for all three data sets - in that case without header rows - returns empty array", function () {
-       queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings([], [], [])
-       .should.eql([]);
+      queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings("endpoint-name._primaryKey", [], [], [])
+      .should.eql([]);
     });   
 
     it("should handle being passed all but the first data set as empty - in that case returns the first data set", function () {
-       queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings([["_primaryKey", "colA"], ['', '']], [], [])
-       .should.eql([["_primaryKey", "colA"], ['', '']]);
+      queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings("endpoint-name._primaryKey", [["endpoint-name._primaryKey", "endpoint-name.colA"], ['', '']], [], [])
+      .should.eql([["endpoint-name._primaryKey", "endpoint-name.colA"], ['', '']]);
     });     
     
     it("should handle being passed all but the second data set as empty - in that case returns the second data set", function () {
-       queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings([], [["_primaryKey", "colA"], ["Z", "Y"]], [])
-       .should.eql([["_primaryKey", "colA"], ["Z", "Y"]]);
+      queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings("endpoint-name._primaryKey", [], [["endpoint-name._primaryKey", "endpoint-name.colA"], ["Z", "Y"]], [])
+      .should.eql([["endpoint-name._primaryKey", "endpoint-name.colA"], ["Z", "Y"]]);
     });    
     
     it("should handle being passed all but the third data set as empty - in that case returns the third data set", function () {
-       queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings([], [], [["_primaryKey", "colA"], [1, 2]])
-       .should.eql([["_primaryKey", "colA"], [1, 2]]);
+      queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings("endpoint-name._primaryKey", [], [], [["_primaryKey", "colA"], [1, 2]])
+      .should.eql([["_primaryKey", "colA"], [1, 2]]);
     });      
     
-     
     
   });   
 

@@ -5,6 +5,7 @@ const core_Set = require('core-js/library/fn/set');
 const core_Array_from = require('core-js/library/fn/array/from');
 const core_Object_values = require("core-js/fn/object/values")
 const core_Array_fill = require('core-js/library/fn/array/virtual/fill');
+const log = require("../src/log-utils.js");
 
 module.exports = {
     
@@ -15,6 +16,7 @@ module.exports = {
      * @return {object} returns a one dimentional array of objects with the property names coming from the passed in array header
      */
     convertFromTwoDimArrWithHeaderToObjArr: (twoDimArr) => {
+      log.trace(`array-utils convertFromTwoDimArrWithHeaderToObjArr(${JSON.stringify(twoDimArr)}) called...`);        
       const copyOfTwoDimArrNoHeaderRow = twoDimArr.slice(1);
       const headerRow = twoDimArr[0];
       const oneDimArrObjs = copyOfTwoDimArrNoHeaderRow.map(function(colName) {
@@ -31,6 +33,7 @@ module.exports = {
      * 
      */
     unionArrs: (...arrays) => {
+      log.trace(`array-utils unionArrs(${arrays}) called...`);          
       const valuesFromAllArrays = [].concat(...arrays);
       const setVersionValuesFromAllArrays = new core_Set(valuesFromAllArrays);
       const uniqueValuesInArrayForm = core_Array_from(setVersionValuesFromAllArrays);
@@ -53,6 +56,7 @@ module.exports = {
      * @return {object} returns a two dimentional array with the first row 0 index array element just being the property names as the "column" headers
      */
     convertOneDimObjArrToTwoDimArrWithHeaderRow: (objArr) => {
+      log.trace(`array-utils convertOneDimObjArrToTwoDimArrWithHeaderRow(${JSON.stringify(objArr)}) called...`);       
       //make sure an array and it has at least one element/object inside
       if (Array.isArray(objArr) && objArr.length) {    
         //generate the header - if there are different numbers of properties in different objects in the array, consolidate them into a comprehensive header (preserving the order)
@@ -99,6 +103,7 @@ module.exports = {
      */     
      //the queries.findMaxPrimaryKeyInAllDataRows returns an array with a single column of max_prim_key and single data row with the max primary key value - returning just the number in the 2nd row (array row position 1), first column (0th array column position) which is the max primary key as this function returns just the numeric primary key value
      lastArrElement: (arr) => {
+        log.trace(`array-utils lastArrElement(${JSON.stringify(arr)}) called...`);        
         //make sure array passed in is 1) not undefined 2) is an array and 3) has at least one element - otherwise return undefined
         if (arr && Array.isArray(arr) && arr.length > 0)
           return arr.slice(-1)[0];
@@ -116,6 +121,7 @@ module.exports = {
      * @return {object[][]} the two dimentional array passed in with the elements specified replaced
      */     
      replaceAllOccurancesInTwoDimArr: (twoDimArr, replaceThis, withThis) => {
+        log.trace(`array-utils replaceAllOccurancesInTwoDimArr(${JSON.stringify(twoDimArr)}, ${replaceThis}, ${withThis}) called...`);       
         return twoDimArr.map( function(row) {
             return row.map( function( cell ) { 
                 if (Object.is(cell, replaceThis))
