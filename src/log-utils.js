@@ -12,12 +12,12 @@ function RawStreamLoggerToMatchDefaultBunyanFormat() {}
  * attempting to match the default format of Banyun - only reason I needed to create a custom raw stream is because of Webpack/GAS incompatibilities with trying to use streams (see Banyun docs)
  */
 RawStreamConsoleToMatchDefaultBunyanFormat.prototype.write = function (rec) {
-    console.log(JSON.stringify({"name":rec.name, "hostname":rec.hostname, "pid": rec.pid, level: rec.level, "msg":rec.msg, "time":rec.time, "v":rec.v}));
+    console.log(JSON.stringify({ "msg":rec.msg, "name":rec.name, "hostname":rec.hostname, "pid": rec.pid, level: rec.level, "time":rec.time, "v":rec.v}));
 },
 
 RawStreamLoggerToMatchDefaultBunyanFormat.prototype.write = function (rec) {
   if (typeof Logger === "object") {
-    Logger.log(JSON.stringify({"name":rec.name, "hostname":rec.hostname, "pid": rec.pid, level: rec.level, "msg":rec.msg, "time":rec.time, "v":rec.v}));
+    Logger.log(JSON.stringify({"msg":rec.msg, "name":rec.name, "hostname":rec.hostname, "pid": rec.pid, level: rec.level, "time":rec.time, "v":rec.v}));
   }
 }
 
