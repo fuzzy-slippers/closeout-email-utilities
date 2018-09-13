@@ -37,21 +37,21 @@ describe("queries", function() {
       queries.filterJustRowsWhereColIsNullOrBlank("endpoint-name.Col3", [["endpoint-name.Col1", "endpoint-name.Col2", "endpoint-name.Col3"]]).should.be.eql([]);
     });  
     
-    // it("should given an array with a header and one data row with no null values, just returns the header row (as no rows with null values in the col specified found)", function () {
-    //   queries.filterJustRowsWhereColIsNullOrBlank("endpoint-name.Col3", [["endpoint-name.Col1", "endpoint-name.Col2", "endpoint-name.Col3"], ["A","AA", "AAA"]]).should.be.eql([]);
-    // });    
+    it("should given an array with a header and one data row with no null values, just returns the header row (as no rows with null values in the col specified found)", function () {
+      queries.filterJustRowsWhereColIsNullOrBlank("endpoint-name.Col3", [["endpoint-name.Col1", "endpoint-name.Col2", "endpoint-name.Col3"], ["A","AA", "AAA"]]).should.be.eql([]);
+    });    
     
-    // it("should given an array with a header and one data row with a blank value in the specified column to scan, return the one row with the blank string value", function () {
-    //   queries.filterJustRowsWhereColIsNullOrBlank("endpoint-name.Col3", [["endpoint-name.Col1", "endpoint-name.Col2", "endpoint-name.Col3"], ["A","AA", ""]]).should.be.eql([["endpoint-name.Col1", "endpoint-name.Col2", "endpoint-name.Col3"], ["A","AA", ""]]);
-    // });        
+    it("should given an array with a header and one data row with a blank value in the specified column to scan, return the one row with the blank string value", function () {
+      queries.filterJustRowsWhereColIsNullOrBlank("endpoint-name.Col3", [["endpoint-name.Col1", "endpoint-name.Col2", "endpoint-name.Col3"], ["A","AA", ""]]).should.be.eql([["endpoint-name.Col1", "endpoint-name.Col2", "endpoint-name.Col3"], ["A","AA", ""]]);
+    });        
     
-    // it("should given an array with a header and one data row with a string with just blank spaces in the specified column to scan, return the one row with the string that is all whitespaces", function () {
-    //   queries.filterJustRowsWhereColIsNullOrBlank("endpoint-name.Col3", [["endpoint-name.Col1", "endpoint-name.Col2", "endpoint-name.Col3"], ["A","AA", "     "]]).should.be.eql([["endpoint-name.Col1", "endpoint-name.Col2", "endpoint-name.Col3"], ["A","AA", "     "]]);
-    // });        
+    it("should given an array with a header and one data row with a string with just blank spaces in the specified column to scan, return the one row with the string that is all whitespaces (although trimmed down to an empty string since we need to trim all strings as a workaround for the TRIM not working in alasql)", function () {
+      queries.filterJustRowsWhereColIsNullOrBlank("endpoint-name.Col3", [["endpoint-name.Col1", "endpoint-name.Col2", "endpoint-name.Col3"], ["A","AA", "     "]]).should.be.eql([["endpoint-name.Col1", "endpoint-name.Col2", "endpoint-name.Col3"], ["A","AA", ""]]);
+    });        
 
-    // it("should given an array with a header and 4 data rows with an endpoint-name.noticeDate column, return just the row with the null notice date and the row with an empty string but not the row with endpoint-name.noticeDate with a string value of 'null'", function () {
-    //   queries.filterJustRowsWhereColIsNullOrBlank("endpoint-name.noticeDate", [["endpoint-name.Col1", "endpoint-name.Col2", "endpoint-name.noticeDate"], ["A","AA", ""], ["B", "BB", "tomorrow"], ["C", "CC", null], ["D", "DD", "null"]]).should.be.eql([["endpoint-name.Col1", "endpoint-name.Col2", "endpoint-name.noticeDate"], ["A","AA", ""], ["C", "CC", null]]);
-    // });      
+    it("should given an array with a header and 4 data rows with an endpoint-name.noticeDate column, return just the row with the null notice date and the row with an empty string but not the row with endpoint-name.noticeDate with a string value of 'null'", function () {
+      queries.filterJustRowsWhereColIsNullOrBlank("endpoint-name.noticeDate", [["endpoint-name.Col1", "endpoint-name.Col2", "endpoint-name.noticeDate"], ["A","AA", ""], ["B", "BB", "tomorrow"], ["C", "CC", null], ["D", "DD", "null"]]).should.be.eql([["endpoint-name.Col1", "endpoint-name.Col2", "endpoint-name.noticeDate"], ["A","AA", ""], ["C", "CC", null]]);
+    });      
     
   });
   
