@@ -45,7 +45,7 @@ module.exports = {
         
         //4c. filter on just the rows/records where the noticeDate is NULL/missing        
         log.trace(`4c. filter on just the rows/records where the noticeDate is NULL/missing`);
-        const justRowsNullNoticeDatesTwoDimArrWHeader = queries.filterJustRowsWhereColIsNull(`${endpointNameOnly}.noticeDate`, newApiCallsTwoDimArrWHeader); 
+        const justRowsNullNoticeDatesTwoDimArrWHeader = queries.filterJustRowsWhereColIsNullOrBlank(`${endpointNameOnly}.noticeDate`, newApiCallsTwoDimArrWHeader); 
         log.trace(`justRowsNullNoticeDatesTwoDimArrWHeader: ${justRowsNullNoticeDatesTwoDimArrWHeader}`);
         
         //5. union the columns that match, then join in the rest of the columns in the existing sheet

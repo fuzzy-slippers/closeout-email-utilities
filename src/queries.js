@@ -34,7 +34,7 @@ module.exports = {
   * @param {string[][]} the 2d array data to query against - must have column headers as the first row 
   * @return {string[][]} a 2d array with a header row and just those particular rows where the column name specified was found to be NULL 
   */    
-  filterJustRowsWhereColIsNull: (colToLookForNulls, twoDArrWHeader) => alasqlUtils.selectFromTwoDimArr(`SELECT * FROM tmptbl1 WHERE [${colToLookForNulls}] IS NULL`, twoDArrWHeader),
+  filterJustRowsWhereColIsNullOrBlank: (colToLookForNulls, twoDArrWHeader) => alasqlUtils.selectFromTwoDimArr(`SELECT * FROM tmptbl1 WHERE [${colToLookForNulls}] IS NULL`, twoDArrWHeader),
   
   /**
   * sort (order by) the data passed in based on the column name specified (order by using ASC ordering) with any rows with a null value in the column to sort on appearing first in the results

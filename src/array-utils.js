@@ -130,7 +130,26 @@ module.exports = {
                   return cell;
             } );
         } );
-     }     
+     },
+     
+    /**
+     * trims whitespace (any blank spaces, newlines, etc on the left or right hand side of the string text only) for all cells in a 2d array - hopefully helpful in catching random blank strings entered in sheet cells
+     * 
+     * @param {object[][]} a two dimentional array to go through and trim all cell values
+     * @return {object[][]} the two dimentional array passed in with a js trim done on all elements/cell values
+     */     
+     trimAllCellsInTwoDimArr: (twoDimArr) => {
+        log.trace(`array-utils trimAllCellsInTwoDimArr(${JSON.stringify(twoDimArr)}) called...`);       
+        return twoDimArr.map( function(row) {
+            return row.map( function( cell ) { 
+                //since numbers, booleans, etc dont have a trim function (and its unnecessary) only try to trim string values, anything other than a string return unchanged
+                if (typeof cell === 'string')
+                  return cell.trim();
+                else
+                  return cell;
+            } );
+        } );
+     },     
 
     
 

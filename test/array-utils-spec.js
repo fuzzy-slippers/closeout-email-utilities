@@ -99,5 +99,26 @@ describe("array-utils", function() {
     }); 
   });    
 
+  describe("#trimAllCellsInTwoDimArr()", function() {
+    it("should if passed a 2d array with strings but nothing that would be changed by a trim, return the array unchanged", function () {
+      arrayUtils.trimAllCellsInTwoDimArr([[1,2,3],["A","B","C"],["AAA","BBB","CCC"]]).should.be.eql([[1,2,3],["A","B","C"],["AAA","BBB","CCC"]]);
+    }); 
+    
+    it(`should if passed a 2d array with 2 strings with extra spaces on the outside left/right, return the 2d array with those extra spaces removed`, function () {
+      arrayUtils.trimAllCellsInTwoDimArr([[1,2,3],[" A ","B","C"],["AAA","  BBB ","CCC"]]).should.be.eql([[1,2,3],["A","B","C"],["AAA","BBB","CCC"]]);
+    });     
+  
+    it(`should if passed a 2d array with 2 strings with tabs and newlines the outside left/right, return the 2d array with those extra spaces removed`, function () {
+      arrayUtils.trimAllCellsInTwoDimArr([[1,2,3],["  A ","B","C"],["AAA",`
+      BBB
+      
+      `,"CCC"]]).should.be.eql([[1,2,3],["A","B","C"],["AAA","BBB","CCC"]]);
+    });     
+    
+    it(`should if passed a 2d array with 2 strings with spaces and tabs only on the inside between other characters, return the 2d array unchanged`, function () {
+      arrayUtils.trimAllCellsInTwoDimArr([[1,2,3],["a furry brown fox went to the woods","B","one tab space   tab"],["AAA","BBB","CCC"]]).should.be.eql([[1,2,3],["a furry brown fox went to the woods","B","one tab space   tab"],["AAA","BBB","CCC"]]);
+    }); 
+  }); 
+
 });
 
