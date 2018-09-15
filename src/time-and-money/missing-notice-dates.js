@@ -28,6 +28,26 @@ module.exports = {
         log.trace(`endpointNameOnly: ${endpointNameOnly}`);
         const prevSheetDataTwoDimArrWHeader = googleAppsScriptWrappers.readDataInSheetWHeaderRowByName(sheetNameToUpdate); log.trace(`prevSheetDataTwoDimArrWHeader: ${prevSheetDataTwoDimArrWHeader}`);
         
+        //6. use the updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates function to check for new t&m docs that should be listed on the validation sheet (and add them to the bottom of the 2d array)
+        log.trace(`6. use the updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates function to check for new t&m docs that should be listed on the validation sheet`);
+        const combinationOfExistingDataPlusNewApiResults = module.export.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates(sheetNameToUpdate);
+        log.trace(`combinationOfExistingDataPlusNewApiResults: ${combinationOfExistingDataPlusNewApiResults}`);
+        
+        
+        //7.  update sheet with old data in the sheet + the new results/flagged records
+        log.trace(`6.  update sheet with old data in the sheet + the new results/flagged records`);
+        googleAppsScriptWrappers.updNamedSheetWArrWHeaderRow(sheetNameToUpdate, combinationOfExistingDataPlusNewApiResults);
+        log.trace(`sheetNameToUpdate: ${sheetNameToUpdate}`)
+    },
+    
+    /*
+     * the function that actually updates the 2d data array with new time and money docs flagged as missing notice dates below the existing (already flagged) data in the sheet
+     * 
+     * @param {object[][]} the 2d array with header data read directly from the sheet as a starting point
+     * @return {object[][]} the 2d array with header data produced after adding in additional validation rows added during this round to the data passed in from the google sheet (for the next step of updating the google sheet)
+     */       
+    updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates(prevSheetDataTwoDimArrWHeader)    
+    {
         //2. determine the highest primary key in the google sheet data read in (before the update)
         log.trace(`2. determine the highest primary key in the google sheet data read in (before the update)`); 
         const prevSheetMaxPrimaryKeyVal = latestByPrimaryKey.findMaxPrimaryKeyValueInData(`${endpointNameOnly}._primaryKey`, prevSheetDataTwoDimArrWHeader, endpointUriStr); 
@@ -53,10 +73,6 @@ module.exports = {
         const combinationOfExistingDataPlusNewApiResults = queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings(`${endpointNameOnly}._primaryKey`,  prevSheetDataTwoDimArrWHeader, justRowsNullNoticeDatesTwoDimArrWHeader);
         log.trace(`combinationOfExistingDataPlusNewApiResults: ${combinationOfExistingDataPlusNewApiResults}`)
         
-        //6.  update sheet with old data in the sheet + the new results/flagged records
-        log.trace(`6.  update sheet with old data in the sheet + the new results/flagged records`);
-        googleAppsScriptWrappers.updNamedSheetWArrWHeaderRow(sheetNameToUpdate, combinationOfExistingDataPlusNewApiResults);
-        log.trace(`sheetNameToUpdate: ${sheetNameToUpdate}`)
     }
     
     
