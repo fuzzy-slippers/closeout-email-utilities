@@ -20,18 +20,15 @@ module.exports = {
      */   
     addAdditionalFlaggedEmptyTimeAndMoneyNoticeDatesToSheet: (sheetNameToUpdate) => {
         log.trace(`missing-notice-dates addAdditionalFlaggedEmptyTimeAndMoneyNoticeDatesToSheet(${sheetNameToUpdate}) called...`);
-        const endpointUriStr = "/award/api/v1/award-amount-transactions/";
-        const endpointNameOnly = apiUtils.extractApiEndpointNameFromUri(endpointUriStr);
         
         //1. read data from sheet
         log.trace(`1. read data from sheet`); 
-        log.trace(`endpointNameOnly: ${endpointNameOnly}`);
         const prevSheetDataTwoDimArrWHeader = googleAppsScriptWrappers.readDataInSheetWHeaderRowByName(sheetNameToUpdate); log.trace(`prevSheetDataTwoDimArrWHeader: ${prevSheetDataTwoDimArrWHeader}`);
         
         //6. use the updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates function to check for new t&m docs that should be listed on the validation sheet (and add them to the bottom of the 2d array)
         log.trace(`6. use the updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates function to check for new t&m docs that should be listed on the validation sheet`);
-        const combinationOfExistingDataPlusNewApiResults = module.export.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates(sheetNameToUpdate);
-        log.trace(`combinationOfExistingDataPlusNewApiResults: ${combinationOfExistingDataPlusNewApiResults}`);
+        const combinationOfExistingDataPlusNewApiResults = module.exports.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates(sheetNameToUpdate);
+        log.trace(`combinationOfExistingDataPlusNewApiResults: ${JSON.stringify(combinationOfExistingDataPlusNewApiResults)}`);
         
         
         //7.  update sheet with old data in the sheet + the new results/flagged records
@@ -48,6 +45,12 @@ module.exports = {
      */       
     updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates(prevSheetDataTwoDimArrWHeader)    
     {
+        log.trace(`missing-notice-dates updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates(${JSON.stringify(prevSheetDataTwoDimArrWHeader)}) called...`);
+        
+        const endpointUriStr = "/award/api/v1/award-amount-transactions/";
+        const endpointNameOnly = apiUtils.extractApiEndpointNameFromUri(endpointUriStr);
+        log.trace(`endpointNameOnly: ${endpointNameOnly}`);
+        
         //2. determine the highest primary key in the google sheet data read in (before the update)
         log.trace(`2. determine the highest primary key in the google sheet data read in (before the update)`); 
         const prevSheetMaxPrimaryKeyVal = latestByPrimaryKey.findMaxPrimaryKeyValueInData(`${endpointNameOnly}._primaryKey`, prevSheetDataTwoDimArrWHeader, endpointUriStr); 

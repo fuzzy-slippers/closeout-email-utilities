@@ -11,7 +11,11 @@ describe("array-utils", function() {
      const test2dArr = [["col1", "col2"], [1,2], ["A", "B"]];
      const expectedResult = [{col1: 1, col2: 2}, {col1: "A", col2: "B"}];
      arrayUtils.convertFromTwoDimArrWithHeaderToObjArr(test2dArr).should.be.eql(expectedResult);
-    });  
+    });
+    
+    it(`should if passed an empty array return an empty array`, function () {
+      arrayUtils.convertFromTwoDimArrWithHeaderToObjArr([]).should.be.eql([]);
+    });       
   });
   
   describe("#unionArrs()", function() {
@@ -22,7 +26,10 @@ describe("array-utils", function() {
     it("should convert 2 simple numeric arrays (2d array) of 1 and 2 with a second array with just 1 to a 1d array with just 1 and 2", function() {
         arrayUtils.unionArrs([1, 2], [1])
         .should.be.eql([1, 2]);
-    });     
+    });  
+    it(`should if passed two empty arrays return an empty array`, function () {
+      arrayUtils.unionArrs([], []).should.be.eql([]);
+    });    
   });
   
   describe("#duplicateArrayAllElementsReplacedWith()", function() {
@@ -70,7 +77,10 @@ describe("array-utils", function() {
     it(`should handle objects with different numbers of properties not always in increasing order - [{"1":"a"}, {"1":"b", "2":"z"}, {"1":"c", "2":"y", "3":"A"}] returning [["1","2","3"],["a", null, null],["b","z", null],["c","y","A"]]`, function () {
      arrayUtils.convertOneDimObjArrToTwoDimArrWithHeaderRow([{"1":"a"}, {"1":"b", "2":"z"}, {"1":"c", "2":"y", "3":"A"}])
      .should.be.eql([["1","2","3"],["a", null, null],["b","z", null],["c","y","A"]]);
-    });    
+    });  
+    it(`should if passed an empty array return an empty array`, function () {
+      arrayUtils.convertOneDimObjArrToTwoDimArrWithHeaderRow([]).should.be.eql([]);
+    });         
   });  
   
   describe("#lastArrElement()", function() {
@@ -97,6 +107,10 @@ describe("array-utils", function() {
     it("should if passed an emtpy array (and some replacments) return an empty array", function () {
       arrayUtils.replaceAllOccurancesInTwoDimArr([], "does not matter", "also does not matter").should.be.eql([]);
     }); 
+    
+    it(`should if passed an empty array return an empty array`, function () {
+      arrayUtils.replaceAllOccurancesInTwoDimArr([]).should.be.eql([]);
+    });     
   });    
 
   describe("#trimAllCellsInTwoDimArr()", function() {
@@ -117,6 +131,10 @@ describe("array-utils", function() {
     
     it(`should if passed a 2d array with 2 strings with spaces and tabs only on the inside between other characters, return the 2d array unchanged`, function () {
       arrayUtils.trimAllCellsInTwoDimArr([[1,2,3],["a furry brown fox went to the woods","B","one tab space   tab"],["AAA","BBB","CCC"]]).should.be.eql([[1,2,3],["a furry brown fox went to the woods","B","one tab space   tab"],["AAA","BBB","CCC"]]);
+    }); 
+    
+    it(`should if passed an empty array return an empty array`, function () {
+      arrayUtils.trimAllCellsInTwoDimArr([]).should.be.eql([]);
     }); 
   }); 
 
