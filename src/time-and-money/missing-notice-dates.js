@@ -23,16 +23,17 @@ module.exports = {
         
         //1. read data from sheet
         log.trace(`1. read data from sheet`); 
-        const prevSheetDataTwoDimArrWHeader = googleAppsScriptWrappers.readDataInSheetWHeaderRowByName(sheetNameToUpdate); log.trace(`prevSheetDataTwoDimArrWHeader: ${prevSheetDataTwoDimArrWHeader}`);
+        const prevSheetDataTwoDimArrWHeader = googleAppsScriptWrappers.readDataInSheetWHeaderRowByName(sheetNameToUpdate); 
+        log.trace(`prevSheetDataTwoDimArrWHeader: ${JSON.stringify(prevSheetDataTwoDimArrWHeader)}`);
         
         //6. use the updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates function to check for new t&m docs that should be listed on the validation sheet (and add them to the bottom of the 2d array)
-        log.trace(`6. use the updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates function to check for new t&m docs that should be listed on the validation sheet`);
         const combinationOfExistingDataPlusNewApiResults = module.exports.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates(prevSheetDataTwoDimArrWHeader);
+        log.trace(`6. use the updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates function to check for new t&m docs that should be listed on the validation sheet`);
         log.trace(`combinationOfExistingDataPlusNewApiResults: ${JSON.stringify(combinationOfExistingDataPlusNewApiResults)}`);
         
         
         //7.  update sheet with old data in the sheet + the new results/flagged records
-        log.trace(`6.  update sheet with old data in the sheet + the new results/flagged records`);
+        log.trace(`7.  update sheet with old data in the sheet + the new results/flagged records`);
         googleAppsScriptWrappers.updNamedSheetWArrWHeaderRow(sheetNameToUpdate, combinationOfExistingDataPlusNewApiResults);
         log.trace(`sheetNameToUpdate: ${sheetNameToUpdate}`)
     },
@@ -74,7 +75,9 @@ module.exports = {
         //5. union the columns that match, then join in the rest of the columns in the existing sheet
         log.trace(`5. union the columns that match, then join in the rest of the columns in the existing sheet`);
         const combinationOfExistingDataPlusNewApiResults = queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings(`${endpointNameOnly}._primaryKey`,  prevSheetDataTwoDimArrWHeader, justRowsNullNoticeDatesTwoDimArrWHeader);
-        log.trace(`combinationOfExistingDataPlusNewApiResults: ${combinationOfExistingDataPlusNewApiResults}`)
+        log.trace(`combinationOfExistingDataPlusNewApiResults: ${combinationOfExistingDataPlusNewApiResults}`);
+        
+        return combinationOfExistingDataPlusNewApiResults;
         
     }
     
