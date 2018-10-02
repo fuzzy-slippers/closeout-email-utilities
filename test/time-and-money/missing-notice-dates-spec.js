@@ -38,38 +38,50 @@ missingNoticeDates.__set__({
     //   }
     // },
     latestByPrimaryKey: {
+
+        //definitely need to mock out  findMaxPrimaryKeyValueInData due to it calling inside another module googleAppsScriptWrappers.setScriptProperty and queries.findMaxColValInAllDataRows     
         findMaxPrimaryKeyValueInData: function (colToFindMax, twoDimArrWHeader, relativeUriPath) {
                                                               console.log(`************************inside rewiring of latestByPrimaryKey.findMaxPrimaryKeyValueInData, twoDimArrWHeader detected as: ${JSON.stringify(twoDimArrWHeader)}*********************`)      
           if (twoDimArrWHeader.length === 0)
           {
-                                  console.log(`RETURNING 8000 when empty array with no header passed in...pretending when no header passed it there is really a last primary key of 8000 in the google property store from last time (for example if someone clears the sheet but there were prior runs)`)
+                                                              console.log(`RETURNING 8000 when empty array with no header passed in...pretending when no header passed it there is really a last primary key of 8000 in the google property store from last time (for example if someone clears the sheet but there were prior runs)`)
             return 8000; // google property store returns null if no property exists yet under that name
           }
           else if (JSON.stringify(twoDimArrWHeader) === JSON.stringify([["award-amount-transactions.NoMockedPropertyInGooglePropertyStoreItsNull", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey"]]))
           {
-                                  console.log(`RETURNING null when array with just header with column name award-amount-transactions.NoMockedPropertyInGooglePropertyStoreItsNull passed in...pretending nothing in the cached google property store value yet - from mock latestByPrimaryKey.findMaxPrimaryKeyValueInData`)
+                                                              console.log(`RETURNING null when array with just header with column name award-amount-transactions.NoMockedPropertyInGooglePropertyStoreItsNull passed in...pretending nothing in the cached google property store value yet - from mock latestByPrimaryKey.findMaxPrimaryKeyValueInData`)
             return null; // google property store returns null if no property exists yet under that name
           } 
           else if (JSON.stringify(twoDimArrWHeader) === JSON.stringify([["award-amount-transactions.UseMockedPropertyValueSevenThousand","award-amount-transactions.ColB","award-amount-transactions._primaryKey"]]))
           {
-                                  console.log(`RETURNING 7000 - from mock latestByPrimaryKey.findMaxPrimaryKeyValueInData`)
+                                                              console.log(`RETURNING 7000 - from mock latestByPrimaryKey.findMaxPrimaryKeyValueInData`)
             return 7000;
           }
+          else if (JSON.stringify(twoDimArrWHeader) === JSON.stringify(
+            [["award-amount-transactions.UseMockedPropertyValueSevenThousand", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey"],
+            ["existing sheet data row 1","A",10],
+            ["existing sheet data row 2","B",20]]
+            )
+          )
+          {
+                                                              console.log(`RETURNING 7000 - from mock latestByPrimaryKey.findMaxPrimaryKeyValueInData`)
+            return 7000;
+          }          
           else
-            return 'FOO3';
+            return "findMaxPrimaryKeyValueInData twoDimArrWHeader DID NOT MATCH ANYTHING";
         },
         
+        // have to mock out gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys due to calls insde to other modules such as apiUtils.hasErrorProperty and arrayUtils.lastArrElement
         gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys: (maxPreviouslyUsedPrimaryKey, relativeUriPath) => {
-                                                      console.log(`************************inside rewiring of latestByPrimaryKey.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys, maxPreviouslyUsedPrimaryKey detected as: ${maxPreviouslyUsedPrimaryKey}*********************`)      
-                                                      
+                                                            console.log(`************************inside rewiring of latestByPrimaryKey.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys, maxPreviouslyUsedPrimaryKey detected as: ${maxPreviouslyUsedPrimaryKey}*********************`)      
           if (maxPreviouslyUsedPrimaryKey === 7000)                                     
             return [["award-amount-transactions.UseMockedPropertyValueSevenThousand","award-amount-transactions.ColB","award-amount-transactions._primaryKey"],[1,2,7001]];
           else if (maxPreviouslyUsedPrimaryKey === 8000) {
-                                                     console.log(`-=-----------============-===========RETURNING [["award-amount-transactions.NoMockedPropertyInGooglePropertyStoreItsNull", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey"]["A","B",8001]]`);
+                                                            console.log(`-=-----------============-===========RETURNING [["award-amount-transactions.NoMockedPropertyInGooglePropertyStoreItsNull", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey"]["A","B",8001]]`);
             return [["award-amount-transactions.NoMockedPropertyInGooglePropertyStoreItsNull", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey"],["A","B",8001]];
           }
-          else if (maxPreviouslyUsedPrimaryKey === null)
-            return [];
+          else (maxPreviouslyUsedPrimaryKey === null)
+            return ["DID NOT MATCH ANY maxPreviouslyUsedPrimaryKey values"];
         },
     },
 });
@@ -80,17 +92,34 @@ describe("missing-notice-dates", function() {
   
   describe("#updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates()", function() {
     it("should when previous array (sheet) data is empty with just a header row with a 'UseMockedPropertyValueSevenThousand' and 'award-amount-transactions._primaryKey' columns (with mocked last primary key value of 7000), should return an array with mocked data for primary key 7000", function () {
-      missingNoticeDates.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates([["award-amount-transactions.UseMockedPropertyValueSevenThousand", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey"]]).should.be.eql([["award-amount-transactions.UseMockedPropertyValueSevenThousand","award-amount-transactions.ColB","award-amount-transactions._primaryKey"],[1,2,7001]]);
+      missingNoticeDates.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates(
+        [["award-amount-transactions.UseMockedPropertyValueSevenThousand", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey"]])
+        .should.be.eql([["award-amount-transactions.UseMockedPropertyValueSevenThousand","award-amount-transactions.ColB","award-amount-transactions._primaryKey"],[1,2,7001]]);
     });    
 
     it("should when the previous array (sheet) data is empty with just a header row (and a mocked last primary key value is not yet in the google property store - its null), set the sheet to empty array - corresponds to the scenario that google property store is empty and the spreadsheet passed in is empty", function () {
-      missingNoticeDates.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates([["award-amount-transactions.NoMockedPropertyInGooglePropertyStoreItsNull", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey"]]).should.be.eql([]);
+      missingNoticeDates.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates(
+        [["award-amount-transactions.NoMockedPropertyInGooglePropertyStoreItsNull", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey"]])
+        .should.be.eql([]);
     });
     
     it("should when the previous array (sheet) data is empty with no header rows (and a mocked last primary key value IS in the google property store - 8000), set the sheet to pretend data listed for primary key 8000", function () {
-      missingNoticeDates.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates([]).should.be.eql([["award-amount-transactions.NoMockedPropertyInGooglePropertyStoreItsNull", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey"],["A","B",8001]]);
+      missingNoticeDates.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates(
+        []).should.be.eql(
+        [["award-amount-transactions.NoMockedPropertyInGooglePropertyStoreItsNull", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey"],["A","B",8001]]);
     }); 
     
+    
+    it("should when previous array (sheet) data has two rows already (and use mocked last primary key value of 7000 to simulate an additional row of data), should return an array with the original sheet data plus the mocked data for primary key 7000", function () {
+      missingNoticeDates.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates(
+        [["award-amount-transactions.UseMockedPropertyValueSevenThousand", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey"],
+        ["existing sheet data row 1","A",10],
+        ["existing sheet data row 2","B",20]])
+        .should.be.eql([["award-amount-transactions.UseMockedPropertyValueSevenThousand", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey"],
+        ["existing sheet data row 1","A",10],
+        ["existing sheet data row 2","B",20],
+        [1,2,7001]]);
+    });    
      
     
     
