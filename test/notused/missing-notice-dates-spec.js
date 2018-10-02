@@ -41,7 +41,10 @@ missingNoticeDates.__set__({
         findMaxPrimaryKeyValueInData: function (colToFindMax, twoDimArrWHeader, relativeUriPath) {
                                                               console.log(`************************inside rewiring of latestByPrimaryKey.findMaxPrimaryKeyValueInData, twoDimArrWHeader detected as: ${JSON.stringify(twoDimArrWHeader)}*********************`)      
           if (twoDimArrWHeader.length === 0)
-            return null;
+          {
+                                  console.log(`RETURNING null when empty array with no header passed in...pretending nothing in the cached google property store value yet - from mock latestByPrimaryKey.findMaxPrimaryKeyValueInData`)
+            return null; // google property store returns null if no property exists yet under that name
+          }
           else if (JSON.stringify(twoDimArrWHeader) === JSON.stringify([["ColA", "ColB", "award-amount-transactions._primaryKey"]]))
             return null; 
           else if (JSON.stringify(twoDimArrWHeader) === JSON.stringify([["award-amount-transactions.UseMockedPropertyValueSevenThousand","award-amount-transactions.ColB","award-amount-transactions._primaryKey"]]))
@@ -58,6 +61,8 @@ missingNoticeDates.__set__({
                                                       
           if (maxPreviouslyUsedPrimaryKey === 7000)                                     
             return [["award-amount-transactions.UseMockedPropertyValueSevenThousand","award-amount-transactions.ColB","award-amount-transactions._primaryKey"],[1,2,7001]];
+          else if (maxPreviouslyUsedPrimaryKey === null)
+            return []
         },
     },
 });
@@ -71,9 +76,9 @@ describe("missing-notice-dates", function() {
       missingNoticeDates.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates([["award-amount-transactions.UseMockedPropertyValueSevenThousand", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey"]]).should.be.eql([["award-amount-transactions.UseMockedPropertyValueSevenThousand","award-amount-transactions.ColB","award-amount-transactions._primaryKey"],[1,2,7001]]);
     });       
     
-    // it("should when the previous array (sheet) data is empty with no header rows (and a mocked last primary key value that points to empty data), set the sheet to empty array", function () {
-    //   missingNoticeDates.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates([]).should.be.eql([]);
-    // }); 
+    it("should when the previous array (sheet) data is empty with no header rows (and a mocked last primary key value is not yet in the google property store - its null), set the sheet to empty array", function () {
+      missingNoticeDates.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates([]).should.be.eql([]);
+    }); 
     
     // it("should when previous array (sheet) data is empty with just a header row with an 'award-amount-transactions._primaryKey' column, but no data rows (and a mocked last primary key value that points to empty data), should return an empty array", function () {
     //   missingNoticeDates.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates([["ColA", "ColB", "award-amount-transactions._primaryKey"]]).should.be.eql([]);
