@@ -48,6 +48,7 @@ module.exports = {
     {
         log.trace(`missing-notice-dates updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates(${JSON.stringify(prevSheetDataTwoDimArrWHeader)}) called...`);
         
+        //since we are specifically looking for missing notice dates, this data comes from the award-amount-transactions API endpoint so we are hard coding that path within the function
         const endpointUriStr = "/award/api/v1/award-amount-transactions/";
         const endpointNameOnly = apiUtils.extractApiEndpointNameFromUri(endpointUriStr);
         log.trace(`endpointNameOnly: ${endpointNameOnly}`);
