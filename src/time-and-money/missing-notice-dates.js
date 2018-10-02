@@ -39,7 +39,7 @@ module.exports = {
     },
     
     /*
-     * the function that actually updates the 2d data array with new time and money docs flagged as missing notice dates below the existing (already flagged) data in the sheet
+     * the function that actually updates the 2d data array with new time and money docs flagged to be added at the bottom of the data already in (coming from) the sheet
      * 
      * @param {object[][]} the 2d array with header data read directly from the sheet as a starting point
      * @return {object[][]} the 2d array with header data produced after adding in additional validation rows added during this round to the data passed in from the google sheet (for the next step of updating the google sheet)

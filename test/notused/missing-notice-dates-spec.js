@@ -22,21 +22,21 @@ const latestByPrimaryKey = require("../../src/latest-by-primary-key.js");
 
 // using rewire to mock out the responses from the callKrGetApiWithWait function (api call results) called inside the missing-notice-dates module - use switch statement to return json for known primary keys and otherwise return json example when an error occurs
 missingNoticeDates.__set__({
-    googleAppsScriptWrappers: {
-        callKrGetApiWithWait: function (relativeApiUri) {
-                                                          console.log(`************************inside rewiring of googleAppsScriptWrappers.callKrGetApiWithWait, relativeApiUri detected as: ${JSON.stringify(relativeApiUri)}*********************`)      
-          return "foofoofoo";
+    // googleAppsScriptWrappers: {
+    //     callKrGetApiWithWait: function (relativeApiUri) {
+    //                                                       console.log(`************************inside rewiring of googleAppsScriptWrappers.callKrGetApiWithWait, relativeApiUri detected as: ${JSON.stringify(relativeApiUri)}*********************`)      
+    //       return "foofoofoo";
           
-        switch (relativeApiUri) {
-          case "/award/api/v1/award-amount-transactions/7001":
-            return '{"ColOne":1, "ColTwo":2,"_primaryKey":7001"}';
-          case "/award/api/v1/award-types/":
-            return '[{"code":1,"description":"Grant","_primaryKey":"1"},{"code":3,"description":"Contract","_primaryKey":"3"},{"code":4,"description":"Indefinite Delivery Contract","_primaryKey":"4"},{"code":5,"description":"Cooperative Agreement","_primaryKey":"5"},{"code":8,"description":"Consortium Membership","_primaryKey":"8"},{"code":9,"description":"Other Transaction Agreement","_primaryKey":"9"},{"code":13,"description":"Non Disclosure Agreement","_primaryKey":"13"},{"code":14,"description":"Material Transfer Agreement","_primaryKey":"14"},{"code":15,"description":"Teaming Agreement","_primaryKey":"15"},{"code":16,"description":"Equipment Loan","_primaryKey":"16"},{"code":17,"description":"Memorandum of Understanding","_primaryKey":"17"},{"code":18,"description":"Intergovernmental Personnel Assignment","_primaryKey":"18"},{"code":19,"description":"CHOOSE AN AWARD TYPE - was blank in RAA - DO NOT USE","_primaryKey":"19"},{"code":20,"description":"Data Use Agreement","_primaryKey":"20"},{"code":21,"description":"Software License","_primaryKey":"21"}]';
-          default:
-            return '{"Error":{"errors":["not found for key -1"]}}';
-        }
-      }
-    },
+    //     switch (relativeApiUri) {
+    //       case "/award/api/v1/award-amount-transactions/7001":
+    //         return '{"ColOne":1, "ColTwo":2,"_primaryKey":7001"}';
+    //       case "/award/api/v1/award-types/":
+    //         return '[{"code":1,"description":"Grant","_primaryKey":"1"},{"code":3,"description":"Contract","_primaryKey":"3"},{"code":4,"description":"Indefinite Delivery Contract","_primaryKey":"4"},{"code":5,"description":"Cooperative Agreement","_primaryKey":"5"},{"code":8,"description":"Consortium Membership","_primaryKey":"8"},{"code":9,"description":"Other Transaction Agreement","_primaryKey":"9"},{"code":13,"description":"Non Disclosure Agreement","_primaryKey":"13"},{"code":14,"description":"Material Transfer Agreement","_primaryKey":"14"},{"code":15,"description":"Teaming Agreement","_primaryKey":"15"},{"code":16,"description":"Equipment Loan","_primaryKey":"16"},{"code":17,"description":"Memorandum of Understanding","_primaryKey":"17"},{"code":18,"description":"Intergovernmental Personnel Assignment","_primaryKey":"18"},{"code":19,"description":"CHOOSE AN AWARD TYPE - was blank in RAA - DO NOT USE","_primaryKey":"19"},{"code":20,"description":"Data Use Agreement","_primaryKey":"20"},{"code":21,"description":"Software License","_primaryKey":"21"}]';
+    //       default:
+    //         return '{"Error":{"errors":["not found for key -1"]}}';
+    //     }
+    //   }
+    // },
     latestByPrimaryKey: {
         findMaxPrimaryKeyValueInData: function (colToFindMax, twoDimArrWHeader, relativeUriPath) {
                                                               console.log(`************************inside rewiring of latestByPrimaryKey.findMaxPrimaryKeyValueInData, twoDimArrWHeader detected as: ${JSON.stringify(twoDimArrWHeader)}*********************`)      
@@ -95,44 +95,3 @@ describe("missing-notice-dates", function() {
 
 
 
-
-
-
-/*
-// using rewire to mock out the responses from the callKrGetApiWithWait function (api call results) called inside the missing-notice-dates module - use switch statement to return json for known primary keys and otherwise return json example when an error occurs
-missingNoticeDates.__set__("googleAppsScriptWrappers", {
-    callKrGetApiWithWait: function (relativeApiUri) {
-                                                          console.log(`************************inside rewiring of googleAppsScriptWrappers.callKrGetApiWithWait, relativeApiUri detected as: ${JSON.stringify(relativeApiUri)}*********************`)      
-      
-      return "foofoofoo";
-      
-      switch (relativeApiUri) {
-      case "/award/api/v1/award-amount-transactions/7001":
-        return '{"ColOne":1, "ColTwo":2,"_primaryKey":7001"}';
-      case "/award/api/v1/award-types/":
-        return '[{"code":1,"description":"Grant","_primaryKey":"1"},{"code":3,"description":"Contract","_primaryKey":"3"},{"code":4,"description":"Indefinite Delivery Contract","_primaryKey":"4"},{"code":5,"description":"Cooperative Agreement","_primaryKey":"5"},{"code":8,"description":"Consortium Membership","_primaryKey":"8"},{"code":9,"description":"Other Transaction Agreement","_primaryKey":"9"},{"code":13,"description":"Non Disclosure Agreement","_primaryKey":"13"},{"code":14,"description":"Material Transfer Agreement","_primaryKey":"14"},{"code":15,"description":"Teaming Agreement","_primaryKey":"15"},{"code":16,"description":"Equipment Loan","_primaryKey":"16"},{"code":17,"description":"Memorandum of Understanding","_primaryKey":"17"},{"code":18,"description":"Intergovernmental Personnel Assignment","_primaryKey":"18"},{"code":19,"description":"CHOOSE AN AWARD TYPE - was blank in RAA - DO NOT USE","_primaryKey":"19"},{"code":20,"description":"Data Use Agreement","_primaryKey":"20"},{"code":21,"description":"Software License","_primaryKey":"21"}]';
-      default:
-        return '{"Error":{"errors":["not found for key -1"]}}';
-      }
-    }
-});
-missingNoticeDates.__set__("latestByPrimaryKey", {
-    findMaxPrimaryKeyValueInData: function (colToFindMax, twoDimArrWHeader, relativeUriPath) {
-                                                          console.log(`************************inside rewiring of latestByPrimaryKey.findMaxPrimaryKeyValueInData, twoDimArrWHeader detected as: ${JSON.stringify(twoDimArrWHeader)}*********************`)      
-      if (twoDimArrWHeader.length === 0)
-        return null;
-      else if (JSON.stringify(twoDimArrWHeader) === JSON.stringify([["ColA", "ColB", "award-amount-transactions._primaryKey"]]))
-        return null; 
-      else if (JSON.stringify(twoDimArrWHeader) === JSON.stringify([["award-amount-transactions.UseMockedPropertyValueSevenThousand","award-amount-transactions.ColB","award-amount-transactions._primaryKey"]]))
-      {
-                              console.log(`RETURNING 7000 - from mock latestByPrimaryKey.findMaxPrimaryKeyValueInData`)
-        return 7000;        
-        
-      }
-      else
-        return 'FOO3';
-    },
-    
-    gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys: (maxPreviouslyUsedPrimaryKey, relativeUriPath) => latestByPrimaryKey.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys(maxPreviouslyUsedPrimaryKey, relativeUriPath)
-});
-*/
