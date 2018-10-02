@@ -87,6 +87,10 @@ describe("latest-by-primary-key", function() {
     it("should given a passed in previous max primary key of string 2 return an empty array (based on rewire sample data primary key 3 not found/API returns error object)", function () {
       latestByPrimaryKey.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys("2", "/award/api/v1/award-amount-transactions/").should.be.eql([]);
     });    
+    
+    it("should given a passed in previous max primary key null which is the value that the google property store will return if the cached property does not exist yet (so when we have an empty sheet plus no cached last highest primary key value) should return back an empty array", function () {
+      latestByPrimaryKey.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys("2", "/award/api/v1/award-amount-transactions/").should.be.eql([]);
+    });     
 
     it("should given a passed in previous max primary key of 773750 return the mocked up data for primary key 773751 and 773752 but stop at the mocked up error on primary key 773753 (based on rewire sample data primary key 773753 not found)", function () {
       latestByPrimaryKey.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys(773750, "/award/api/v1/award-amount-transactions/")

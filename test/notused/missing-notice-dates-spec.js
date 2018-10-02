@@ -76,7 +76,7 @@ describe("missing-notice-dates", function() {
       missingNoticeDates.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates([["award-amount-transactions.UseMockedPropertyValueSevenThousand", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey"]]).should.be.eql([["award-amount-transactions.UseMockedPropertyValueSevenThousand","award-amount-transactions.ColB","award-amount-transactions._primaryKey"],[1,2,7001]]);
     });       
     
-    it("should when the previous array (sheet) data is empty with no header rows (and a mocked last primary key value is not yet in the google property store - its null), set the sheet to empty array", function () {
+    it("should when the previous array (sheet) data is empty with no header rows (and a mocked last primary key value is not yet in the google property store - its null), set the sheet to empty array - corresponds to the scenario that google property store is empty and the spreadsheet passed in is empty", function () {
       missingNoticeDates.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates([]).should.be.eql([]);
     }); 
     
