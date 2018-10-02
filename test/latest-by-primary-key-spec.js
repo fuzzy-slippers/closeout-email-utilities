@@ -84,8 +84,8 @@ describe("latest-by-primary-key", function() {
       latestByPrimaryKey.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys(1, "/award/api/v1/award-amount-transactions/").should.be.eql([["award-amount-transactions.testCol1", "award-amount-transactions._primaryKey"], ["B", "2"]]);
     });  
     
-    it("should given a passed in previous max primary key of 2 return an empty array (based on rewire sample data primary key 3 not found/API returns error object)", function () {
-      latestByPrimaryKey.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys(2, "/award/api/v1/award-amount-transactions/").should.be.eql([]);
+    it("should given a passed in previous max primary key of string 2 return an empty array (based on rewire sample data primary key 3 not found/API returns error object)", function () {
+      latestByPrimaryKey.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys("2", "/award/api/v1/award-amount-transactions/").should.be.eql([]);
     });    
 
     it("should given a passed in previous max primary key of 773750 return the mocked up data for primary key 773751 and 773752 but stop at the mocked up error on primary key 773753 (based on rewire sample data primary key 773753 not found)", function () {
