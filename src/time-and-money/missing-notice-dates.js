@@ -62,7 +62,7 @@ module.exports = {
         log.trace(`3. query data by increasing primary key values until we hit an error with the message that that primary key is not found`);
         //note: later may want to improve so that we can handle gaps in primary keys (wait until the 3rd error on the 3rd primary key past the last one for example, but for now stopping on first error)
         const newApiCallsTwoDimArrWHeader = latestByPrimaryKey.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys(prevSheetMaxPrimaryKeyVal, endpointUriStr); 
-        log.trace(`newApiCallsTwoDimArrWHeader: ${newApiCallsTwoDimArrWHeader}`);
+        log.trace(`newApiCallsTwoDimArrWHeader: ${JSON.stringify(newApiCallsTwoDimArrWHeader)}`);
         
         //4a. join in document statuses on those records that do not yet have it
         

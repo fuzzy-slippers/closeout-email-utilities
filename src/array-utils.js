@@ -139,16 +139,21 @@ module.exports = {
      * @return {object[][]} the two dimentional array passed in with a js trim done on all elements/cell values
      */     
      trimAllCellsInTwoDimArr: (twoDimArr) => {
-        log.trace(`array-utils trimAllCellsInTwoDimArr(${JSON.stringify(twoDimArr)}) called...`);       
-        return twoDimArr.map( function(row) {
-            return row.map( function( cell ) { 
-                //since numbers, booleans, etc dont have a trim function (and its unnecessary) only try to trim string values, anything other than a string return unchanged
-                if (typeof cell === 'string')
-                  return cell.trim();
-                else
-                  return cell;
-            } );
-        } );
+        log.trace(`array-utils trimAllCellsInTwoDimArr(${JSON.stringify(twoDimArr)}) called...`);
+        //if it's not a 2d array, just return the array unchanged (based on https://stackoverflow.com/questions/31104879/how-to-check-if-array-is-multidimensional-jquery)
+        if (!twoDimArr[0] || twoDimArr[0].constructor !== Array)
+          return twoDimArr;
+        else {
+          return twoDimArr.map( function(row) {
+              return row.map( function( cell ) { 
+                  //since numbers, booleans, etc dont have a trim function (and its unnecessary) only try to trim string values, anything other than a string return unchanged
+                  if (typeof cell === 'string')
+                    return cell.trim();
+                  else
+                    return cell;
+              } );
+          } );
+        }  
      },     
 
     

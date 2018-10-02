@@ -136,6 +136,11 @@ describe("array-utils", function() {
     it(`should if passed an empty array return an empty array`, function () {
       arrayUtils.trimAllCellsInTwoDimArr([]).should.be.eql([]);
     }); 
+    
+    it(`should if passed an array with a single null value returns that same array back with the single null value`, function () {
+      arrayUtils.trimAllCellsInTwoDimArr([null]).should.be.eql([null]);
+    });     
+    
   }); 
 
 });

@@ -42,11 +42,14 @@ missingNoticeDates.__set__({
                                                               console.log(`************************inside rewiring of latestByPrimaryKey.findMaxPrimaryKeyValueInData, twoDimArrWHeader detected as: ${JSON.stringify(twoDimArrWHeader)}*********************`)      
           if (twoDimArrWHeader.length === 0)
           {
-                                  console.log(`RETURNING null when empty array with no header passed in...pretending nothing in the cached google property store value yet - from mock latestByPrimaryKey.findMaxPrimaryKeyValueInData`)
-            return null; // google property store returns null if no property exists yet under that name
+                                  console.log(`RETURNING 8000 when empty array with no header passed in...pretending when no header passed it there is really a last primary key of 8000 in the google property store from last time (for example if someone clears the sheet but there were prior runs)`)
+            return 8000; // google property store returns null if no property exists yet under that name
           }
-          else if (JSON.stringify(twoDimArrWHeader) === JSON.stringify([["ColA", "ColB", "award-amount-transactions._primaryKey"]]))
-            return null; 
+          else if (JSON.stringify(twoDimArrWHeader) === JSON.stringify([["award-amount-transactions.NoMockedPropertyInGooglePropertyStoreItsNull", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey"]]))
+          {
+                                  console.log(`RETURNING null when array with just header with column name award-amount-transactions.NoMockedPropertyInGooglePropertyStoreItsNull passed in...pretending nothing in the cached google property store value yet - from mock latestByPrimaryKey.findMaxPrimaryKeyValueInData`)
+            return null; // google property store returns null if no property exists yet under that name
+          } 
           else if (JSON.stringify(twoDimArrWHeader) === JSON.stringify([["award-amount-transactions.UseMockedPropertyValueSevenThousand","award-amount-transactions.ColB","award-amount-transactions._primaryKey"]]))
           {
                                   console.log(`RETURNING 7000 - from mock latestByPrimaryKey.findMaxPrimaryKeyValueInData`)
@@ -61,8 +64,12 @@ missingNoticeDates.__set__({
                                                       
           if (maxPreviouslyUsedPrimaryKey === 7000)                                     
             return [["award-amount-transactions.UseMockedPropertyValueSevenThousand","award-amount-transactions.ColB","award-amount-transactions._primaryKey"],[1,2,7001]];
+          else if (maxPreviouslyUsedPrimaryKey === 8000) {
+                                                     console.log(`-=-----------============-===========RETURNING [["award-amount-transactions.NoMockedPropertyInGooglePropertyStoreItsNull", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey"]["A","B",8001]]`);
+            return [["award-amount-transactions.NoMockedPropertyInGooglePropertyStoreItsNull", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey"],["A","B",8001]];
+          }
           else if (maxPreviouslyUsedPrimaryKey === null)
-            return []
+            return [];
         },
     },
 });
@@ -74,11 +81,18 @@ describe("missing-notice-dates", function() {
   describe("#updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates()", function() {
     it("should when previous array (sheet) data is empty with just a header row with a 'UseMockedPropertyValueSevenThousand' and 'award-amount-transactions._primaryKey' columns (with mocked last primary key value of 7000), should return an array with mocked data for primary key 7000", function () {
       missingNoticeDates.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates([["award-amount-transactions.UseMockedPropertyValueSevenThousand", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey"]]).should.be.eql([["award-amount-transactions.UseMockedPropertyValueSevenThousand","award-amount-transactions.ColB","award-amount-transactions._primaryKey"],[1,2,7001]]);
-    });       
+    });    
+
+    it("should when the previous array (sheet) data is empty with just a header row (and a mocked last primary key value is not yet in the google property store - its null), set the sheet to empty array - corresponds to the scenario that google property store is empty and the spreadsheet passed in is empty", function () {
+      missingNoticeDates.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates([["award-amount-transactions.NoMockedPropertyInGooglePropertyStoreItsNull", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey"]]).should.be.eql([]);
+    });
     
-    it("should when the previous array (sheet) data is empty with no header rows (and a mocked last primary key value is not yet in the google property store - its null), set the sheet to empty array - corresponds to the scenario that google property store is empty and the spreadsheet passed in is empty", function () {
-      missingNoticeDates.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates([]).should.be.eql([]);
+    it("should when the previous array (sheet) data is empty with no header rows (and a mocked last primary key value IS in the google property store - 8000), set the sheet to pretend data listed for primary key 8000", function () {
+      missingNoticeDates.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates([]).should.be.eql([["award-amount-transactions.NoMockedPropertyInGooglePropertyStoreItsNull", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey"],["A","B",8001]]);
     }); 
+    
+     
+    
     
     // it("should when previous array (sheet) data is empty with just a header row with an 'award-amount-transactions._primaryKey' column, but no data rows (and a mocked last primary key value that points to empty data), should return an empty array", function () {
     //   missingNoticeDates.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates([["ColA", "ColB", "award-amount-transactions._primaryKey"]]).should.be.eql([]);

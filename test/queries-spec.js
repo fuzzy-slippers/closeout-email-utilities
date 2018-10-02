@@ -35,7 +35,11 @@ describe("queries", function() {
     
     it("should given an array with just a header row, returning empty array", function () {
       queries.filterJustRowsWhereColIsNullOrBlank("endpoint-name.Col3", [["endpoint-name.Col1", "endpoint-name.Col2", "endpoint-name.Col3"]]).should.be.eql([]);
-    });  
+    }); 
+  
+    it("should given a column name to search but a completely empty array, return an empty array", function () {
+      queries.filterJustRowsWhereColIsNullOrBlank("endpoint-name.Col3", []).should.be.eql([]);
+    });    
     
     it("should given an array with a header and one data row with no null values, just returns the header row (as no rows with null values in the col specified found)", function () {
       queries.filterJustRowsWhereColIsNullOrBlank("endpoint-name.Col3", [["endpoint-name.Col1", "endpoint-name.Col2", "endpoint-name.Col3"], ["A","AA", "AAA"]]).should.be.eql([]);
