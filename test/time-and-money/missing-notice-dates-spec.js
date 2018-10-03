@@ -91,6 +91,15 @@ missingNoticeDates.__set__({
           {
                                                               console.log(`RETURNING 11000 - from mock latestByPrimaryKey.findMaxPrimaryKeyValueInData`)
             return 11000;
+          }
+          else if (JSON.stringify(twoDimArrWHeader) === JSON.stringify(             
+          [["award-amount-transactions.UseMockedPropertyValueElevenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey"],
+          ["existing sheet data row 1","",10],
+          ["existing sheet data row 2","2026-06-26"],
+          ["existing sheet data row 3","",30]])) 
+          {
+                                                              console.log(`RETURNING 11000 also - from mock latestByPrimaryKey.findMaxPrimaryKeyValueInData`)
+            return 11000;
           }          
           else
             return "findMaxPrimaryKeyValueInData twoDimArrWHeader DID NOT MATCH ANYTHING";
@@ -180,7 +189,7 @@ describe("missing-notice-dates", function() {
     }); 
     
     
-    it("should when previous array (sheet) data (3 rows) have award-amount-transactions.noticeDate and mocked API row returned has notice date that is the string null it is not excluded from results (mocked primary key 11000)", function () {
+    it("should when previous array (sheet) data (3 rows) have award-amount-transactions.noticeDate and mocked API row returned has notice date that is null it is not excluded from results (mocked primary key 11000)", function () {
       missingNoticeDates.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates(
         [["award-amount-transactions.UseMockedPropertyValueElevenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey"],
         ["existing sheet data row 1","",10],
@@ -189,6 +198,18 @@ describe("missing-notice-dates", function() {
         .should.be.eql([["award-amount-transactions.UseMockedPropertyValueElevenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey"],
         ["existing sheet data row 1","",10],
         ["existing sheet data row 2","",20],
+        ["existing sheet data row 3","",30],
+        ["from mocked API data row 4","",11001]]);
+    });    
+    
+    it("should when previous array (sheet) data (3 rows) have award-amount-transactions.noticeDate entered in one row but not the others and mocked API row returned has notice date that is null it is not excluded from results (mocked primary key again using 11000) - should not include the row in the mocked spreadsheet existing data that had a notice date entered", function () {
+      missingNoticeDates.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates(
+        [["award-amount-transactions.UseMockedPropertyValueElevenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey"],
+        ["existing sheet data row 1","",10],
+        ["existing sheet data row 2","2026-06-26"],
+        ["existing sheet data row 3","",30]])
+        .should.be.eql([["award-amount-transactions.UseMockedPropertyValueElevenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey"],
+        ["existing sheet data row 1","",10],
         ["existing sheet data row 3","",30],
         ["from mocked API data row 4","",11001]]);
     });    
