@@ -100,6 +100,15 @@ missingNoticeDates.__set__({
           {
                                                               console.log(`RETURNING 11000 also - from mock latestByPrimaryKey.findMaxPrimaryKeyValueInData`)
             return 11000;
+          }
+          else if (JSON.stringify(twoDimArrWHeader) === JSON.stringify(             
+          [["award-amount-transactions.UseMockedPropertyValueElevenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey", "extraSpreadsheetColumn1", "extraSpreadsheetColumn2", "extraSpreadsheetColumn3"],
+          ["existing sheet data row 1","",10,"manually entered into sheet 1", "", ""],
+          ["existing sheet data row 2","",20,"manually entered into sheet 1", "manually entered into sheet 2", ""],
+          ["existing sheet data row 3","",30,"manually entered into sheet 1", "manually entered into sheet 2", "manually entered into sheet 3"]])) 
+          {
+                                                              console.log(`RETURNING 11000 also - from mock latestByPrimaryKey.findMaxPrimaryKeyValueInData`)
+            return 11000;
           }          
           else
             return "findMaxPrimaryKeyValueInData twoDimArrWHeader DID NOT MATCH ANYTHING";
@@ -212,7 +221,20 @@ describe("missing-notice-dates", function() {
         ["existing sheet data row 1","",10],
         ["existing sheet data row 3","",30],
         ["from mocked API data row 4","",11001]]);
-    });    
+    });   
+    
+    it("should when previous array (sheet) data (3 rows) has extra columns, simulating manually entered data into the google sheet for example, the results will include both those extra columns for the spreadsheet data and the appropriate columns for the mocked API data (which would have the normal amount of columns) (mocked primary key 11000)", function () {
+      missingNoticeDates.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates(
+        [["award-amount-transactions.UseMockedPropertyValueElevenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey", "extraSpreadsheetColumn1", "extraSpreadsheetColumn2", "extraSpreadsheetColumn3"],
+        ["existing sheet data row 1","",10,"manually entered into sheet 1", "", ""],
+        ["existing sheet data row 2","",20,"manually entered into sheet 1", "manually entered into sheet 2", ""],
+        ["existing sheet data row 3","",30,"manually entered into sheet 1", "manually entered into sheet 2", "manually entered into sheet 3"]])
+        .should.be.eql(        [["award-amount-transactions.UseMockedPropertyValueElevenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey", "extraSpreadsheetColumn1", "extraSpreadsheetColumn2", "extraSpreadsheetColumn3"],
+        ["existing sheet data row 1","",10,"manually entered into sheet 1", "", ""],
+        ["existing sheet data row 2","",20,"manually entered into sheet 1", "manually entered into sheet 2", ""],
+        ["existing sheet data row 3","",30,"manually entered into sheet 1", "manually entered into sheet 2", "manually entered into sheet 3"],
+        ["from mocked API data row 4","",11001,"","",""]]);
+    });     
      
     
     
