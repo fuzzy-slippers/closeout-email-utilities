@@ -26,10 +26,11 @@ module.exports = {
         const prevSheetDataTwoDimArrWHeader = googleAppsScriptWrappers.readDataInSheetWHeaderRowByName(sheetNameToUpdate); 
         log.trace(`prevSheetDataTwoDimArrWHeader: ${JSON.stringify(prevSheetDataTwoDimArrWHeader)}`);
         
-        //6. use the updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates function to check for new t&m docs that should be listed on the validation sheet (and add them to the bottom of the 2d array)
+        //2a. use the updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates function to check for new t&m docs that should be listed on the validation sheet (and add them to the bottom of the 2d array)
+        log.trace(`2a. use the updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates function to check for new t&m docs that should be listed on the validation sheet`);
         const combinationOfExistingDataPlusNewApiResults = module.exports.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates(prevSheetDataTwoDimArrWHeader);
-        log.trace(`6. use the updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates function to check for new t&m docs that should be listed on the validation sheet`);
-        log.trace(`combinationOfExistingDataPlusNewApiResults: ${JSON.stringify(combinationOfExistingDataPlusNewApiResults)}`);
+        //6. after updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates finishes/returns back results
+        log.trace(`6. result from calling updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates function is combinationOfExistingDataPlusNewApiResults: ${JSON.stringify(combinationOfExistingDataPlusNewApiResults)}`);
         
         
         //7.  update sheet with old data in the sheet + the new results/flagged records
@@ -39,7 +40,7 @@ module.exports = {
     },
     
     /*
-     * the function that actually updates the 2d data array with new time and money docs flagged to be added at the bottom of the data already in (coming from) the sheet
+     * the helper function for addAdditionalFlaggedEmptyTimeAndMoneyNoticeDatesToSheet that actually updates the 2d data array with new time and money docs flagged to be added at the bottom of the data already in (coming from) the sheet
      * 
      * @param {object[][]} the 2d array with header data read directly from the sheet as a starting point
      * @return {object[][]} the 2d array with header data produced after adding in additional validation rows added during this round to the data passed in from the google sheet (for the next step of updating the google sheet)
@@ -53,8 +54,8 @@ module.exports = {
         const endpointNameOnly = apiUtils.extractApiEndpointNameFromUri(endpointUriStr);
         log.trace(`endpointNameOnly: ${endpointNameOnly}`);
         
-        //2. determine the highest primary key in the google sheet data read in (before the update)
-        log.trace(`2. determine the highest primary key in the google sheet data read in (before the update)`); 
+        //2b. determine the highest primary key in the google sheet data read in (before the update)
+        log.trace(`2b. determine the highest primary key in the google sheet data read in (before the update)`); 
         const prevSheetMaxPrimaryKeyVal = latestByPrimaryKey.findMaxPrimaryKeyValueInData(`${endpointNameOnly}._primaryKey`, prevSheetDataTwoDimArrWHeader, endpointUriStr); 
         log.trace(`prevSheetMaxPrimaryKeyVal: ${prevSheetMaxPrimaryKeyVal}`);
 
@@ -64,8 +65,7 @@ module.exports = {
         const newApiCallsTwoDimArrWHeader = latestByPrimaryKey.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys(prevSheetMaxPrimaryKeyVal, endpointUriStr); 
         log.trace(`newApiCallsTwoDimArrWHeader: ${JSON.stringify(newApiCallsTwoDimArrWHeader)}`);
         
-        //4a. join in document statuses on those records that do not yet have it
-        
+        //4a. (for now using the quick and dirty checking if transactionTypeCode is null/blank as it is required, to confirm if its a pending or final document, rather than calling 2nd API - but may later) join in document statuses on those records that do not yet have it
         //4b. filter on just rows where the document status is FINAL
         
         //4c. filter on just the rows/records where the noticeDate is NULL/missing        
@@ -79,8 +79,10 @@ module.exports = {
         log.trace(`combinationOfExistingDataPlusNewApiResults: ${combinationOfExistingDataPlusNewApiResults}`);
         
         return combinationOfExistingDataPlusNewApiResults;
-        
     }
+    
+    
+    
     
     
 }

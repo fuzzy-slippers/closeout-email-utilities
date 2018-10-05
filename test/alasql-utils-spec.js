@@ -137,20 +137,44 @@ describe("alasql-utils", function() {
                   [5, null, undefined],
                   ]);      
     });       
-    
-    
-    // not using yet (may never need the way we are just passing the data to load)
-    // it("should if passed test 2d array and a valid insert statement, the returned data should have one more row than the original", function () {
-    //   const origTwoDimArr = [["column1", "column2"], ["avocado", "orange"], [null, "watermelon"], ["pineapple", null]];
-    //   const testSqlStmt = "insert into tmptbl1 values ('SPIKE', 'FRI');SELECT * FROM tmptbl1;";
-    //   const retVal = alasqlUtils.selectFromTwoDimArr(origTwoDimArr, testSqlStmt);
-    //   console.log(`retVal: ${JSON.stringify(retVal)}`);
-    //   retVal.length.should.not.eql(origTwoDimArr.length);
-    //   retVal.length.should.eql(4);      
-    // });
-    
-   
   });
+  
+  describe("#insertUpdDelFromTwoDimArr()", function() { 
+    it("should if passed test 2d array and a valid insert sql statement, the returned data should have one more row than the original", function () {
+      const origTwoDimArr = [["column1", "column2"], ["avocado", "orange"], ["", "watermelon"], ["pineapple", ""]];
+      const testInsertSqlStmt = "insert into tmptbl1 (column1, column2) values ('SPIKE', 'FRI')";
+      const retVal = alasqlUtils.insertUpdDelFromTwoDimArr(testInsertSqlStmt, origTwoDimArr);
+                                                                //console.log(`retVal: ${JSON.stringify(retVal)}`);
+      retVal.length.should.not.eql(origTwoDimArr.length);
+      retVal.length.should.eql(5);
+      retVal.should.deepEqual([["column1", "column2"], 
+                              ["avocado", "orange"], 
+                              ["", "watermelon"], 
+                              ["pineapple", ""], 
+                              ["SPIKE","FRI"]]); 
+    });    
+    
+    it("should if passed an empty 2d array with just a column header row and a valid insert sql statement, the returned data should have the column header row plus the one row of data", function () {
+      const origTwoDimArr = [["A", "B"]];
+      const testInsertSqlStmt = "insert into tmptbl1 (A, B) values (1, 2)";
+      const retVal = alasqlUtils.insertUpdDelFromTwoDimArr(testInsertSqlStmt, origTwoDimArr);
+      retVal.should.deepEqual([["A", "B"], 
+                              [1, 2]]); 
+    });   
+    
+    it("should if passed test 2d array and a valid insert sql statement inserting all empty string values (null values problematic in alasql because they are stored as undefined instead, the returned data should have one more row than the original with empty string values", function () {
+      const origTwoDimArr = [["col1", "col2"], ["avocado", "orange"], ["", "watermelon"], ["pineapple", ""]];
+      const testInsertSqlStmt = "insert into tmptbl1 (col1, col2) values ('', '')";
+      const retVal = alasqlUtils.insertUpdDelFromTwoDimArr(testInsertSqlStmt, origTwoDimArr);
+      retVal.should.deepEqual([["col1", "col2"], 
+                              ["avocado", "orange"], 
+                              ["", "watermelon"], 
+                              ["pineapple", ""], 
+                              ["",""]]); 
+    });     
+    
+    
+  });    
 
 });
    

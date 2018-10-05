@@ -64,35 +64,27 @@ module.exports = {
         const resultObjArr = tempDb.exec(sqlToTransformData);
         const resultTwoDimArr = arrayUtils.convertOneDimObjArrToTwoDimArrWithHeaderRow(resultObjArr); 
         return resultTwoDimArr;
-    }
+    },
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    // /** TODO:
-    //  * perform single INSERT/UPDATE/DELETE action against  (Note: table name referenced in SQL query should always be "tmptbl1")
-    //  * for example you can pass in data from a sheet with null values and a sql SELECT statement excluding nulls and it will only return 2d data with the results (to use to update another sheet/tab)  
-    //  * NOTE: this function only designed for SELECT statements against single tables (with or without where clauses, group by, etc - INSERT/UPDATE/DELETE use other function!)
-    //  *
-    //  * @param {object} 2d array of data (with first row as column headers) as a starting point (that the query will be run against)
-    //  * @param {string} valid alasql SELECT SQL statement to run against that original 2d array data loaded as a alasql formatted table  
-    //  * @return {object} 2d array exported from the table after the SQL statement has been run against that table/data
-    //  */
-    // insertUpdDelFromTwoDimArr(twoDimArrWHeader, sqlInsertUpdDelStmt)
-    // {
-    //     const tempDb = this.createNewDatabase_();
-    //     this.addTablePopulatedByTwoDimArrWithHeaderRowData_(tempDb, "tmptbl1", twoDimArrWHeader);
-    //     const rowsAffected = tempDb.exec(sqlInsertUpdDelStmt);
-    //     const resultObjArr = tempDb.exec("SELECT * FROM tmptbl1;");
-    //     const resultTwoDimArr = arrayUtils.convertOneDimObjArrToTwoDimArrWithHeaderRow(resultObjArr); 
-    //     return resultTwoDimArr;
-    // },    
+
+    /**
+     * transform passed in data by performing a single INSERT/UPDATE/DELETE action against the data passed in, then querying the results (select all) and returning them  (Note: table name referenced in SQL query should always be "tmptbl1")
+     *
+     * @param {string} valid alasql INSERT, UPDATE or DELETE single SQL statement to run against that original 2d array data loaded as a alasql formatted table  
+     * @param {object} 2d array of data (with first row as column headers) as a starting point (that the insert, update or delete will be run against)      
+     * @return {object} 2d array exported from the table based on the initial data passed in after the INSERT/UPDATE/DELETE statment has been has been run against that table/data
+     */
+    insertUpdDelFromTwoDimArr(sqlSingleInsertUpdDelStmt, twoDimArrWHeader)
+    {
+        log.trace(`alasql-utils insertUpdDelFromTwoDimArr(${sqlSingleInsertUpdDelStmt}, ${JSON.stringify(twoDimArrWHeader)}) called...`);        
+        const tempDb = this.createNewDatabase_();
+        this.addTablePopulatedByTwoDimArrWithHeaderRowData_(tempDb, "tmptbl1", twoDimArrWHeader);
+        const rowsAffected = tempDb.exec(sqlSingleInsertUpdDelStmt);
+        const resultObjArr = tempDb.exec("SELECT * FROM tmptbl1;");
+                                                                console.log(`resultObjArr: ${JSON.stringify(resultObjArr)}`);        
+        const resultTwoDimArr = arrayUtils.convertOneDimObjArrToTwoDimArrWithHeaderRow(resultObjArr); 
+                                                                console.log(`resultTwoDimArr: ${JSON.stringify(resultTwoDimArr)}`);         
+        return resultTwoDimArr;
+    },    
 
 }
