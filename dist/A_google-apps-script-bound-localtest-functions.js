@@ -14,6 +14,7 @@
  */
 function  updateSheetAdditionalMissingNoticeDate() {
   var startTime = "updateSheetAdditionalMissingNoticeDate started at " + new Date();
+  console.log("--------------------------------------------------------------------------------------");
   Logger.log(startTime);console.log(startTime);  
   missingNoticeDates.addAdditionalFlaggedEmptyTimeAndMoneyNoticeDatesToSheet("TNMBlankNoticeDates");
 }
