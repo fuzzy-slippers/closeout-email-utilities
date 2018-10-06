@@ -195,14 +195,15 @@ describe("queries", function() {
       retVal[1][colPosition].should.eql("");
       retVal[2][colPosition].should.eql("");
       retVal[3][colPosition].should.eql("");      
-    });    
-    // it("should given a passed in 2d array without the new last updated column, should have a date within 1000 ms from the current time at testing", function () {
-    //   const retVal = queries.addColumnComputedLastUpdated("endPointName.computedLastUpdated", [["Col1", "Col2", "Col3"], ["A","AA", 1], ["B", "BB", 2], ["C", "CC", 3]]);
-    //   const colPosition = retVal[0].indexOf("endPointName.computedLastUpdated");
-    //   retVal[1][colPosition].should.be.approximately(new Date(), 1000);
-    //   retVal[2][colPosition].should.be.approximately(new Date(), 1000);
-    //   retVal[3][colPosition].should.be.approximately(new Date(), 1000);      
-    // }); 
+    }); 
+    it("should given a passed in 2d array with the refreshed column already present, in the result 2d array the header should only have one the one extra column, not multiple added columns", function () {
+      const functionFirstRunResults = queries.addColumnComputedRefreshed("endPointName.computedRefreshed", [["Col1", "Col2", "Col3"], ["A","AA", "AAA"], ["B", "BB", "BBB"], ["C", "CC", "CCC"]]);
+      const functionSecondRunResults = queries.addColumnComputedRefreshed("endPointName.computedRefreshed", functionFirstRunResults);
+      const functionThirdRunResults = queries.addColumnComputedRefreshed("endPointName.computedRefreshed", functionSecondRunResults);
+      functionFirstRunResults[0].length.should.eql(4);
+      functionSecondRunResults[0].length.should.eql(4);
+      functionThirdRunResults[0].length.should.eql(4);
+    });     
  
   });  
 
