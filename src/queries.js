@@ -7,15 +7,15 @@ const log = require("../src/log-utils.js");
 
 module.exports = {
 
-  /**
-  * THE BELOW FUNCTION IS JUST FOR TESTING - FOR NOW....
-  * Query returns just rows where co1 is greater than 12 (13+) 
-  *
-  * @param {string[][]} the original data to query against - must have column headers as the first row and have column with header "col1"
-  * @return {string[][]} the resulting data where rows with "col1" column values less or equal to 12 have been excluded
-  */
-  testSelect: (twoDArrWHeader) => alasqlUtils.selectFromTwoDimArr("SELECT * FROM tmptbl1 WHERE Col1 > 12", twoDArrWHeader)
-  ,
+  // /**
+  // * THE BELOW FUNCTION IS JUST FOR TESTING - FOR NOW....
+  // * Query returns just rows where co1 is greater than 12 (13+) 
+  // *
+  // * @param {string[][]} the original data to query against - must have column headers as the first row and have column with header "col1"
+  // * @return {string[][]} the resulting data where rows with "col1" column values less or equal to 12 have been excluded
+  // */
+  // testSelect: (twoDArrWHeader) => alasqlUtils.selectFromTwoDimArr("SELECT * FROM tmptbl1 WHERE Col1 > 12", twoDArrWHeader)
+  // ,
 
   /**
   * Find the max value in the column specified- the highest (max) in a whole dataset for that column 
@@ -36,7 +36,7 @@ module.exports = {
   */    
   filterJustRowsWhereColIsNullOrBlank: (colToLookForNulls, twoDArrWHeader) => {
     const twoDArrWHeaderCellsTrimmed = arrayUtils.trimAllCellsInTwoDimArr(twoDArrWHeader);
-    return alasqlUtils.selectFromTwoDimArr(`SELECT * FROM tmptbl1 WHERE [${colToLookForNulls}] IS NULL OR [${colToLookForNulls}] = ''`, twoDArrWHeaderCellsTrimmed)
+    return alasqlUtils.selectFromTwoDimArr(`SELECT * FROM tmptbl1 WHERE [${colToLookForNulls}] IS NULL OR [${colToLookForNulls}] = ''`, twoDArrWHeaderCellsTrimmed);
   },
   
   /**
@@ -159,170 +159,29 @@ module.exports = {
     const initialQueryResults = module.exports.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted(priKeyColName, twoDArrWHeader, secondTwoDArrWHeader, thirdTwoDArrWHeader);
     const sortedQueryResults = module.exports.orderByColumnWithName(priKeyColName, initialQueryResults);
     return arrayUtils.replaceAllOccurancesInTwoDimArr(sortedQueryResults, null, "");
-  }
+  },
   
   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* working top part:
-
-      SELECT * FROM tmptbl1
-      WHERE _primaryKey IN
-      (
-        SELECT _primaryKey FROM tmptbl1 
-        UNION 
-        SELECT _primaryKey FROM tmptbl2 
-        UNION 
-        SELECT _primaryKey FROM tmptbl3
-      ) 
-      
-      
-      OR...
-      
-      
-              SELECT ${columnNamesSecondTable} 
-        FROM tmptbl1
-        WHERE _primaryKey IN
-        (
-          SELECT _primaryKey FROM tmptbl1 
-          UNION 
-          SELECT _primaryKey FROM tmptbl2 
-          UNION 
-          SELECT _primaryKey FROM tmptbl3
-        ) 
-      
-*/
-
-
-
-/* scratch
-        SELECT ${columnNamesSecondTable} 
-        FROM tmptbl1
-        WHERE _primaryKey IN
-        (
-          SELECT _primaryKey FROM tmptbl1 
-          UNION 
-          SELECT _primaryKey FROM tmptbl2 
-          UNION 
-          SELECT _primaryKey FROM tmptbl3
-        ) 
-      )
-      
-      UNION 
-      
-      SELECT ${columnNamesSecondTable} FROM
-      (
-        SELECT ${columnNamesSecondTable} FROM tmptbl2 
-        UNION 
-        SELECT ${columnNamesSecondTable} FROM tmptbl3
-      ) 
-      WHERE _primaryKey NOT IN 
-      (
-        SELECT _primaryKey from tmptbl1
-      )
-
-
-
-
-
-
-
-
-  unionUsingWithExtraColumnsInFirstTablePreserved: (twoDArrWHeader, secondTwoDArrWHeader, thirdTwoDArrWHeader) => {
-    //since the third table is optional, if it's not passed in, use an empty array in it's place, which in a UNION is equivalent to not adding it since it will never union in blank rows
-    const thirdTwoDArrWHeaderEmptyArrIfNotPassedIn = (thirdTwoDArrWHeader ? thirdTwoDArrWHeader : []);    
-    //due to a bug in AlaSQL that causes the second and third tables in a union statement to be blank if using SELECT *, but not if you list out the column names, had to do this dynamically based on the column names in the first 2d array and converting them with join to 'col1', 'col2', etc
-    const columnNamesFirstTable = twoDArrWHeader[0].join(", ");
-    
-    
-    const columnNamesSecondTable = secondTwoDArrWHeader[0].join(", ");
-                                                    console.log(`columnNamesFirstTable: ${columnNamesFirstTable}`);
-    //return alasqlUtils.selectFromTwoDimArr(`SELECT ${columnNamesFirstTable} FROM tmptbl1 UNION SELECT ${columnNamesFirstTable} FROM tmptbl2 UNION SELECT ${columnNamesFirstTable} FROM tmptbl3`, twoDArrWHeader, secondTwoDArrWHeader, thirdTwoDArrWHeaderEmptyArrIfNotPassedIn);
-    return alasqlUtils.selectFromTwoDimArr(`
- 
-      SELECT * FROM tmptbl1
-      WHERE ${columnNamesSecondTable} IN
-      (
-        SELECT ${columnNamesSecondTable} FROM tmptbl1 
-        UNION SELECT ${columnNamesSecondTable} FROM tmptbl2 
-        UNION SELECT ${columnNamesSecondTable} FROM tmptbl3
-      ) 
-      
-       
-       `, twoDArrWHeader, secondTwoDArrWHeader, thirdTwoDArrWHeaderEmptyArrIfNotPassedIn);
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      
-      UNION
-      
-    SELECT * FROM
-      ( 
-        SELECT * FROM tmptbl1
-      ) TABLE1ALLCOLS
-      WHERE ${columnNamesSecondTable} IN
-      (
-        SELECT ${columnNamesSecondTable} FROM tmptbl1 
-        UNION SELECT ${columnNamesSecondTable} FROM tmptbl2 
-        UNION SELECT ${columnNamesSecondTable} FROM tmptbl3
-      )       
-
-*/
-
+  /**
+  * adds a new column to a 2d array with header, with the name specified and each row of the new column initialized to the current date/time
+  * 
+  * @param {string} the column name (for the header row) of the column being added to list the last updated date/time
+  * @param {string[][]} a 2d array with a header row without the column, that should have the new column added
+  * @return {string[][]} a 2d array with a header that is the initial 2d array with the additional column added on the righthand side
+  */    
+  addColumnComputedLastUpdated: (colName, twoDArrWHeader) => {
+    log.trace(`queries addColumnComputedLastUpdated: (${colName}, ${JSON.stringify(twoDArrWHeader)}) called...`);
+    return alasqlUtils.selectFromTwoDimArr(`SELECT *, date(now()) AS [${colName}] FROM tmptbl1`, twoDArrWHeader);
+  }  
   
-  //alasqlUtils.selectFromTwoDimArr("SELECT * FROM tmptbl1 UNION ALL SELECT * FROM tmptbl1 UNION ALL SELECT * FROM tmptbl1", twoDArrWHeader, secondTwoDArrWHeader, (thirdTwoDArrWHeader ? thirdTwoDArrWHeader : []))
-    
-  
-  
-  
-                      //   //DELETE LATER
-                      // testAlasqlWorking2(twoDimArrPassedIn)
-                      // {
-                      //     var mybase = this.createNewDatabase_();
-                      //     this.addTablePopulatedByTwoDimArrWithHeaderRowData_(mybase, "testtabledata", twoDimArrPassedIn)
-                      //     var res = mybase.exec("SELECT * FROM testtabledata WHERE Col1 > 12");
-                      //     return res;
-                      // }
 
-};
+
+};  
+
+
+
+
+
+
 
 

@@ -76,10 +76,43 @@ module.exports = {
         //5. union the columns that match, then join in the rest of the columns in the existing sheet
         log.trace(`5. union the columns that match, then join in the rest of the columns in the existing sheet`);
         const combinationOfExistingDataPlusNewApiResults = queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings(`${endpointNameOnly}._primaryKey`,  prevSheetDataTwoDimArrWHeader, justRowsNullNoticeDatesTwoDimArrWHeader);
-        log.trace(`combinationOfExistingDataPlusNewApiResults: ${combinationOfExistingDataPlusNewApiResults}`);
+        log.trace(`combinationOfExistingDataPlusNewApiResults: ${JSON.stringify(combinationOfExistingDataPlusNewApiResults)}`);
+        
+        //6. add Final Document? column
+        
+        
+        //7. add Last Updated column
         
         return combinationOfExistingDataPlusNewApiResults;
-    }
+    },
+    
+    
+    /**
+     * this function operates on one row at a time (so only does rows worth of API calls to check if data has changed) - look for oldest timestamp with pending status and does API call to see if data has changed, and updates the array and sheet with that new data
+     * Note: final documents should not be updated/changing (but may want to design it in a way that it would be easy to update these rows too later if we find out they can)
+     * 
+     * @param {string} a string with the name of the tab/sheet within the google sheet the program that should be updated (updates single row that is non-final/pending, the pending row one with the max primary key value)
+     */   
+    updateRefreshOnePendingRowInSheet: (sheetNameToUpdate) => {
+        // log.trace(`missing-notice-dates addAdditionalFlaggedEmptyTimeAndMoneyNoticeDatesToSheet(${sheetNameToUpdate}) called...`);
+        
+        // //1. read data from sheet
+        // log.trace(`1. read data from sheet`); 
+        // const prevSheetDataTwoDimArrWHeader = googleAppsScriptWrappers.readDataInSheetWHeaderRowByName(sheetNameToUpdate); 
+        // log.trace(`prevSheetDataTwoDimArrWHeader: ${JSON.stringify(prevSheetDataTwoDimArrWHeader)}`);
+        
+        // //2a. use the updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates function to check for new t&m docs that should be listed on the validation sheet (and add them to the bottom of the 2d array)
+        // log.trace(`2a. use the updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates function to check for new t&m docs that should be listed on the validation sheet`);
+        // const combinationOfExistingDataPlusNewApiResults = module.exports.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates(prevSheetDataTwoDimArrWHeader);
+        // //6. after updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates finishes/returns back results
+        // log.trace(`6. result from calling updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates function is combinationOfExistingDataPlusNewApiResults: ${JSON.stringify(combinationOfExistingDataPlusNewApiResults)}`);
+        
+        
+        // //7.  update sheet with old data in the sheet + the new results/flagged records
+        // log.trace(`7.  update sheet with old data in the sheet + the new results/flagged records`);
+        // googleAppsScriptWrappers.updNamedSheetWArrWHeaderRow(sheetNameToUpdate, combinationOfExistingDataPlusNewApiResults);
+        // log.trace(`sheetNameToUpdate: ${sheetNameToUpdate}`)
+    }    
     
     
     

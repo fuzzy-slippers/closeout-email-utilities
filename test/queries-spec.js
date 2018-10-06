@@ -181,8 +181,30 @@ describe("queries", function() {
       .should.eql([["_primaryKey", "colA"], [1, 2]]);
     });      
     
-    
   });   
+  
+  
+  
+  describe("#addColumnComputedLastUpdated()", function() {
+    it("should given a passed in 2d array without the new last updated column, in the result 2d array the header should now have a column that matches the name passed in for the last updated column (far right)", function () {
+      queries.addColumnComputedLastUpdated("endPointName.computedLastUpdated", [["Col1", "Col2", "Col3"], ["A","AA", "AAA"], ["B", "BB", "BBB"], ["C", "CC", "CCC"]])[0].should.containEql("endPointName.computedLastUpdated");
+    });  
+    it("should given a passed in 2d array without the new last updated column, should have non blank data in each element", function () {
+      const retVal = queries.addColumnComputedLastUpdated("endPointName.computedLastUpdated", [["Col1", "Col2", "Col3"], ["A","AA", 1], ["B", "BB", 2], ["C", "CC", 3]]);
+      const colPosition = retVal[0].indexOf("endPointName.computedLastUpdated");
+      retVal[1][colPosition].should.be.above(0);
+      retVal[2][colPosition].should.be.above(0);
+      retVal[3][colPosition].should.be.above(0);      
+    });    
+    it("should given a passed in 2d array without the new last updated column, should have a date within 1000 ms from the current time at testing", function () {
+      const retVal = queries.addColumnComputedLastUpdated("endPointName.computedLastUpdated", [["Col1", "Col2", "Col3"], ["A","AA", 1], ["B", "BB", 2], ["C", "CC", 3]]);
+      const colPosition = retVal[0].indexOf("endPointName.computedLastUpdated");
+      retVal[1][colPosition].should.be.approximately(new Date(), 1000);
+      retVal[2][colPosition].should.be.approximately(new Date(), 1000);
+      retVal[3][colPosition].should.be.approximately(new Date(), 1000);      
+    }); 
+ 
+  });  
 
 });
 
