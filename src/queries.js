@@ -65,52 +65,24 @@ module.exports = {
     const thirdTwoDArrWHeaderEmptyArrIfNotPassedIn = (thirdTwoDArrWHeader.length > 0 ? thirdTwoDArrWHeader : []);    
     //due to a bug in AlaSQL that causes the second and third tables in a union statement to be blank if using SELECT *, but not if you list out the column names, had to do this dynamically based on the column names in the first 2d array and converting them with join to format 'col1', 'col2', etc - 
     // however if data for that table is an empty array, we needed to get the column name list from somewhere else (using * causes the unions to return blank rows) so found that can use the header rows from the second or third table data instead as long as those are not blank
-    const columnNamesFirstTable =   (twoDArrWHeader.length > 0 ? "[" + twoDArrWHeader[0].join("], [") + "]" : 
-                                                              secondTwoDArrWHeader.length > 0 ? "[" + secondTwoDArrWHeader[0].join("], [") + "]" : 
-                                                              thirdTwoDArrWHeader.length > 0 ? "[" + thirdTwoDArrWHeader[0].join("], [") + "]" : "*"
+    const columnNamesFirstTable =   (twoDArrWHeader.length > 0 ? module.exports.generateListOfColumnNamesInAlaSqlSelectFormat(twoDArrWHeader) : 
+                                                              secondTwoDArrWHeader.length > 0 ? module.exports.generateListOfColumnNamesInAlaSqlSelectFormat(secondTwoDArrWHeader) : 
+                                                              module.exports.generateListOfColumnNamesInAlaSqlSelectFormat(thirdTwoDArrWHeader)
                                     );
-    const columnNamesSecondTable = (secondTwoDArrWHeader.length > 0 ? "[" + secondTwoDArrWHeader[0].join("], [") + "]": 
-                                                              thirdTwoDArrWHeader.length > 0 ? "[" + thirdTwoDArrWHeader[0].join("], [") + "]" : "*"
+    const columnNamesSecondTable = (secondTwoDArrWHeader.length > 0 ? module.exports.generateListOfColumnNamesInAlaSqlSelectFormat(secondTwoDArrWHeader): 
+                                                              module.exports.generateListOfColumnNamesInAlaSqlSelectFormat(thirdTwoDArrWHeader) 
                                     );
-                                                                      // console.log(`columnNamesFirstTable: ${columnNamesFirstTable}`);
-                                                                      // console.log(`columnNamesSecondTable: ${columnNamesSecondTable}`);
-                                                                      // console.log(`first table data passed into unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted: ${JSON.stringify(twoDArrWHeader)}`);
-                                                                      // console.log(`second table data passed into unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted: ${JSON.stringify(secondTwoDArrWHeader)}`);
-                                                                      //return alasqlUtils.selectFromTwoDimArr(`SELECT ${columnNamesFirstTable} FROM tmptbl1 UNION SELECT ${columnNamesFirstTable} FROM tmptbl2 UNION SELECT ${columnNamesFirstTable} FROM tmptbl3`, twoDArrWHeader, secondTwoDArrWHeader, thirdTwoDArrWHeaderEmptyArrIfNotPassedIn);
-                                                                      
-                                                                      // console.log(`
-                                                                            
-                                                                      
-                                                                      //           SELECT ${columnNamesFirstTable}
-                                                                      //           FROM tmptbl1
-                                                                      //           WHERE [${priKeyColName}] IN
-                                                                      //           (
-                                                                      //             SELECT [${priKeyColName}] FROM tmptbl1 A
-                                                                      //             UNION 
-                                                                      //             SELECT [${priKeyColName}] FROM tmptbl2 B
-                                                                      //             UNION 
-                                                                      //             SELECT [${priKeyColName}] FROM tmptbl3 C
-                                                                      //           )
-                                                                        
-                                                                      //           UNION
-                                                                                
-                                                                      //           SELECT ${columnNamesSecondTable} FROM
-                                                                      //           (
-                                                                      //             SELECT ${columnNamesSecondTable} FROM tmptbl2 D
-                                                                      //             UNION 
-                                                                      //             SELECT ${columnNamesSecondTable} FROM tmptbl3 E
-                                                                      //           ) 
-                                                                                
-                                                                      //           MINUS 
-                                                                                
-                                                                      //           SELECT ${columnNamesSecondTable} FROM tmptbl1 F
-                                                                      
-                                                                      
-                                                                             
-                                                                      //       `);
-       
 
-                                                                      
+    ////attempting to simplify
+    // const columnNamesFirstTable =   (twoDArrWHeader.length > 0 ? module.exports.generateListOfColumnNamesInAlaSqlSelectFormat(twoDArrWHeader) : 
+    //                                                           secondTwoDArrWHeader.length > 0 ? module.exports.generateListOfColumnNamesInAlaSqlSelectFormat(secondTwoDArrWHeader) : 
+    //                                                           thirdTwoDArrWHeader.length > 0 ? module.exports.generateListOfColumnNamesInAlaSqlSelectFormat(thirdTwoDArrWHeader) : "*"
+    //                                 );
+    // const columnNamesSecondTable = (secondTwoDArrWHeader.length > 0 ? module.exports.generateListOfColumnNamesInAlaSqlSelectFormat(secondTwoDArrWHeader): 
+    //                                                           thirdTwoDArrWHeader.length > 0 ? module.exports.generateListOfColumnNamesInAlaSqlSelectFormat(thirdTwoDArrWHeader) : "*"
+    //                                 );
+
+
     return alasqlUtils.selectFromTwoDimArr(`
       
 
@@ -179,14 +151,32 @@ module.exports = {
   * generates a column name list string to be used with alaSql select statements, such as SELECT {column name list string goes here} - mostly needed due to bugs in alasql with * and unions 
   * 
   * @param {string[][]} a 2d array with a header row and potentially data (to use as the basis for the column name list)
-  * @return {string} a string in the valid '[col1], [col2], [col3]' format for alasql SELECT statements - note that brackets are needed to handle column names with dot notation and other special characters and cant hurt
+  * @return {string} a string in the valid '[col1], [col2], [col3]' format for alasql SELECT statements - note that brackets are needed to handle column names with dot notation and other special characters and cant hurt - returns '*' if empty array passed in
   */    
   generateListOfColumnNamesInAlaSqlSelectFormat: (twoDArrWHeader) => {
     log.trace(`queries generateListOfColumnNamesInAlaSqlSelectFormat: (${JSON.stringify(twoDArrWHeader)}) called...`);
     if (twoDArrWHeader.length > 0 && twoDArrWHeader[0].length > 0)
       return "[" + twoDArrWHeader[0].join("], [") + "]";
     else return "*";
-  }  
+  },  
+  
+  /**
+  * generates a column name list string to be used with alaSql select statements, such as SELECT {column name list string goes here} but this time with up to three 2d arrays passed in, and returning the column name list from the first 2d array passed in that is non-empty, otherwise return * if all three are empty 
+  * @param {string[][]} a 2d array with a header row and potentially data (to use as the basis for the column name list)
+  * @param {string[][]} a 2d array with a header row and potentially data (to use as the basis for the column name list)
+  * @param {string[][]} a 2d array with a header row and potentially data (to use as the basis for the column name list) 
+  * @return {string} a string in the valid '[col1], [col2], [col3]' format for alasql SELECT statements (based on the first passed in non-empty 2d arr) - note that brackets are needed to handle column names with dot notation and other special characters and cant hurt - returns '*' if empty array passed in
+  */    
+  generateListOfColumnNamesInAlaSqlSelectFormatFirstNonEmptyTwoDArr: (twoDArrWHeader1, twoDArrWHeader2, twoDArrWHeader3) => {
+    log.trace(`queries generateListOfColumnNamesInAlaSqlSelectFormatFirstNonEmptyTwoDArr: (${JSON.stringify(twoDArrWHeader1)}, ${JSON.stringify(twoDArrWHeader2)}, ${JSON.stringify(twoDArrWHeader3)}) called...`);
+    if (twoDArrWHeader1.length > 0 && twoDArrWHeader1[0].length > 0)
+      return module.exports.generateListOfColumnNamesInAlaSqlSelectFormat(twoDArrWHeader1);
+    else if (twoDArrWHeader2.length > 0 && twoDArrWHeader2[0].length > 0)
+      return module.exports.generateListOfColumnNamesInAlaSqlSelectFormat(twoDArrWHeader2);
+    //generateListOfColumnNamesInAlaSqlSelectFormat will return '*' if the 2d array passed in is empty 
+    else 
+      return module.exports.generateListOfColumnNamesInAlaSqlSelectFormat(twoDArrWHeader3);
+  }   
 
 };  
 

@@ -287,6 +287,49 @@ describe("queries", function() {
     
   });  
   
+   describe("#generateListOfColumnNamesInAlaSqlSelectFormatFirstNonEmptyTwoDArr()", function() {
+    it("should given two 2d non-empty arrays with a header rows with 3 column names and no data rows, return from the first 2d array passed in a string with just those column names in a format that works for alaSQL Select explicit column listings", function () {
+      queries.generateListOfColumnNamesInAlaSqlSelectFormatFirstNonEmptyTwoDArr([["Col1", "Col2", "Col3"]], [["ColA", "ColB", "ColC"]], [])
+      .should.be.eql("[Col1], [Col2], [Col3]");
+    });  
+    
+    it("should given two 2d arrays with a header rows, the first empty 1d arr and the second non-empty, return the 3 column names and no data rows from the second array, return from the first 2d array passed in a string with just those column names in a format that works for alaSQL Select explicit column listings", function () {
+      queries.generateListOfColumnNamesInAlaSqlSelectFormatFirstNonEmptyTwoDArr([], [["ColA", "ColB", "ColC"]], [])
+      .should.be.eql("[ColA], [ColB], [ColC]");
+    });     
+    
+    it("should given two 2d arrays with a header rows, the first empty 2d arr and the second non-empty, return the 3 column names and no data rows from the second array, return from the first 2d array passed in a string with just those column names in a format that works for alaSQL Select explicit column listings", function () {
+      queries.generateListOfColumnNamesInAlaSqlSelectFormatFirstNonEmptyTwoDArr([[]], [["ColA", "ColB", "ColC"]], [])
+      .should.be.eql("[ColA], [ColB], [ColC]");
+    });       
+    
+    it("should given three 2d arrays with a header rows, the first two are empty 1d arrs and the third non-empty, return the 3 column names and no data rows from the second array, return from the first 2d array passed in a string with just those column names in a format that works for alaSQL Select explicit column listings", function () {
+      queries.generateListOfColumnNamesInAlaSqlSelectFormatFirstNonEmptyTwoDArr([], [], [["endpoint-name.Col1", "endpoint-name.Col2", "endpoint-name.Col3"], [1,2,3],["A","B","C"]])
+      .should.be.eql("[endpoint-name.Col1], [endpoint-name.Col2], [endpoint-name.Col3]");
+    });   
+    
+    it("should given three 2d arrays with a header rows, the first two are empty 2d arrs and the third non-empty, return the 3 column names and no data rows from the second array, return from the first 2d array passed in a string with just those column names in a format that works for alaSQL Select explicit column listings", function () {
+      queries.generateListOfColumnNamesInAlaSqlSelectFormatFirstNonEmptyTwoDArr([[]], [[]], [["endpoint-name.Col1", "endpoint-name.Col2", "endpoint-name.Col3"], [1,2,3],["A","B","C"]])
+      .should.be.eql("[endpoint-name.Col1], [endpoint-name.Col2], [endpoint-name.Col3]");
+    });    
+    
+    it("should given three 2d arrays with a header row and all three are empty 1d arrs, should return *", function () {
+      queries.generateListOfColumnNamesInAlaSqlSelectFormatFirstNonEmptyTwoDArr([], [], [])
+      .should.be.eql("*");
+    });       
+    
+    it("should given three 2d arrays with a header rows and all three are empty 2d arrays, should return *", function () {
+      queries.generateListOfColumnNamesInAlaSqlSelectFormatFirstNonEmptyTwoDArr([[]], [[]], [[]])
+      .should.be.eql("*");
+    }); 
+    
+    it("should given three 2d arrays with a header rows and all three are empty either 1d or 2d arrs, should return *", function () {
+      queries.generateListOfColumnNamesInAlaSqlSelectFormatFirstNonEmptyTwoDArr([[]], [], [[]])
+      .should.be.eql("*");
+    });         
+    
+  });   
+  
 
 });
 
