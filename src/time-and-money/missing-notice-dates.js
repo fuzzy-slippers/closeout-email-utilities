@@ -86,7 +86,7 @@ module.exports = {
         //7. add "award-amount-transactions.computedIsFinal"" column        
         
         
-        return combinationOfExistingDataPlusNewApiResults;
+        return twoDArrDataWithComputedRefreshedColumnAdded;
     },
     
     
