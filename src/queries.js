@@ -60,7 +60,7 @@ module.exports = {
   * @return {string[][]} a 2d array with a header row/column names matching the first data set - if a row was from the second or third data set, the extra columns not in those data sets will all show a blank string and as mentioned times when rows match between the columns in the first data set and the other data sets, data will be returned only once matching the first data set row with the extra data
   */    
   unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted: (priKeyColName, twoDArrWHeader = [], secondTwoDArrWHeader = [], thirdTwoDArrWHeader = []) => {
-    log.trace(`queries unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted: (${JSON.stringify(twoDArrWHeader)}, ${JSON.stringify(secondTwoDArrWHeader)}, ${JSON.stringify(thirdTwoDArrWHeader)}) called...`);     
+    log.trace(`queries unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted: (${priKeyColName}, ${JSON.stringify(twoDArrWHeader)}, ${JSON.stringify(secondTwoDArrWHeader)}, ${JSON.stringify(thirdTwoDArrWHeader)}) called...`);     
     //if any of the arrays are undefined/not passed in, use an empty array in it's place, which in a UNION is equivalent to not adding it
     const thirdTwoDArrWHeaderEmptyArrIfNotPassedIn = (thirdTwoDArrWHeader.length > 0 ? thirdTwoDArrWHeader : []);    
     //due to a bug in AlaSQL that causes the second and third tables in a union statement to be blank if using SELECT *, but not if you list out the column names, had to do this dynamically based on the column names in the first 2d array and converting them with join to format 'col1', 'col2', etc - 
@@ -172,9 +172,21 @@ module.exports = {
   addColumnComputedRefreshed: (colName, twoDArrWHeader) => {
     log.trace(`queries addColumnComputedLastUpdated: (${colName}, ${JSON.stringify(twoDArrWHeader)}) called...`);
     return alasqlUtils.selectFromTwoDimArr(`SELECT *, '' AS [${colName}] FROM tmptbl1`, twoDArrWHeader);
-  }  
+  },  
   
 
+  /**
+  * generates a column name list string to be used with alaSql select statements, such as SELECT {column name list string goes here} - mostly needed due to bugs in alasql with * and unions 
+  * 
+  * @param {string[][]} a 2d array with a header row and potentially data (to use as the basis for the column name list)
+  * @return {string} a string in the valid '[col1], [col2], [col3]' format for alasql SELECT statements - note that brackets are needed to handle column names with dot notation and other special characters and cant hurt
+  */    
+  generateListOfColumnNamesInAlaSqlSelectFormat: (twoDArrWHeader) => {
+    log.trace(`queries generateListOfColumnNamesInAlaSqlSelectFormat: (${JSON.stringify(twoDArrWHeader)}) called...`);
+    if (twoDArrWHeader.length > 0 && twoDArrWHeader[0].length > 0)
+      return "[" + twoDArrWHeader[0].join("], [") + "]";
+    else return "*";
+  }  
 
 };  
 

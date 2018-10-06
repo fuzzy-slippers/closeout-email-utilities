@@ -77,15 +77,6 @@ describe("queries", function() {
   }); 
   
   
-                                                  // describe("#unionWithExtraColumnsInFirstTablePreserved()", function() {
-                                                  //   it("should given the two tables return the union of the two tables but with any additional column names and values in the first table in the results", function () {
-                                                  //     queries.unionWithExtraColumnsInFirstTablePreserved([["Col1", "Col2", "Col3"], ["A","AA", ""], ["B", "BB", "tomorrow"], ["C", "CC", ""]],
-                                                  //                                                         [["Col1", "Col2"], ["A","AA"], ["B", "BB"], ["C", "CC"]],
-                                                  //                                                         [["Col1", "Col2"], ["A","AA"], ["B", "BB"], ["C", "CC"]])
-                                                  //                                                         .should.be.eql([["Col1", "Col2", "Col3"], ["A","AA", ""], ["B", "BB", "tomorrow"], ["C", "CC", ""]]);
-                                                  //   });  
-                                                  // });  
-  
   describe("#unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted()", function() {
     it("should given the two tables and the first table assumed to have a unique _primaryKey column return the union of the two tables but with any additional column names and values in the first table in the results", function () {
       const retVal = queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted("endpoint-name._primaryKey",
@@ -124,8 +115,11 @@ describe("queries", function() {
     
   });  
   
+  
+  
+  
   describe("#unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings()", function() {
-    it("should given the two tables and the first table assumed to have a unique _primaryKey column return the union of the two tables but with any additional column names and values in the first table in the results", function () {
+    it("should given three tables and the first table assumed to have a unique _primaryKey column return the union of the tables but with any additional column names and values in the first table in the results", function () {
       queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings("award-amount-transactions._primaryKey",
                                                           [["award-amount-transactions._primaryKey", "award-amount-transactions.Col2", "award-amount-transactions.Col3"], 
                                                           [1,"AA", ""], 
@@ -180,12 +174,64 @@ describe("queries", function() {
       queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings("endpoint-name._primaryKey", [], [], [["_primaryKey", "colA"], [1, 2]])
       .should.eql([["_primaryKey", "colA"], [1, 2]]);
     });      
+
+    it("should given only two tables and the first table assumed to have a unique _primaryKey column return the union of the tables but with any additional column names and values in the first table in the results", function () {
+      queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings("award-amount-transactions._primaryKey",
+                                                          [["award-amount-transactions._primaryKey", "award-amount-transactions.Col2", "award-amount-transactions.Col3"], 
+                                                          [1,"AA", ""], 
+                                                          [2, "BB", "tomorrow"], 
+                                                          [3, "CC", ""], 
+                                                          [4, "DD", "The Next Day"]
+                                                          ],
+                                                          [
+                                                            ["award-amount-transactions._primaryKey", "award-amount-transactions.Col2"], 
+                                                            [1,"AA"], 
+                                                            [2, "BB"], 
+                                                            [3, "CC"], 
+                                                            [5, "EE"]
+                                                          ],
+                                                          [])
+                                                          .should.eql(
+                                                          [["award-amount-transactions._primaryKey", "award-amount-transactions.Col2", "award-amount-transactions.Col3"], 
+                                                          [1,"AA", ""], 
+                                                          [2, "BB", "tomorrow"], 
+                                                          [3, "CC", ""], 
+                                                          [4, "DD", "The Next Day"],
+                                                          [5, "EE", '']
+                                                          ]);
+    });
+    
+    // it("should given only two tables and the first table assumed to have a unique _primaryKey column (and some extra columns on the left not just the right side), return the union of the tables but with any additional column names and values in the first table in the results", function () {
+    //   queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings("award-amount-transactions._primaryKey",
+    //                                                       [["column-only-in-first-table"],["award-amount-transactions._primaryKey", "award-amount-transactions.Col2", "award-amount-transactions.Col3"], 
+    //                                                       ["FromFirstTableOnly",1,"AA", ""], 
+    //                                                       ["",2, "BB", "tomorrow"], 
+    //                                                       ["",3, "CC", ""], 
+    //                                                       ["",4, "DD", "The Next Day"]
+    //                                                       ],
+    //                                                       [
+    //                                                         ["award-amount-transactions._primaryKey", "award-amount-transactions.Col2"], 
+    //                                                         [1,"AA"], 
+    //                                                         [2, "BB"], 
+    //                                                         [3, "CC"], 
+    //                                                         [5, "EE"]
+    //                                                       ],
+    //                                                       [])
+    //                                                       .should.eql(
+    //                                                       [["column-only-in-first-table"],["award-amount-transactions._primaryKey", "award-amount-transactions.Col2", "award-amount-transactions.Col3"], 
+    //                                                       ["FromFirstTableOnly",1,"AA", ""], 
+    //                                                       ["",2, "BB", "tomorrow"], 
+    //                                                       ["",3, "CC", ""], 
+    //                                                       ["",4, "DD", "The Next Day"],
+    //                                                       ["",5, "EE", '']
+    //                                                       ]);
+    // });    
     
   });   
   
   
   
-  describe("#addColumnComputedLastUpdated()", function() {
+  describe("#addColumnComputedRefreshed()", function() {
     it("should given a passed in 2d array without the new refreshed column, in the result 2d array the header should now have a column that matches the name passed in for the last updated column (far right)", function () {
       queries.addColumnComputedRefreshed("endPointName.computedRefreshed", [["Col1", "Col2", "Col3"], ["A","AA", "AAA"], ["B", "BB", "BBB"], ["C", "CC", "CCC"]])[0].should.containEql("endPointName.computedRefreshed");
     });  
@@ -206,6 +252,41 @@ describe("queries", function() {
     });     
  
   });  
+  
+  
+   describe("#generateListOfColumnNamesInAlaSqlSelectFormat()", function() {
+    it("should given a 2d array with a header row with 3 column names and no data rows, return a string with just those column names in a format that works for alaSQL Select explicit column listings", function () {
+      queries.generateListOfColumnNamesInAlaSqlSelectFormat([["Col1", "Col2", "Col3"]])
+      .should.be.eql("[Col1], [Col2], [Col3]");
+    });  
+    
+    it("should given a 2d array with a header row with 3 column names and with data rows, return a string with just those column names in a format that works for alaSQL Select explicit column listings", function () {
+      queries.generateListOfColumnNamesInAlaSqlSelectFormat([["Col1", "Col2", "Col3"], [1,2,3],["A","B","C"]])
+      .should.be.eql("[Col1], [Col2], [Col3]");
+    });    
+    
+    it("should given a 2d array with a header row with 3 column names and with data rows, return a string with just those column names in a format that works for alaSQL Select explicit column listings", function () {
+      queries.generateListOfColumnNamesInAlaSqlSelectFormat([["Col1", "Col2", "Col3"], [1,2,3],["A","B","C"]])
+      .should.be.eql("[Col1], [Col2], [Col3]");
+    });    
+    
+    it("should given a 2d array with a header row with 3 column names that are in dot format and with data rows, return a string with just those column names in a format that works for alaSQL Select explicit column listings", function () {
+      queries.generateListOfColumnNamesInAlaSqlSelectFormat([["endpoint-name.Col1", "endpoint-name.Col2", "endpoint-name.Col3"], [1,2,3],["A","B","C"]])
+      .should.be.eql("[endpoint-name.Col1], [endpoint-name.Col2], [endpoint-name.Col3]");
+    });
+    
+    it("should given an empty 1d array, return * since a blank string would cause the select clause to be invalid - 'SELECT * from tmptbl1' is valid but 'SELECT from tmptbl1' is not valid", function () {
+      queries.generateListOfColumnNamesInAlaSqlSelectFormat([])
+      .should.be.eql("*");
+    });    
+
+    it("should given an empty 2d array, return * since a blank string would cause the select clause to be invalid - 'SELECT * from tmptbl1' is valid but 'SELECT from tmptbl1' is not valid", function () {
+      queries.generateListOfColumnNamesInAlaSqlSelectFormat([[]])
+      .should.be.eql("*");
+    });    
+    
+  });  
+  
 
 });
 
