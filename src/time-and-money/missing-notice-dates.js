@@ -78,10 +78,9 @@ module.exports = {
         const combinationOfExistingDataPlusNewApiResults = queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings(`${endpointNameOnly}._primaryKey`,  prevSheetDataTwoDimArrWHeader, justRowsNullNoticeDatesTwoDimArrWHeader);
         log.trace(`combinationOfExistingDataPlusNewApiResults: ${JSON.stringify(combinationOfExistingDataPlusNewApiResults)}`);
         
-        //6. add Final Document? column
-        
-        
-        //7. add Last Updated column
+        //6. add "award-amount-transactions.computedLastUpdated" column
+
+        //7. add "award-amount-transactions.computedIsFinal"" column        
         
         return combinationOfExistingDataPlusNewApiResults;
     },

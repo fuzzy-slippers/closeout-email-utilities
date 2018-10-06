@@ -169,9 +169,9 @@ module.exports = {
   * @param {string[][]} a 2d array with a header row without the column, that should have the new column added
   * @return {string[][]} a 2d array with a header that is the initial 2d array with the additional column added on the righthand side
   */    
-  addColumnComputedLastUpdated: (colName, twoDArrWHeader) => {
+  addColumnComputedRefreshed: (colName, twoDArrWHeader) => {
     log.trace(`queries addColumnComputedLastUpdated: (${colName}, ${JSON.stringify(twoDArrWHeader)}) called...`);
-    return alasqlUtils.selectFromTwoDimArr(`SELECT *, date(now()) AS [${colName}] FROM tmptbl1`, twoDArrWHeader);
+    return alasqlUtils.selectFromTwoDimArr(`SELECT *, '' AS [${colName}] FROM tmptbl1`, twoDArrWHeader);
   }  
   
 
