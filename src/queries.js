@@ -80,7 +80,6 @@ module.exports = {
 
     return alasqlUtils.selectFromTwoDimArr(`
       
-
           SELECT ${columnNamesFirstTable}
           FROM tmptbl1
           WHERE [${priKeyColName}] IN
@@ -104,8 +103,6 @@ module.exports = {
           MINUS 
           
           SELECT ${columnNamesSecondTable} FROM tmptbl1 F
-
-
        
        `, twoDArrWHeader , secondTwoDArrWHeader, thirdTwoDArrWHeaderEmptyArrIfNotPassedIn);
   },
@@ -138,7 +135,7 @@ module.exports = {
   */    
   addColumnComputedRefreshed: (colName, twoDArrWHeader) => {
     log.trace(`queries addColumnComputedLastUpdated: (${colName}, ${JSON.stringify(twoDArrWHeader)}) called...`);
-    return alasqlUtils.selectFromTwoDimArr(`SELECT *, '' AS [${colName}] FROM tmptbl1`, twoDArrWHeader);
+    return alasqlUtils.selectFromTwoDimArr(`SELECT ${module.exports.generateListOfColumnNamesInAlaSqlSelectFormat(twoDArrWHeader)}, '' AS [${colName}] FROM tmptbl1`, twoDArrWHeader);
   },  
   
 

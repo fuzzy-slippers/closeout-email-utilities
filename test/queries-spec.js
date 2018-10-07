@@ -201,32 +201,62 @@ describe("queries", function() {
                                                           ]);
     });
     
-    // it("should given only two tables and the first table assumed to have a unique _primaryKey column (and some extra columns on the left not just the right side), return the union of the tables but with any additional column names and values in the first table in the results", function () {
-    //   queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings("award-amount-transactions._primaryKey",
-    //                                                       [["column-only-in-first-table"],["award-amount-transactions._primaryKey", "award-amount-transactions.Col2", "award-amount-transactions.Col3"], 
-    //                                                       ["FromFirstTableOnly",1,"AA", ""], 
-    //                                                       ["",2, "BB", "tomorrow"], 
-    //                                                       ["",3, "CC", ""], 
-    //                                                       ["",4, "DD", "The Next Day"]
-    //                                                       ],
-    //                                                       [
-    //                                                         ["award-amount-transactions._primaryKey", "award-amount-transactions.Col2"], 
-    //                                                         [1,"AA"], 
-    //                                                         [2, "BB"], 
-    //                                                         [3, "CC"], 
-    //                                                         [5, "EE"]
-    //                                                       ],
-    //                                                       [])
-    //                                                       .should.eql(
-    //                                                       [["column-only-in-first-table"],["award-amount-transactions._primaryKey", "award-amount-transactions.Col2", "award-amount-transactions.Col3"], 
-    //                                                       ["FromFirstTableOnly",1,"AA", ""], 
-    //                                                       ["",2, "BB", "tomorrow"], 
-    //                                                       ["",3, "CC", ""], 
-    //                                                       ["",4, "DD", "The Next Day"],
-    //                                                       ["",5, "EE", '']
-    //                                                       ]);
-    // });    
-    
+    it("should given only two tables and the first table assumed to have a unique _primaryKey column return the union of the tables but with any additional columns (that would be alphabetically to the left if sorted by the extra column names) ", function () {
+      queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings("award-amount-transactions._primaryKey",
+                                                          [["award-amount-transactions._primaryKey", "award-amount-transactions.Col2", "aaa", "___bbb"], 
+                                                          [1,"AA", "", 1000], 
+                                                          [2, "BB", "tomorrow", 2000], 
+                                                          [3, "CC", "", 3000], 
+                                                          [4, "DD", "The Next Day", 4000]
+                                                          ],
+                                                          [
+                                                            ["award-amount-transactions._primaryKey", "award-amount-transactions.Col2"], 
+                                                            [1,"AA"], 
+                                                            [2, "BB"], 
+                                                            [3, "CC"], 
+                                                            [5, "EE"]
+                                                          ],
+                                                          [])
+                                                          .should.eql(
+                                                          [["award-amount-transactions._primaryKey", "award-amount-transactions.Col2", "aaa", "___bbb"], 
+                                                          [1,"AA", "", 1000], 
+                                                          [2, "BB", "tomorrow", 2000], 
+                                                          [3, "CC", "", 3000], 
+                                                          [4, "DD", "The Next Day", 4000],
+                                                          [5, "EE", "", ""]
+                                                          ]);
+    });    
+
+    /* note commenting this out because my plan is to always add extra columns in the google sheet or programically to the right hand side of the google sheet, even joining in new tables...if this changes in the future this test may be needed to be resurected - if this does need to happen...I think one possible way to achieve this althrough might be messy would be to create another version of the generateListOfColumnNamesInAlaSqlSelectFormatFirstNonEmptyTwoDArr function designed specifically to create the header for the union columnNamesSecondTable variable that instead of it having [col1], [col2] when the columnNamesFirstTable is [col0], [col1], [col2], [col3], we would need to have that function create for the columnNamesSecondTable variable '' AS [col0], [col1], [col2], '' AS [col3] or something similar (by comparing the headers in the different 2d arrays - but I think the program might be cleaner to avoid that if possible so I'm going to try to make the rule that all columns are added to the right hand side)
+    it("should given only two tables and the first table assumed to have a unique _primaryKey column (and some extra columns on the left not just the right side), return the union of the tables but with any additional column names and values in the first table in the results", function () {
+      const unionRetVal = queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings("award-amount-transactions._primaryKey",
+                                                          [["aaa", "award-amount-transactions._primaryKey", "award-amount-transactions.Col2", "award-amount-transactions.Col3"], 
+                                                          ["",1,"AA", ""], 
+                                                          ["",2, "BB", "tomorrow"], 
+                                                          ["",3, "CC", ""], 
+                                                          ["",4, "DD", "The Next Day"]
+                                                          ],
+                                                          [
+                                                            ["award-amount-transactions._primaryKey", "award-amount-transactions.Col2"], 
+                                                            [1,"AA"], 
+                                                            [2, "BB"], 
+                                                            [3, "CC"], 
+                                                            [5, "NEWCOL"]
+                                                          ],
+                                                          []);
+                                                                        console.log(`^^^^^^^^^^^^^^^^^^^^^^^^^^unionRetVal: ${JSON.stringify(unionRetVal)}`);                                                          
+                                                          
+                                                          unionRetVal.should.eql(
+                                                          [["aaa","award-amount-transactions._primaryKey", "award-amount-transactions.Col2", "award-amount-transactions.Col3"], 
+                                                          ["",1,"AA", ""], 
+                                                          ["",2, "BB", "tomorrow"], 
+                                                          ["",3, "CC", ""], 
+                                                          ["",4, "DD", "The Next Day"],
+                                                          ["",5, "NEWCOL", '']
+                                                          ]);
+    });    
+*/
+
   });   
   
   
