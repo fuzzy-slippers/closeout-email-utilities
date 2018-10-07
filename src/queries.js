@@ -148,7 +148,9 @@ module.exports = {
   */    
   addColumnComputedAutoSave: (colNameToAdd, colNameRequiredColToCheckForBlankValues, twoDArrWHeader) => {
     log.trace(`queries addColumnComputedLastUpdated: (${colNameToAdd}, ${colNameRequiredColToCheckForBlankValues}, ${JSON.stringify(twoDArrWHeader)}) called...`);
-    return alasqlUtils.selectFromTwoDimArr(`SELECT ${module.exports.generateListOfColumnNamesInAlaSqlSelectFormat(twoDArrWHeader)}, CASE WHEN [${colNameRequiredColToCheckForBlankValues}] = '' THEN 'AUTOSAVE' ELSE '' END AS [${colNameToAdd}] FROM tmptbl1`, twoDArrWHeader);
+    //in order to accurately match if the transaction type code (required) column is blank and therefore indicating the TNM doc is pending, need to trim each cell (there is a bug in the alaSql trim function)
+    const twoDArrWHeaderCellsTrimmed = arrayUtils.trimAllCellsInTwoDimArr(twoDArrWHeader);
+    return alasqlUtils.selectFromTwoDimArr(`SELECT ${module.exports.generateListOfColumnNamesInAlaSqlSelectFormat(twoDArrWHeaderCellsTrimmed)}, CASE WHEN [${colNameRequiredColToCheckForBlankValues}] = '' THEN 'AUTOSAVE' ELSE '' END AS [${colNameToAdd}] FROM tmptbl1`, twoDArrWHeaderCellsTrimmed);
   },  
   
 

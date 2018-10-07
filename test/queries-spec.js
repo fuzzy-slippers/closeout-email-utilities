@@ -290,7 +290,7 @@ describe("queries", function() {
       .should.eql(["Col1", "Col2", "endPointName.transactionTypeCode","endPointName.computedAutoSave"]);
     });  
     it("should given a passed in 2d array with the new auto save column and a endPointName.transactionTypeCode column, the auto save column is filled out based on the empty status of the endPointName.transactionTypeCode column", function () {
-      queries.addColumnComputedAutoSave("endPointName.computedAutoSave", "endPointName.transactionTypeCode", [["Col1", "Col2", "endPointName.transactionTypeCode"], ["A","AA", ""], ["B", "BB", 2], ["C", "CC", ""]])
+      queries.addColumnComputedAutoSave("endPointName.computedAutoSave", "endPointName.transactionTypeCode", [["Col1", "Col2", "endPointName.transactionTypeCode"], ["A","AA", ""], ["B", "BB", 2], ["C", "CC", " "]])
       .should.eql([["Col1", "Col2", "endPointName.transactionTypeCode","endPointName.computedAutoSave"], ["A","AA", "", "AUTOSAVE"], ["B", "BB", 2,""], ["C", "CC", "","AUTOSAVE"]])     
     }); 
     it("should given a passed in 2d array with the new auto save column and a endPointName.transactionTypeCode column name but none of the header rows matching the endPointName.transactionTypeCode column name, add the additional row but never fill out AUTOSAVE as there is nothing to base the logic on", function () {
