@@ -127,7 +127,7 @@ module.exports = {
   
   
   /**
-  * adds a new column to a 2d array with header, with the name specified and each row of the new column initialized to the current date/time
+  * adds a new column to a 2d array with header, with the name specified and each row of the new column initialized to an empty string (later will be updated with the current date and time when re-running pending rows)
   * 
   * @param {string} the column name (for the header row) of the column being added to list the last updated date/time
   * @param {string[][]} a 2d array with a header row without the column, that should have the new column added
@@ -136,6 +136,19 @@ module.exports = {
   addColumnComputedRefreshed: (colName, twoDArrWHeader) => {
     log.trace(`queries addColumnComputedLastUpdated: (${colName}, ${JSON.stringify(twoDArrWHeader)}) called...`);
     return alasqlUtils.selectFromTwoDimArr(`SELECT ${module.exports.generateListOfColumnNamesInAlaSqlSelectFormat(twoDArrWHeader)}, '' AS [${colName}] FROM tmptbl1`, twoDArrWHeader);
+  },  
+  
+  /**
+  * adds a new column to a 2d array with header that adds a new column (name specified) that auto-populates a value of AUTOSAVE for all rows that appear to be non-final documents (does this by checking for an empty value in the second column name specified which is presumably a required field)
+  * 
+  * @param {string} the column name (for the header row) of the column being added which will list AUTOSAVE for pending documents
+  * @param {string} the column name of the required column to check for blank values that will indicate if a row/document is in AUTOSAVE status
+  * @param {string[][]} a 2d array with a header row without the column, that should have the new column added
+  * @return {string[][]} a 2d array with a header that is the initial 2d array with the additional column added (with the AUTOSAVE values added) on the righthand side
+  */    
+  addColumnComputedAutoSave: (colNameToAdd, colNameRequiredColToCheckForBlankValues, twoDArrWHeader) => {
+    log.trace(`queries addColumnComputedLastUpdated: (${colNameToAdd}, ${colNameRequiredColToCheckForBlankValues}, ${JSON.stringify(twoDArrWHeader)}) called...`);
+    return alasqlUtils.selectFromTwoDimArr(`SELECT ${module.exports.generateListOfColumnNamesInAlaSqlSelectFormat(twoDArrWHeader)}, CASE WHEN [${colNameRequiredColToCheckForBlankValues}] = '' THEN 'AUTOSAVE' ELSE '' END AS [${colNameToAdd}] FROM tmptbl1`, twoDArrWHeader);
   },  
   
 
