@@ -83,10 +83,12 @@ module.exports = {
         const twoDArrDataWithComputedRefreshedColumnAdded = queries.addColumnComputedRefreshed(`${endpointNameOnly}.computedRefreshed`, combinationOfExistingDataPlusNewApiResults);
         log.trace(`twoDArrDataWithComputedRefreshedColumnAdded: ${JSON.stringify(twoDArrDataWithComputedRefreshedColumnAdded)}`);
 
-        //7. add "award-amount-transactions.computedIsFinal"" column        
+        //7. add "award-amount-transactions.computedIsAutoSaved"" column        
+        log.trace(`7. add "award-amount-transactions.computedIsAutoSaved"" column `);
+        const twoDArrDataWithComputedAutoSavedColumnAdded = queries.addColumnComputedAutoSave(`${endpointNameOnly}.computedIsAutoSaved`, `${endpointNameOnly}.transactionTypeCode`,  twoDArrDataWithComputedRefreshedColumnAdded);
+        log.trace(`twoDArrDataWithComputedAutoSavedColumnAdded: ${JSON.stringify(twoDArrDataWithComputedAutoSavedColumnAdded)}`);        
         
-        
-        return twoDArrDataWithComputedRefreshedColumnAdded;
+        return twoDArrDataWithComputedAutoSavedColumnAdded;
     },
     
     
