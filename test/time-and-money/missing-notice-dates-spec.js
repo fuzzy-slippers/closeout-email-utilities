@@ -149,7 +149,7 @@ describe("missing-notice-dates", function() {
     it("should when previous array (sheet) data is empty with just a header row with a 'UseMockedPropertyValueSevenThousand' and 'award-amount-transactions._primaryKey' columns (with mocked last primary key value of 7000), should return an array with mocked data for primary key 7000", function () {
       missingNoticeDates.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates(
         [["award-amount-transactions.UseMockedPropertyValueSevenThousand", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey"]])
-        .should.be.eql([["award-amount-transactions.UseMockedPropertyValueSevenThousand","award-amount-transactions.ColB","award-amount-transactions._primaryKey","award-amount-transactions.computedRefreshed"],[1,2,7001,""]]);
+        .should.be.eql([["award-amount-transactions.UseMockedPropertyValueSevenThousand","award-amount-transactions.ColB","award-amount-transactions._primaryKey","award-amount-transactions.computedRefreshed","award-amount-transactions.computedIsAutoSaved"],[1,2,7001,"",""]]);
     });    
 
     it("should when the previous array (sheet) data is empty with just a header row (and a mocked last primary key value is not yet in the google property store - its null), set the sheet to empty array - corresponds to the scenario that google property store is empty and the spreadsheet passed in is empty", function () {
@@ -161,7 +161,7 @@ describe("missing-notice-dates", function() {
     it("should when the previous array (sheet) data is empty with no header rows (and a mocked last primary key value IS in the google property store - 8000), set the sheet to pretend data listed for primary key 8000", function () {
       missingNoticeDates.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates(
         []).should.be.eql(
-        [["award-amount-transactions.NoMockedPropertyInGooglePropertyStoreItsNull", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey","award-amount-transactions.computedRefreshed"],["A","B",8001,""]]);
+        [["award-amount-transactions.NoMockedPropertyInGooglePropertyStoreItsNull", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey","award-amount-transactions.computedRefreshed","award-amount-transactions.computedIsAutoSaved"],["A","B",8001,"",""]]);
     }); 
     
     
@@ -170,21 +170,21 @@ describe("missing-notice-dates", function() {
         [["award-amount-transactions.UseMockedPropertyValueSevenThousand", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey"],
         ["existing sheet data row 1","A",10],
         ["existing sheet data row 2","B",20]])
-        .should.be.eql([["award-amount-transactions.UseMockedPropertyValueSevenThousand", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey","award-amount-transactions.computedRefreshed"],
-        ["existing sheet data row 1","A",10,""],
-        ["existing sheet data row 2","B",20,""],
-        [1,2,7001,""]]);
+        .should.be.eql([["award-amount-transactions.UseMockedPropertyValueSevenThousand", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey","award-amount-transactions.computedRefreshed","award-amount-transactions.computedIsAutoSaved"],
+        ["existing sheet data row 1","A",10,"",""],
+        ["existing sheet data row 2","B",20,"",""],
+        [1,2,7001,"",""]]);
     });    
     
     it("should when previous array (sheet) data (2 rows) have award-amount-transactions.noticeDate and award-amount-transactions._primaryKey columns (and use mocked last primary key value of 9000 to simulate an additional row of data with a null notice date), should return an array with the original sheet data plus the mocked data for primary key 9000", function () {
       missingNoticeDates.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates(
-        [["award-amount-transactions.UseMockedPropertyValueNineThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey"],
+        [["award-amount-transactions.UseMockedPropertyValueNineThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey",],
         ["existing sheet data row 1","A",10],
         ["existing sheet data row 2","B",20]])
-        .should.be.eql([["award-amount-transactions.UseMockedPropertyValueNineThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey","award-amount-transactions.computedRefreshed"],
-        ["existing sheet data row 1","A",10,""],
-        ["existing sheet data row 2","B",20,""],
-        ["from mocked API data row 3","",9001,""]]);
+        .should.be.eql([["award-amount-transactions.UseMockedPropertyValueNineThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey","award-amount-transactions.computedRefreshed","award-amount-transactions.computedIsAutoSaved"],
+        ["existing sheet data row 1","A",10,"",""],
+        ["existing sheet data row 2","B",20,"",""],
+        ["from mocked API data row 3","",9001,"",""]]);
     });  
 
     it("should when previous array (sheet) data (2 rows) have award-amount-transactions.noticeDate and mocked API row returned has notice date that is NOT NULL/BLANK so is excluded from results (mocked primary key 10000)", function () {
@@ -192,9 +192,9 @@ describe("missing-notice-dates", function() {
         [["award-amount-transactions.UseMockedPropertyValueTenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey"],
         ["existing sheet data row 1","",10],
         ["existing sheet data row 2","",20]])
-        .should.be.eql([["award-amount-transactions.UseMockedPropertyValueTenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey","award-amount-transactions.computedRefreshed"],
-        ["existing sheet data row 1","",10,""],
-        ["existing sheet data row 2","",20,""]]);
+        .should.be.eql([["award-amount-transactions.UseMockedPropertyValueTenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey","award-amount-transactions.computedRefreshed","award-amount-transactions.computedIsAutoSaved"],
+        ["existing sheet data row 1","",10,"",""],
+        ["existing sheet data row 2","",20,"",""]]);
     }); 
     
     
@@ -204,11 +204,11 @@ describe("missing-notice-dates", function() {
         ["existing sheet data row 1","",10],
         ["existing sheet data row 2","",20],
         ["existing sheet data row 3","",30]])
-        .should.be.eql([["award-amount-transactions.UseMockedPropertyValueElevenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey","award-amount-transactions.computedRefreshed"],
-        ["existing sheet data row 1","",10,""],
-        ["existing sheet data row 2","",20,""],
-        ["existing sheet data row 3","",30,""],
-        ["from mocked API data row 4","",11001,""]]);
+        .should.be.eql([["award-amount-transactions.UseMockedPropertyValueElevenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey","award-amount-transactions.computedRefreshed","award-amount-transactions.computedIsAutoSaved"],
+        ["existing sheet data row 1","",10,"",""],
+        ["existing sheet data row 2","",20,"",""],
+        ["existing sheet data row 3","",30,"",""],
+        ["from mocked API data row 4","",11001,"",""]]);
     });    
     
     it("should when previous array (sheet) data (3 rows) have award-amount-transactions.noticeDate entered in one row but not the others and mocked API row returned has notice date that is null it is not excluded from results (mocked primary key again using 11000) - should not include the row in the mocked spreadsheet existing data that had a notice date entered", function () {
@@ -217,10 +217,10 @@ describe("missing-notice-dates", function() {
         ["existing sheet data row 1","",10],
         ["existing sheet data row 2","2026-06-26"],
         ["existing sheet data row 3","",30]])
-        .should.be.eql([["award-amount-transactions.UseMockedPropertyValueElevenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey","award-amount-transactions.computedRefreshed"],
-        ["existing sheet data row 1","",10,""],
-        ["existing sheet data row 3","",30,""],
-        ["from mocked API data row 4","",11001,""]]);
+        .should.be.eql([["award-amount-transactions.UseMockedPropertyValueElevenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey","award-amount-transactions.computedRefreshed","award-amount-transactions.computedIsAutoSaved"],
+        ["existing sheet data row 1","",10,"",""],
+        ["existing sheet data row 3","",30,"",""],
+        ["from mocked API data row 4","",11001,"",""]]);
     });   
     
     it("should when previous array (sheet) data (3 rows) has extra columns, simulating manually entered data into the google sheet for example, the results will include both those extra columns for the spreadsheet data and the appropriate columns for the mocked API data (which would have the normal amount of columns) (mocked primary key 11000)", function () {
@@ -229,11 +229,11 @@ describe("missing-notice-dates", function() {
         ["existing sheet data row 1","",10,"manually entered into sheet 1", "", ""],
         ["existing sheet data row 2","",20,"manually entered into sheet 1", "manually entered into sheet 2", ""],
         ["existing sheet data row 3","",30,"manually entered into sheet 1", "manually entered into sheet 2", "manually entered into sheet 3"]])
-        .should.be.eql(        [["award-amount-transactions.UseMockedPropertyValueElevenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey", "extraSpreadsheetColumn1", "extraSpreadsheetColumn2", "extraSpreadsheetColumn3","award-amount-transactions.computedRefreshed"],
-        ["existing sheet data row 1","",10,"manually entered into sheet 1", "", "",""],
-        ["existing sheet data row 2","",20,"manually entered into sheet 1", "manually entered into sheet 2", "",""],
-        ["existing sheet data row 3","",30,"manually entered into sheet 1", "manually entered into sheet 2", "manually entered into sheet 3",""],
-        ["from mocked API data row 4","",11001,"","","",""]]);
+        .should.be.eql(        [["award-amount-transactions.UseMockedPropertyValueElevenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey", "extraSpreadsheetColumn1", "extraSpreadsheetColumn2", "extraSpreadsheetColumn3","award-amount-transactions.computedRefreshed","award-amount-transactions.computedIsAutoSaved"],
+        ["existing sheet data row 1","",10,"manually entered into sheet 1", "", "","",""],
+        ["existing sheet data row 2","",20,"manually entered into sheet 1", "manually entered into sheet 2", "","",""],
+        ["existing sheet data row 3","",30,"manually entered into sheet 1", "manually entered into sheet 2", "manually entered into sheet 3","",""],
+        ["from mocked API data row 4","",11001,"","","","",""]]);
     });     
      
     

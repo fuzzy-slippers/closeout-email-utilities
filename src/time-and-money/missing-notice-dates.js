@@ -93,7 +93,7 @@ module.exports = {
     
     
     /**
-     * this function operates on one row at a time (so only does rows worth of API calls to check if data has changed) - look for oldest timestamp with pending status and does API call to see if data has changed, and updates the array and sheet with that new data
+     * this function operates on one row at a time (so only does rows worth of API calls to check if data has changed) - look for oldest timestamp with AUTOSAVE status and does API call to see if data has changed, and updates the array and sheet with that new data
      * Note: final documents should not be updated/changing (but may want to design it in a way that it would be easy to update these rows too later if we find out they can)
      * 
      * @param {string} a string with the name of the tab/sheet within the google sheet the program that should be updated (updates single row that is non-final/pending, the pending row one with the max primary key value)
@@ -106,17 +106,22 @@ module.exports = {
         // const prevSheetDataTwoDimArrWHeader = googleAppsScriptWrappers.readDataInSheetWHeaderRowByName(sheetNameToUpdate); 
         // log.trace(`prevSheetDataTwoDimArrWHeader: ${JSON.stringify(prevSheetDataTwoDimArrWHeader)}`);
         
-        // //2a. use the updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates function to check for new t&m docs that should be listed on the validation sheet (and add them to the bottom of the 2d array)
-        // log.trace(`2a. use the updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates function to check for new t&m docs that should be listed on the validation sheet`);
-        // const combinationOfExistingDataPlusNewApiResults = module.exports.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates(prevSheetDataTwoDimArrWHeader);
-        // //6. after updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates finishes/returns back results
-        // log.trace(`6. result from calling updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates function is combinationOfExistingDataPlusNewApiResults: ${JSON.stringify(combinationOfExistingDataPlusNewApiResults)}`);
+        // 2. create a 2d array copy of data by filtering only on 1) rows that are AUTOSAVES and 2) look for the row 
+        // with the oldest update timestamp value and 3) return its primary key value only 
         
+        // 3. if there are no AUTOSAVE rows (no primary key is returned) then exit out of the function without proceeding/updating the sheet
         
-        // //7.  update sheet with old data in the sheet + the new results/flagged records
+        // 4. Make API call using primary key from previous step 
+        
+        // 5. create query function that uses the insert/update/delete alasql function update the row in question with 
+        //  1) the data returned by the API call and 2) refresh the computedRefreshed date/time to the current date/time and 
+        //  3) blank out the AUTOSAVE in the couputedIsAutoSaved column  
+        
+        // 6. update the google sheet tab (name specified) with the updated results
         // log.trace(`7.  update sheet with old data in the sheet + the new results/flagged records`);
         // googleAppsScriptWrappers.updNamedSheetWArrWHeaderRow(sheetNameToUpdate, combinationOfExistingDataPlusNewApiResults);
-        // log.trace(`sheetNameToUpdate: ${sheetNameToUpdate}`)
+        // log.trace(`sheetNameToUpdate: ${sheetNameToUpdate}`);
+
     }    
     
     
