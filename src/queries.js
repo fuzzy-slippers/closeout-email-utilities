@@ -183,7 +183,32 @@ module.exports = {
     //generateListOfColumnNamesInAlaSqlSelectFormat will return '*' if the 2d array passed in is empty 
     else 
       return module.exports.generateListOfColumnNamesInAlaSqlSelectFormat(twoDArrWHeader3);
-  }   
+  },   
+
+  /**
+  * gets the single primary key value from the data passed in of the AUTOSAVE row with the oldest/most stale refresh date/time listed 
+  * @param {string} the name of the primary key column in the header row of the 2d array passed in
+  * @param {string} the name of the last refresh date column in the header row of the 2d array passed in
+  * @param {string} the name of the is auto saved column in the header row of the 2d array passed in
+  * @param {string[][]} a 2d array with a header row and data to run the query against
+  * @return {string} the primary key value of the AUTOSAVE row that was refreshed the longest ago 
+  */    
+  getPrimaryKeyOfAutoSavedRowWOldestRefreshDate: (primKeyColName, lastRefreshDateColName, isAutoSavedColName, twoDArrWHeader) => {
+    log.trace(`queries getPrimaryKeyOfAutoSavedRowWOldestRefreshDate: (${primKeyColName}, ${lastRefreshDateColName}, ${isAutoSavedColName}, ${JSON.stringify(twoDArrWHeader)}) called...`);
+    const retVal = alasqlUtils.selectFromTwoDimArr(`SELECT MIN(${primKeyColName}) AS minPriKeyIfMultWSameRefreshDt
+                                            FROM tmptbl1 
+                                            WHERE ${isAutoSavedColName} = 'AUTOSAVE'
+                                            AND ${lastRefreshDateColName} = 
+                                              (
+                                                SELECT MIN(${lastRefreshDateColName})
+                                                FROM tmptbl1
+                                                WHERE ${isAutoSavedColName} = 'AUTOSAVE' 
+                                              )
+                                            `, twoDArrWHeader);
+    //we dont care about the header row, just return the single "data" value in the 2nd "data" row ( minPriKeyIfMultWSameRefreshDt not column header)
+console.log(`########################retVal: ${JSON.stringify(retVal)}`);
+    return retVal[1][0];    
+  }
 
 };  
 

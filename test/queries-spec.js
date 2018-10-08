@@ -381,6 +381,27 @@ describe("queries", function() {
     
   });   
   
+  
+        // 2. create a 2d array copy of data by filtering only on 1) rows that are AUTOSAVES and 2) look for the row 
+        // with the oldest update timestamp value and 3) return its primary key value only   
+  
+   describe("#getPrimaryKeyOfAutoSavedRowWOldestRefreshDate()", function() {
+    it("should given data with several rows marked as AUTOSAVE and various refreshed date/timestamps return the primary key with the oldest/most stale refreshed date (mocked as integers for now)", function () {
+      queries.getPrimaryKeyOfAutoSavedRowWOldestRefreshDate("pkey","col4RefreshDt","col5AutoSaved",
+        [
+        ["pkey", "col2", "col3","col4RefreshDt","col5AutoSaved"], 
+        [1,"AA", "",30, "AUTOSAVE"], 
+        [2, "BB", "", "", ""], 
+        [3, "CC", "", 10, "AUTOSAVE"], 
+        [4, "DD", "", "", ""]
+        ])
+      .should.be.eql(3);
+    });  
+    
+       
+    
+  });  
+
 
 });
 
