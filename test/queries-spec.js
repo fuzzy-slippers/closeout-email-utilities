@@ -421,6 +421,17 @@ describe("queries", function() {
         ]).should.be.eql(14);
     });
     
+    it("should given multiple AUTOSAVE rows that have the same exact refresh date timestamp, choose the one with the lowest primary key ", function () {
+      queries.getPrimaryKeyOfAutoSavedRowWOldestRefreshDate("pkey","col4RefreshDt","col5AutoSaved",
+        [
+        ["col2", "col3", "pkey", "col4RefreshDt","col5AutoSaved"], 
+        ["AA", "", 22, Date.parse("2016-10-09T16:03:14.672Z"), "AUTOSAVE"], 
+        ["BB", "", 20, Date.parse("2016-10-09T16:03:14.672Z"), "AUTOSAVE"], 
+        ["CC", "", 21, Date.parse("2016-10-09T16:03:14.672Z"), "AUTOSAVE"], 
+        ["DD", "", 11, "", ""]
+        ]).should.be.eql(20);
+    });    
+    
     
     it("should given data with just one row marked as AUTOSAVE return the primary key value of that one row", function () {
       queries.getPrimaryKeyOfAutoSavedRowWOldestRefreshDate("award-amount-transactions._primaryKey","award-amount-transactions.computedRefreshed","award-amount-transactions.computedIsAutoSaved",
