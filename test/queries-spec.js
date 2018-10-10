@@ -386,7 +386,7 @@ describe("queries", function() {
         // with the oldest update timestamp value and 3) return its primary key value only   
   
    describe("#getPrimaryKeyOfAutoSavedRowWOldestRefreshDate()", function() {
-    it("should given data with several rows marked as AUTOSAVE and various refreshed date/timestamps return the primary key with the oldest/most stale refreshed date (mocked as integers for now)", function () {
+    it("should given data with several rows marked as AUTOSAVE and various integers instead of real dates/timestamps, return the primary key with the oldest/most stale integer (mocked as integers for now)", function () {
       queries.getPrimaryKeyOfAutoSavedRowWOldestRefreshDate("pkey","col4RefreshDt","col5AutoSaved",
         [
         ["pkey", "col2", "col3","col4RefreshDt","col5AutoSaved"], 
@@ -398,7 +398,51 @@ describe("queries", function() {
       .should.be.eql(3);
     });  
     
-       
+    //
+    
+    it("should given data with several rows marked as AUTOSAVE and real dates/timestamps, return the primary key with the oldest/most stale date/timestamp", function () {
+      queries.getPrimaryKeyOfAutoSavedRowWOldestRefreshDate("pkey","col4RefreshDt","col5AutoSaved",
+        [
+        ["pkey", "col2", "col3","col4RefreshDt","col5AutoSaved"], 
+        [1,"AA", "", Date.parse("2018-10-09T16:03:14.672Z"), "AUTOSAVE"], 
+        [2, "BB", "", "", ""], 
+        [3, "CC", "", Date.parse("2017-10-09T16:03:14.672Z"), "AUTOSAVE"], 
+        [4, "DD", "", "", ""]
+        ])
+      .should.be.eql(3);
+    });      
+    
+    it("should given data (with primary key column not on leftmost side of 2d Arr) with several rows marked as AUTOSAVE and various refreshed date/timestamps return the primary key with the oldest/most stale refreshed date (mocked as integers for now)", function () {
+      queries.getPrimaryKeyOfAutoSavedRowWOldestRefreshDate("pkey","col4RefreshDt","col5AutoSaved",
+        [
+        ["col2", "col3", "pkey", "col4RefreshDt","col5AutoSaved"], 
+        ["AA", "", 14, Date.parse("2016-10-09T16:03:14.672Z"), "AUTOSAVE"], 
+        ["BB", "", 13, "", ""], 
+        ["CC", "", 12, Date.parse("2018-10-09T16:03:14.672Z"), "AUTOSAVE"], 
+        ["DD", "", 11, "", ""]
+        ]).should.be.eql(14);
+    });
+    
+    
+    // it("should given data with just one row marked as AUTOSAVE return the primary key value of that one row", function () {
+    //   queries.getPrimaryKeyOfAutoSavedRowWOldestRefreshDate("award-amount-transactions._primaryKey","col4RefreshDt","col5AutoSaved",
+    //     [
+    //     ["pkey", "col2", "col3","col4RefreshDt","col5AutoSaved"], 
+    //     [3, "CC", "", 10, "AUTOSAVE"], 
+    //     ])
+    //   .should.be.eql(3);
+    // });      
+    
+    
+    // it("should given data with just one row NOT marked as autosave return 0", function ()
+    // {});
+    
+    
+    // it("should given data with just one row NOT marked as autosave return 0", function ()
+    // {}); 
+    
+    // it("should given empty 2d array return 0", function ()
+    // {});     
     
   });  
 

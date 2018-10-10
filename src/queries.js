@@ -195,7 +195,7 @@ module.exports = {
   */    
   getPrimaryKeyOfAutoSavedRowWOldestRefreshDate: (primKeyColName, lastRefreshDateColName, isAutoSavedColName, twoDArrWHeader) => {
     log.trace(`queries getPrimaryKeyOfAutoSavedRowWOldestRefreshDate: (${primKeyColName}, ${lastRefreshDateColName}, ${isAutoSavedColName}, ${JSON.stringify(twoDArrWHeader)}) called...`);
-    const retVal = alasqlUtils.selectFromTwoDimArr(`SELECT MIN(${primKeyColName}) AS minPriKeyIfMultWSameRefreshDt
+    const resultsTwoDimArrFromSelectQuery = alasqlUtils.selectFromTwoDimArr(`SELECT MIN(${primKeyColName}) AS minPriKeyIfMultWSameRefreshDt
                                             FROM tmptbl1 
                                             WHERE ${isAutoSavedColName} = 'AUTOSAVE'
                                             AND ${lastRefreshDateColName} = 
@@ -206,8 +206,7 @@ module.exports = {
                                               )
                                             `, twoDArrWHeader);
     //we dont care about the header row, just return the single "data" value in the 2nd "data" row ( minPriKeyIfMultWSameRefreshDt not column header)
-console.log(`########################retVal: ${JSON.stringify(retVal)}`);
-    return retVal[1][0];    
+    return resultsTwoDimArrFromSelectQuery[1][0];    
   }
 
 };  
