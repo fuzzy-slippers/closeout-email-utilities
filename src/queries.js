@@ -195,18 +195,29 @@ module.exports = {
   */    
   getPrimaryKeyOfAutoSavedRowWOldestRefreshDate: (primKeyColName, lastRefreshDateColName, isAutoSavedColName, twoDArrWHeader) => {
     log.trace(`queries getPrimaryKeyOfAutoSavedRowWOldestRefreshDate: (${primKeyColName}, ${lastRefreshDateColName}, ${isAutoSavedColName}, ${JSON.stringify(twoDArrWHeader)}) called...`);
-    const resultsTwoDimArrFromSelectQuery = alasqlUtils.selectFromTwoDimArr(`SELECT MIN(${primKeyColName}) AS minPriKeyIfMultWSameRefreshDt
-                                            FROM tmptbl1 
-                                            WHERE ${isAutoSavedColName} = 'AUTOSAVE'
-                                            AND ${lastRefreshDateColName} = 
-                                              (
-                                                SELECT MIN(${lastRefreshDateColName})
-                                                FROM tmptbl1
-                                                WHERE ${isAutoSavedColName} = 'AUTOSAVE' 
-                                              )
-                                            `, twoDArrWHeader);
-    //we dont care about the header row, just return the single "data" value in the 2nd "data" row ( minPriKeyIfMultWSameRefreshDt not column header)
-    return resultsTwoDimArrFromSelectQuery[1][0];    
+    // make sure the passed in 2d array has at least a header row and data rows
+    if (twoDArrWHeader && twoDArrWHeader.length > 1) {
+      const resultsTwoDimArrFromSelectQuery = alasqlUtils.selectFromTwoDimArr(`SELECT MIN([${primKeyColName}]) AS minPriKeyIfMultWSameRefreshDt
+                                              FROM tmptbl1 
+                                              WHERE [${isAutoSavedColName}] = 'AUTOSAVE'
+                                              AND [${lastRefreshDateColName}] = 
+                                                (
+                                                  SELECT MIN([${lastRefreshDateColName}])
+                                                  FROM tmptbl1
+                                                  WHERE [${isAutoSavedColName}] = 'AUTOSAVE' 
+                                                )
+                                              `, twoDArrWHeader);
+      //we dont care about the header row, just return the single "data" value in the 2nd "data" row ( minPriKeyIfMultWSameRefreshDt not column header)                                              
+      const valueOfMinPriKeyIfMultWSameRefresDtReturned = resultsTwoDimArrFromSelectQuery[1][0];
+      //alaSql will return null if no AUTOSAVE rows found, so only returning if not null, otherwise return 0
+      if (valueOfMinPriKeyIfMultWSameRefresDtReturned)
+        return valueOfMinPriKeyIfMultWSameRefresDtReturned;
+      else 
+        return 0;
+    }
+    // otherwise if the 2d array passed in has no data return 0 - (figured this was better than undefined but would prevent worst case API calls against all records)       
+    else 
+      return 0; 
   }
 
 };  
