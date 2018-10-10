@@ -423,9 +423,9 @@ describe("queries", function() {
     
     
     it("should given data with just one row marked as AUTOSAVE return the primary key value of that one row", function () {
-      queries.getPrimaryKeyOfAutoSavedRowWOldestRefreshDate("award-amount-transactions._primaryKey","col4RefreshDt","col5AutoSaved",
+      queries.getPrimaryKeyOfAutoSavedRowWOldestRefreshDate("award-amount-transactions._primaryKey","award-amount-transactions.computedRefreshed","award-amount-transactions.computedIsAutoSaved",
         [
-        ["award-amount-transactions._primaryKey", "col2", "col3","col4RefreshDt","col5AutoSaved"], 
+        ["award-amount-transactions._primaryKey", "col2", "col3","award-amount-transactions.computedRefreshed","award-amount-transactions.computedIsAutoSaved"], 
         [7, "CC", "", Date.parse("2016-10-09T16:03:14.672Z"), "AUTOSAVE"], 
         ])
       .should.be.eql(7);

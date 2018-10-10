@@ -197,7 +197,8 @@ module.exports = {
     log.trace(`queries getPrimaryKeyOfAutoSavedRowWOldestRefreshDate: (${primKeyColName}, ${lastRefreshDateColName}, ${isAutoSavedColName}, ${JSON.stringify(twoDArrWHeader)}) called...`);
     // make sure the passed in 2d array has at least a header row and data rows
     if (twoDArrWHeader && twoDArrWHeader.length > 1) {
-      const resultsTwoDimArrFromSelectQuery = alasqlUtils.selectFromTwoDimArr(`SELECT MIN([${primKeyColName}]) AS minPriKeyIfMultWSameRefreshDt
+      const resultsTwoDimArrFromSelectQuery = alasqlUtils.selectFromTwoDimArr(
+                                              `SELECT MIN([${primKeyColName}]) AS minPriKeyIfMultWSameRefreshDt
                                               FROM tmptbl1 
                                               WHERE [${isAutoSavedColName}] = 'AUTOSAVE'
                                               AND [${lastRefreshDateColName}] = 
