@@ -90,18 +90,18 @@ describe("api-utils", function() {
   }); 
   
   
-  describe("#getAwardAmountTransactionByPrimaryKey()", function() {
+  // describe("#getAwardAmountTransactionByPrimaryKey()", function() {
     
-    it("should if passed the _primaryKey 773750, return a valid js object (not raw JSON) with a awardAmountTransactionId property of 773750", function () {
-                                      // console.log(`missingNoticeDates.getAwardAmountTransactionByPrimaryKey(773750) is returning: ${JSON.stringify(apiUtils.getAwardAmountTransactionByPrimaryKey("773750"))}\n`)
-      apiUtils.getAwardAmountTransactionByPrimaryKey("773750").should.have.property("award-amount-transactions.awardAmountTransactionId", 773750);
-    }); 
+  //   it("should if passed the _primaryKey 773750, return a valid js object (not raw JSON) with a awardAmountTransactionId property of 773750", function () {
+  //                                     // console.log(`missingNoticeDates.getAwardAmountTransactionByPrimaryKey(773750) is returning: ${JSON.stringify(apiUtils.getAwardAmountTransactionByPrimaryKey("773750"))}\n`)
+  //     apiUtils.getAwardAmountTransactionByPrimaryKey("773750").should.have.property("award-amount-transactions.awardAmountTransactionId", 773750);
+  //   }); 
     
-    it("should if given a totally invalid primary key like -1 return an error object", function () {
-      apiUtils.getAwardAmountTransactionByPrimaryKey(-1).should.have.property("Error");
-    }); 
+  //   it("should if given a totally invalid primary key like -1 return an error object", function () {
+  //     apiUtils.getAwardAmountTransactionByPrimaryKey(-1).should.have.property("Error");
+  //   }); 
     
-  });  
+  // });  
   
 
 });
