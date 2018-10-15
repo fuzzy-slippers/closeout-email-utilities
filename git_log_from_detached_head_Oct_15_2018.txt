@@ -1,0 +1,505 @@
+commit c1ae9c8a4e5142561fd68c21e9fda8199dbb5000
+Author: Zach Friedman <zif@umd.edu>
+Date:   Wed Oct 10 19:27:18 2018 +0000
+
+    Added unit test to confirm that everything will work if two AUTOSAVE rows have the same refresh timestamp
+
+commit 739ddfbacbec385189961ee0f10a2359b89748f9
+Author: Zach Friedman <zif@umd.edu>
+Date:   Wed Oct 10 19:06:34 2018 +0000
+
+    Made sure to test special char dot endpoint/column names in all columns as part of getPrimaryKeyOfAutoSavedRowWOldestRefreshDate unit tests
+
+commit 5d5cb475682af06d356cec084cf3e8a7bf20678e
+Author: Zach Friedman <zif@umd.edu>
+Date:   Wed Oct 10 19:01:17 2018 +0000
+
+    Fixed issue with getPrimaryKeyOfAutoSavedRowWOldestRefreshDate caught by test - when there are no AUTOSAVE rows (and so the alasql select returns no data rows in the results), the max in alaSQL was returning a null value, but we want the function
+    to return a primary key of 0 if no rows found...so worked on a fix for that situation
+
+commit db600b2b1d62aceabe7fbf6f36667db255dfb3f7
+Author: Zach Friedman <zif@umd.edu>
+Date:   Wed Oct 10 14:56:46 2018 +0000
+
+    Used log statement to determine the format of dates created with the alasql date(now()) function inside a SELECT statement. Used a sample date to then create 2 more unit tests with more realistic date values to sort by for the AUTOSAVE rows to test against,
+    as well as a test where the primary key column is not the leftmost column, as is true in real life data (confirms nothing is tied to column positions and it is using column names to identify the data)
+
+commit bc0263def457601cdb89fe661d89ecf3c39578bf
+Author: Zach Friedman <zif@umd.edu>
+Date:   Mon Oct 8 03:52:50 2018 +0000
+
+    Created getPrimaryKeyOfAutoSavedRowWOldestRefreshDate function to be the first step in refreshing AUTOSAVE'd PENDING time and money doc award amount transactions rows (for now just with one unit test)
+    will add more robust tests as the second stage - the function looks for just AUTOSAVE rows and then returns the primary key of the AUTOSAVE row with the oldest refreshed date/timestamp
+
+commit 973cca22d30f5b5971fee4f51cc9332734050a82
+Author: Zach Friedman <zif@umd.edu>
+Date:   Mon Oct 8 02:44:29 2018 +0000
+
+    Updated missing notes dates integration tests to work with new "award-amount-transactions.computedIsAutoSaved" column added on the right by the updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates function
+    although I may not create new integration tests its nice to have this running to make sure nothing is inadvertently broken
+
+commit 93ee8e924e703a8970fce7b499e93d5e030056d1
+Author: Zach Friedman <zif@umd.edu>
+Date:   Sun Oct 7 04:41:22 2018 +0000
+
+    added ignore to missing-notice-dates temporarily to allow testing in google sheets - plan is to go back through all the integration tests and add the computedIsAutoSaved columns into the test data
+
+commit 63b5dc3fb48759e4b95a7e1e932159c388a25e3d
+Author: Zach Friedman <zif@umd.edu>
+Date:   Sun Oct 7 04:36:22 2018 +0000
+
+    added trim step to addColumnComputedAutoSave function - added test with cell value of " " for transactionTypeCode and used js function to trim each 2d array cell before loading into the function
+    due to bug with alaSql trim db function
+
+commit 334332c8e48e45271a4ac3f1db7be9b8f03c7082
+Author: Zach Friedman <zif@umd.edu>
+Date:   Sun Oct 7 04:31:28 2018 +0000
+
+    Added addColumnComputedAutoSave function to queries module as well as tests - will add in a new column, filing out AUTOSAVE for rows where it detects the document is pending based on a required field showing
+    blank values
+
+commit 88a9233cd711c8fd87baef14af7d73ac1865876c
+Author: Zach Friedman <zif@umd.edu>
+Date:   Sun Oct 7 02:56:40 2018 +0000
+
+    Updated the addColumnComputedRefreshed so that it would always add the refreshed column on the right hand side of the sheet - (wanted to do this from the start but just found the solution of using
+    the new generateListOfColumnNamesInAlaSqlSelectFormat function to explicitly list the original columns instead of *, which then seemed to allow the column to be added to the right side! Also then
+    removed (but commented for the future if we need it) my unit test that was attempting to check adding new columns on the left hand side of just one of the 2d arrays - simulating if an extra column was added
+    to the google sheet only (but not the API data returned) on the left hand side of the sheet - my goal is to avoid this scenario and always add extra columns on the right hand side
+
+commit c8746d39227a7561b8480bbbf87f48ad31ccac6e
+Author: Zach Friedman <zif@umd.edu>
+Date:   Sat Oct 6 22:51:13 2018 +0000
+
+    Switched all the calls in   unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted over to generateListOfColumnNamesInAlaSqlSelectFormatFirstNonEmptyTwoDArr and all tests still passing
+
+commit 5cc143de60c039945f9562869cbbbd878d55e90d
+Author: Zach Friedman <zif@umd.edu>
+Date:   Sat Oct 6 22:46:44 2018 +0000
+
+    created generateListOfColumnNamesInAlaSqlSelectFormatFirstNonEmptyTwoDArr function as a helper to further clean up/make more readible/testible the unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted function - specifically around the area of determining the select column names which apeared to have a bug (easier to trace down the bug hopefully with unit tests)
+
+commit b7c6894d9e7eab5555dab38e4c181e3db00bb993
+Author: Zach Friedman <zif@umd.edu>
+Date:   Sat Oct 6 22:04:40 2018 +0000
+
+    Added tests and new function generateListOfColumnNamesInAlaSqlSelectFormat which had been part of the unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted function logic previously but trying to split it out now that we are noticing problems with that part of the code (bug) and trying to refactor that unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted to make it cleaner and easier to reason about by using helper functions
+
+commit f2edad4199c758696ed32f741384c49cc43a6700
+Author: Zach Friedman <zif@umd.edu>
+Date:   Sat Oct 6 16:28:23 2018 +0000
+
+    Updated the integration tests in missing-notice-dates testing the updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates function to reflect all data being returned having an added "award-amount-transactions.computedRefreshed" row
+    got tests to pass - does not really seem to confirm much about the new logic but at least these integration tests can keep running for now
+
+commit f0073ab2444a7a35abf757f7420b0268dfe3b86c
+Author: Zach Friedman <zif@umd.edu>
+Date:   Sat Oct 6 03:31:43 2018 +0000
+
+    depricated missing notice dates integration tests - were useful for a period but not sustainable as we are working on adding extra columns etc to the returned data
+
+commit 21bfa9869b1e7f059edb7ae94037548c57757dad
+Author: Zach Friedman <zif@umd.edu>
+Date:   Sat Oct 6 03:27:45 2018 +0000
+
+    Added additional test to make sure running the addColumnComputedRefreshed function on the sheet data more than one will not add more than one copy of the computedRefreshed column
+
+commit 405accb9605bcf2766f37b8c6f9b9cb50fd10074
+Author: Zach Friedman <zif@umd.edu>
+Date:   Sat Oct 6 03:20:52 2018 +0000
+
+    Added step to add computedRefreshed column to data in missing notice dates module - updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates function - so that it will happen on each sheet refresh
+
+commit 61834fa796ca4dec5367e7632260e0d966e38534
+Author: Zach Friedman <zif@umd.edu>
+Date:   Sat Oct 6 03:15:58 2018 +0000
+
+    Decided to change logic for function to add new column to "award-transaction-detail.computedRefreshed" column which would be blank at first (all rows) and then be updated only when the pending rows are refreshed
+    one by one
+
+commit 8d3969282003d98a5e1acb73495d3ecae6b39d26
+Author: Zach Friedman <zif@umd.edu>
+Date:   Sat Oct 6 01:13:54 2018 +0000
+
+    Added in tests and logic for new addColumnComputedLastUpdated function in the queries module to add in a new column we will call "award-transaction-details.generatedLastUpdated"
+
+commit 54e635b388446ffa1f5a6e8ef1bd2f9ca4ff8e8f
+Author: Zach Friedman <zif@umd.edu>
+Date:   Fri Oct 5 02:55:05 2018 +0000
+
+    worked on new insertUpdDelFromTwoDimArr function in the alasql module and several tests for testing that single inserts and then querying is working as expected through the function
+    did run into one quirk with alasql where inserting null values with the insert was then showing the stored values as undefined while the js array when loaded in with null values was keeping the null values - instead did my tests with blank values...which I believe is what will come from the google sheets and those empty string values behaved as I would expect
+
+commit d551bd3f69024b419d4c3deee1f8d229e5f2682a
+Author: Zach Friedman <zif@umd.edu>
+Date:   Fri Oct 5 01:52:19 2018 +0000
+
+    Just updated some of the step/comment numbering in missing-notice-dates module and commented out some test/sample query and its tests in the queries module and queries-spec
+
+commit 2c1c7df6cb5559b9b2c28525b2b4656391f75470
+Author: Zach Friedman <zif@umd.edu>
+Date:   Wed Oct 3 03:54:33 2018 +0000
+
+    added another test for missing notice dates that tests out if the google sheet has extra manually entered columns and sporatically entered extra data, but the data coming back from the mocked API row
+    only has the smaller number of standard colums, that the result data is successfully a blend/union of the two together
+
+commit 31fe97a30762a4e36566c2f9582a291c480fba9b
+Author: Zach Friedman <zif@umd.edu>
+Date:   Wed Oct 3 03:29:17 2018 +0000
+
+    another missing notice dates test to confirm that if the preexisting data in the google sheet has notice dates entered in, that data will be excluded after the refresh, even if the data
+    row coming from the mocked API call has a null notice date and so is added in to the bottom of the results (rows)
+
+commit 3aab1b8bf613d68b0f906563767c0417fb0334f2
+Author: Zach Friedman <zif@umd.edu>
+Date:   Wed Oct 3 02:38:25 2018 +0000
+
+    added test (and mocks) to missing-notice-dates module for 4 rows (3 from sheet, 1 from API data mocked up) where the API data returned had a null notice date instead of blank, and that row would be included in validation list
+
+commit 78cbc622ecb91e1ecc24bd53af0c4a21f87dea99
+Author: Zach Friedman <zif@umd.edu>
+Date:   Wed Oct 3 02:12:53 2018 +0000
+
+    Added test to make sure that when the API returns an row with a non-null notice date, that its not added into the data returned
+
+commit c9c17997e0cd2ca2243a9ee90ec059e1bdb57f71
+Author: Zach Friedman <zif@umd.edu>
+Date:   Wed Oct 3 01:49:07 2018 +0000
+
+    added additional missing-notice-dates test that looks at 2 existing rows of data, header with notice date and primary key and then mocks new data row from mocked APIs with blank notice date (so is included) in
+    3 row output
+
+commit 695ca37172beebf234f78e23e211853ba85fe5d9
+Author: Zach Friedman <zif@umd.edu>
+Date:   Tue Oct 2 22:30:03 2018 +0000
+
+    Worked on a test where both 2 previous rows are simulates as if coming from the existing google sheet, with another header row and then mocked up data is coming from a mocked version
+    of the function that pulls data from the API based on the primary key value (in this case 7001)
+
+commit a4b8f524fa24f1123584ed1eb2b55ddec94be054
+Author: Zach Friedman <zif@umd.edu>
+Date:   Tue Oct 2 21:53:16 2018 +0000
+
+    Worked through issues with third test for missing notice dates module which was failing (turned out to be hard to find bug in mocked array formatting) - should when the previous array (sheet) data is empty with no header rows (and a mocked last primary key value IS in the google property store - 8000), set the sheet to pretend data listed for primary key 8000
+    Also in the process added another test to queries module for cases of blank arrays
+    Also added test and code to handle 1d arrays passed into array utils function to trim 2d array data fields
+
+commit 79df6ae9da91490b1d3e81140a216f5ab50011d3
+Author: Zach Friedman <zif@umd.edu>
+Date:   Tue Oct 2 05:37:10 2018 +0000
+
+    added complimentary test in latest-by-primary-key
+    given a passed in previous max primary key null which is the value that the google property store will return if the cached property does not exist yet (so when we have an empty sheet plus no cached last highest primary key value) should return back an empty array
+
+commit 61df89551e50056ec5826e64c0fd871fbf343e03
+Author: Zach Friedman <zif@umd.edu>
+Date:   Tue Oct 2 05:33:45 2018 +0000
+
+    added test which corresponds to the scenario that google property store is empty and the spreadsheet passed in is empty -
+    should when the previous array (sheet) data is empty with no header rows (and a mocked last primary key value is not yet in the google property store - its null), set the sheet to empty array
+
+commit 7d3093aee3c1f8282f19d0b82fcb934c8eb6aace
+Author: Zach Friedman <zif@umd.edu>
+Date:   Tue Oct 2 05:22:47 2018 +0000
+
+    forgot to add in separte commmit 2 messages ago - also added 2 additional tests to latest-by-primary-key module (related to scenarios where primary keys/data does not yet exist):
+    should given a passed in previous max primary key of string 2 return an empty array (based on rewire sample data primary key 3 not found/API returns error object)
+    and
+    should given a passed in previous primary key of 2 return the an empty object (would look up primary key 3 which does not exist yet in our mocked data)
+
+commit b148fd4fef32e1fb50035d40a5566f8ddba23a9f
+Author: Zach Friedman <zif@umd.edu>
+Date:   Tue Oct 2 05:19:51 2018 +0000
+
+    confirmed that I am no longer needing the rewire/mock for googleAppsScriptWrappers.callKrGetApiWithWait, tested the code without it...this is helpful to know as it means less mocking is needed for each scenario we want to test
+    from start to finish in the missingNoticeDates.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates process/integration
+
+commit 6ee28dca617dc06360303bbc32bf5c8650769d6a
+Author: Zach Friedman <zif@umd.edu>
+Date:   Tue Oct 2 04:59:17 2018 +0000
+
+    Worked all the way through initial missing-notice-dates integration test - mocked when previous array (sheet) data is empty with just a header row with a 'UseMockedPropertyValueSevenThousand' and 'award-amount-transactions._primaryKey' columns (with mocked last primary key value of 7000), should return an array with mocked data for primary key 7000
+    and all data mocked up - looking for the specific header row [["award-amount-transactions.UseMockedPropertyValueSevenThousand","award-amount-transactions.ColB","award-amount-transactions._primaryKey"]] it then knows to pretend that the cached property store latest primary key value is 7000
+    and that when calling gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys with the maxPreviouslyUsedPrimaryKey of  7000 always return [["award-amount-transactions.UseMockedPropertyValueSevenThousand","award-amount-transactions.ColB","award-amount-transactions._primaryKey"],[1,2,7001]]
+    pretending that the APIs would have found data under primary key 7001 - so everything is basically mocked...its just testing the interaction between the steps
+
+commit 3da124d42f5ac6454da70707ebf1dfa750a52a01
+Author: Zach Friedman <zif@umd.edu>
+Date:   Wed Sep 19 01:05:17 2018 +0000
+
+    Created initial framework for testing missing-notice-dates module updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates function including an initial rewire mock of the latestByPrimaryKey findMaxPrimaryKeyValueInData library
+    so that if passed in an empty array as the sheet data, that it does a mock up that just returns null (as if the google property cache had no record for the last primary key value stored or the properties store got erased or something)
+    created the first test that verifies that if you pass in blank data and it cant find a max primary key in the properties store, then it will just return back an empty array
+
+commit 7fb5b08d3830930c323d1065534603e026623bef
+Author: Zach Friedman <zif@umd.edu>
+Date:   Wed Sep 19 00:25:28 2018 +0000
+
+    Fixed issue that in tracing seems to be passing of data between updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDate and addAdditionalFlaggedEmptyTimeAndMoneyNoticeDatesToSheet functions
+    also fixed the ordering of the trace messages so that trace message 6 will be printed after the function that does steps 2-5 returns rather than before which makes the tracing more not less confusing
+
+commit 72c7c3d21ca4a6bd77c02a1611856fe4b88fcd28
+Author: Zach Friedman <zif@umd.edu>
+Date:   Tue Sep 18 23:07:40 2018 +0000
+
+    Found bug in missing-notice-dates where it was passing sheet name into function to update the sheet data, not the data array itself - next step is to do application side testing in GAS to confirm if that was the only fix needed to get things
+    back to normal after splitting the missing-notice-dates module into 2 functions (to be able to start unit testing the one that works with the data)
+
+commit 45530f9ac3959544bc10136a25301e66dfa19d2e
+Author: Zach Friedman <zif@umd.edu>
+Date:   Tue Sep 18 22:59:26 2018 +0000
+
+    Added tests for the array-utils functions to support if an empty array is passed in that an empty array is returned back from the functions (pretty much the functions in the module all seemed to make sense to add that test)
+    I did that because it looked as though the error in the live GAS testing were happening after trimAllCellsInTwoDimArr were being passed an empty array - but all the tests passed the first time once added so it must be something else
+
+commit c9c0f892cf69d23c0f7a59f2b661e25e6ebe1456
+Author: Zach Friedman <zif@umd.edu>
+Date:   Sat Sep 15 01:18:40 2018 +0000
+
+    Worked on splitting out the addAdditionalFlaggedEmtpyTimeAndMoneyNoticeDatesToSheet function into 2 - one that just reads from the google sheet and updates the google sheet and a second that actually adds rows to the 2d array
+    to indicate new validations flagged rows - the benefit of splitting it in this way is we can write unit/integration tests to test out how it performs with mocked out API calls, last cached primary key, etc
+
+commit 8294d5b185716db3bb95bd3d365f40885676b91b
+Author: Zach Friedman <zif@umd.edu>
+Date:   Thu Sep 13 23:15:07 2018 +0000
+
+    changed the filterJustRowsWhereColIsNull function in the queries module to filterJustRowsWhereColIsNullOrBlank to also return rows with blank fields - in doing some testing it looked like null values may be ending up a blank strings in some
+    cases so wanted to include those as well (but due to some sort of bug in alasql and TRIM, maybe just with column names that have dots in them and need the [] around them, I could not use the SQL TRIM
+    so instead am using the new array-utils filterJustRowsWhereColIsNullOrBlank and added several tests to make sure it was returning those rows with a blank string in the matching column specified as well
+
+commit d49c9697529cee0a1e4b7686ef78691fa9b3d69a
+Author: Zach Friedman <zif@umd.edu>
+Date:   Thu Sep 13 23:03:11 2018 +0000
+
+    Worked on tests and a new array-utils function trimAllCellsInTwoDimArr that will take the data from a sheet and remove extra whitespace to the left and right of any string - in case people have extra whitespace after what
+    they type in, etc - the main reason this was needed is that the TRIM function in alasql was not working correctly and when checking for nulls and blank values, we need an easy way to check for blank strings so
+    need to first change a string with a lot of whitespace to an empty string if it doesnt have any actual characters written in - I could see this coming up a lot in google sheets having a few blank spaces in a cell that are invisible
+
+commit 04818b013f208a65f91836280634afa03ae37fed
+Author: Zach Friedman <zif@umd.edu>
+Date:   Thu Sep 13 21:48:35 2018 +0000
+
+    started down the path of integration tests (added /test/notused/missing-notice-dates-spec initial test code but quickly realized with the number of sub functions and GAS cache values that would need to be mocked out and that sinon spy's would be needed to test if the spreadsheet was going to be updated with the correct data so backed out the changes and for now keeping the partial work in the /test/notused folder
+
+commit d9ba3dbd781abdb50f8fd67b8217ec1ebca63e8b
+Author: Zach Friedman <zif@umd.edu>
+Date:   Thu Sep 13 20:56:28 2018 +0000
+
+    changed the ordering/format of Bunyan trace and info logs so that it was easier to see the log messages, especially in strackdriver which tends to cut them off
+
+commit b3e9d370be81a317b4768a2e46a71eff32157859
+Author: Zach Friedman <zif@umd.edu>
+Date:   Wed Sep 12 23:19:59 2018 +0000
+
+    Added logging (log.trace) at each step in the missing-notice-dates module so that it will be easy to see the progression through the program. Trying to work on an issue that I noticed during testing - at this point test records with
+    valid notice dates are now being flagged after the changes to add support for prefixes to sheet column names, so trying to trace through it in GAS live code, so tracing is the way to go (maybe will add integration level unit tests as a future
+    step as well
+
+commit 4814c31cede154751066281add8fca100da3b9a0
+Author: Zach Friedman <zif@umd.edu>
+Date:   Wed Sep 12 17:27:09 2018 +0000
+
+    Added (and tested out) Banyun logging with explicitly logging out the start of each function and converting all object/array data passed in to JSON - into the alasql-utils, array-utils, latest-by-primary-key, obj-utils, queries and missing-notice-dates modules
+    
+    added ability to pass in column names via colToLookForNulls parameter to returnRowsWithNullNoticeDates, orderByColumnWithName, unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted functions in alasqlUtils module and updated addAdditionalFlaggedEmptyTimeAndMoneyNoticeDatesToSheet to reflect calling functions passing endpoint name dot prefix to column names
+    
+    created objectAssignSingleObjEs3Friendly also as a further way to isolate the merging of each object, so that it could be logged individually to Banyun for tracing through the live/production errors currently observed in GAS
+    
+    created objUtils.mergeObjArrIntoSingleObj as alternative to destructuring and Object.assign so that the logging could capture better where there were problems (logging each call of the function with parameters)
+    
+    Worked on custom RawStreamConsoleToMatchDefaultBunyanFormat function  - went through and matched the output of a standard Banyun logger and output the same items in the same order and the same format for the custom raw logger that is needed to work with Stackdriver (only console.log appears to work - also works with C9 side as well) output the name, hostname, pid, level, msg, time, and v
+    
+    Tested if we could remove logging.json for now as we were not utilizing due to issues importing streams from JSON (can't be strings - research surfaced this issue and no listed workarounds for JSON) - may be able to switch back with raw Bunyan logging later
+    
+    cleaned up old (orphaned version) of api-utils.js now that sufficient testing/time has passed to confirm things are working with the current version
+    
+    Refactored to hasErrorProperty function name - did some research on JS errors - best practices appear to suggest not creating custom error objects, but figured it was a middle ground to have objects returned via API data as not js "error" objects but can detect the way KR APIs let us know there was an error with the API request (via the data returned)
+
+commit 5437a80d0218360cf91d32bbe2d64ac6708dceb9
+Author: Zach Friedman <zif@umd.edu>
+Date:   Fri Sep 7 03:51:49 2018 +0000
+
+    Got Bunyan logging partially set up (at least it's not logging info messages both via Mocha tests (can change the environment variable via package.json if we dont want mocha tests to log particular urgency levels of logs) and ALSO crucially
+    now logging to stackdriver through google apps script!!! woohoo...using raw option so may want to update the formatting to match a standard bunyan format as best I can...
+
+commit af94a36e6dd5b7e494bde8b982627cf2b5c30520
+Author: Zach Friedman <zif@umd.edu>
+Date:   Wed Sep 5 21:13:54 2018 +0000
+
+    finished adding tests that expected prepended column names from the endpoint name like "award-amount-transaction._primaryKey" in all the latest-by-primary-key.js module (before only some of the tests were expecting col names to be prepended)
+    (after reviewing diffs between the 2 branches related to the two times I tried to add in the tests/code for prepending the URI endpoint names to the column/field names)
+    also updated/fixed issues with the rewire npm library usage in latest-by-primary-key-spec.js that were overwritting all apiUtils function calls (kept getting errors that the functions were missing in that module after the rewire) - found that I
+    was able to successfully require/import a 2nd copy of the apiUtils module and set the functions that we did not want to be mocked out/overwritten in api-utils.js back to point to the actual code by having the mocked versions of those function call the
+    function in the second required copy of the API module - so far seemed to be working because tests passed
+    also had to move the endPointname into a separate variable/step in gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys because it was giving an error when it being calculated inside the part of code that specified the column name
+
+commit 27827e01877219927d30114e32b43d4417c6465b
+Author: Zach Friedman <zif@umd.edu>
+Date:   Wed Sep 5 04:06:58 2018 +0000
+
+    This commit adds changes to multiple modules to allow for column names of data returned from API calls to be prefaced with the endpoint name, for example award-types._primaryKey instead of _primaryKey
+    required adding parameters to pass around the column names for queries, etc
+    
+    (so far tests seem to be running - initially tried with code in branch but could not get working...it seemed like the only last trick other than adding the changes slowly was renaming the one function apiGetCallKr to apiGetCallKrNoPrefixes
+    and the new version to apiGetCallKr as before)
+
+commit 3b0dc605b2958822b84f14bd8327382997646ef3
+Author: Zach Friedman <zif@umd.edu>
+Date:   Wed Jul 18 20:18:42 2018 +0000
+
+    Final push to get proof of concept ready to show to eRA team (final changes yesterday).
+    
+    1. reorganize the validation for time and money notice dates into a standalone latest-by-primary-key module that can collect up new data from any
+    KR api based on the latest primary key values and change missing-notice-dates module to just be the steps from various libraries that refresh the missing notice dates on time and money records and the specific API
+    
+    2. Refactor function that updates the google sheet with validations to allow any sheet/tab name to be passed in (removed hard coded sheet names) so
+    it will be easier to specify different tab names for different validations in the future
+    
+    3. clean up naming of sheet, sheet script and validation kickoff functions to be more intuitively named/labeled
+
+commit 319c316c1be7ed33a23aeda96b678b73676076b4
+Author: Zach Friedman <zif@umd.edu>
+Date:   Tue Jul 17 17:19:00 2018 +0000
+
+    have a running version of the program to update an existing google sheet with new time and money docs with notice dates left blank (leaves existing data alone so far, extra column, formatting)
+    
+    to do this:
+    
+    -added a number of test cases for union of arrays when one or more of the three 2d arrays are empty (like when the spreadsheet is empty, no data is retrieved from the APIs, etc)
+    
+    -fixed bug in the utility that converted 2d arrays with header rows to 1d array of objects - was changing the 2d array passed in as a side effect removing the header row, got it switched to non-mutating array operations - slice, etc
+    
+    -added pollyfill for Object.is Javascript function that was not being polyfilled by Webpack for some reason, maybe because it thought it was already in the version of ES3 GAS uses but it isnt - was causing our function to search
+    and replace through 2d array values to fail - set up new global polyfill function that sits in the main GAS js scipts folder and can therefore overwrite global objects - was able to copy/paste from MSN polyfill without
+    changes so promising for the future as a way to handle this type of missing polyfill scenario
+
+commit 7ac67dda7f3ef107385397854955278ac2bb1e45
+Author: Zach Friedman <zif@umd.edu>
+Date:   Mon Jul 16 21:05:18 2018 +0000
+
+    Was able to get tests written and functions created to allow the following:
+    -test to confirm that revised selectFromTwoDimArr function that takes up to 3 data sets (3 tables worth of data) can successfully join the data in those data sets
+    -tests to confirm that revised selectFromTwoDimArr function that now takes up to 3 data sets can union between those data sets
+    -an initial comprensive test to confirm that a new query will take three data sets, assuming the all three have a set of columns but the first may have extra columns and will return a unioned version but where
+     instead of it just returning the columns in all 3, it will return the data from the first table that is added to the right of the columns in all 3 data sets, useful for when adding api data to a sheet that
+     has that plus some user or other process entered data - however right now due to bugs in alasql the data is not 1) sorted or 2) may show nulls or empty strings (will need standalone functions to handle both)
+
+commit 7d3f0faf420c1a2d7cb91e5d7d517190de9ea6e2
+Author: Zach Friedman <zif@umd.edu>
+Date:   Sat Jul 14 01:46:18 2018 +0000
+
+    in the middle of working on persisting parameter changes - worked on steps up through sending only rows with blank notice dates to
+    the google sheet during testing on the google apps script side
+
+commit 3e98d86c4708f82113e349abeb11530d5e997bd6
+Author: Zach Friedman <zif@umd.edu>
+Date:   Thu Jul 12 20:51:27 2018 +0000
+
+    We have now successfully added the first half of the missing notice dates initial check code with unit tests and also just tested on
+    the google apps script code.
+    
+    A google-apps-script-wrappers folder/module that includes functions wrapping Google Apps script specific function calls (with rewrite
+    mocks so that we could do unit tests on them, returning specific mocked API data). Added functions for api calls against our external
+    api with wait 1 sec/caching library, read 2d array from google sheet and write 2d array to google sheet by sheet name
+    
+    Also added since last commit an api-utils module with tests (converts api data into js objects with logic to handle API errors and create
+    a special js object from it)
+
+commit 69f0d163a9c673097efc8a1d2af74703df6272bf
+Author: Zach Friedman <zif@umd.edu>
+Date:   Tue May 22 22:27:38 2018 +0000
+
+    Fixed issue with duplicateArrayReplaceAllElementsWith, which was not working with arrays created with the Array constructor (like new Array(5)) which is what we were doing - it was causing all kinds of havoc as
+    the array values (or holes as they are known in javascript) werent getting replaced with null values - instead attempted to use the ES5 Array.apply (at least I hope it's ES5 friendly) seemed to fix it
+
+commit 121fcf74f621e0ecaf27249aa686f86c0241e3b5
+Author: Zach Friedman <zif@umd.edu>
+Date:   Wed Apr 25 19:33:36 2018 +0000
+
+    still not really working...doing a commit so I can come back to this point after I try going back to prior commits (hoping to find the point where GAS compilation was working)
+
+commit f2b4c717cbfe552eaf657573f103708e9ecbc025
+Author: Zach Friedman <zif@umd.edu>
+Date:   Wed Apr 25 17:39:05 2018 +0000
+
+    finished creating queries.js (will want to rename later) and unit tests for the first queries function - mid way through playing around with webpack/babel configs trying to get Set to work in Google
+    Apps script - doing this commit just so its easier to roll these config changes back if need be if things go south
+
+commit 49fd9584bd1ebb25f4a434f53c97f8cb17cd2c48
+Author: Zach Friedman <zif@umd.edu>
+Date:   Sat Apr 21 02:00:12 2018 +0000
+
+    worked on convertOneDimObjArrToTwoDimArrWithHeaderRow function (wrote it in a functional way using es5 functional array features like spread operator and keys()/values() functions
+    wrote a bunch of unit tests for it
+    also had to create helper function unionArrs (redid from example online to work in the version of Node (8) I was running...was complaining about no "new" operator
+    for the set statement - got around it by splitting into multiple statements and using new Set..
+
+commit ec1d51d5f1ad52c221726a11df61c15dc742fb68
+Author: Zach Friedman <zif@umd.edu>
+Date:   Tue Apr 17 18:18:55 2018 +0000
+
+    got clasp push working again - had been giving error complaining about gitignore and file enums, but I think it was a property I tried to add to specify the clasp directory to upload (dist directory path)
+    in any case, I was able to do a build and push and run the test program through the apps script console afterward and it was querying via alasql correctly
+
+commit 0544f495ced5d134401bafbe77b2f64cba0f4e48
+Author: Zach Friedman <zif@umd.edu>
+Date:   Tue Apr 17 15:53:48 2018 +0000
+
+    Adding the clasp related files (javascript that is not under /src (libraries) but instead is going to be apps script only javascript), clasp settings like .claspignore and appscript.json
+    The goal is to have a copy of these files somewhere since clasp does not seem to have a mechanism for keeping files (in investigation, versions and deployments dont allow for retrieving source code versions)
+    however we are excluding the webpack bundle js which changes each time and the .clasp.json which seemed to be both simple and have our script id which I figured might not be great to post to github
+
+commit 1131bbf55f3d20d6ccbab26e0d21cd1db46c0264
+Author: Zach Friedman <zif@umd.edu>
+Date:   Fri Apr 13 16:29:56 2018 +0000
+
+    everything working with a test to 1. pull data from a google sheet 2. convert that data to an array of js objects and
+    3. load that data into an alasql table and 4. query that data with a sql where clause limiting results
+
+commit ced375a96eda031e0df12233c7978a9c6e662086
+Author: Zach Friedman <zif@umd.edu>
+Date:   Thu Apr 12 19:00:06 2018 +0000
+
+    now that I got webpack working again with the babel es6 tranformations and things were compiling via clasp push, wanted to do a commit
+    also changed the name (so far thats the only change) of the alasql supporting lib to alasql-utils.sql
+
+commit 2be420e1130e945236ccbf9005ae1bb00c5bf592
+Author: Zach Friedman <zif@umd.edu>
+Date:   Wed Apr 11 21:44:23 2018 +0000
+
+    at this point we have test scripts that show:
+    1. the alasql library is working to do queries and create tables, when loaded through webpack
+    2. changed the alasql package.json back to the out of the box settings and specify the non minified version of the library by using the explicit /alasql/dist/alasql.js non-minified path when requiring it
+    3. for now hooked up the test sheet the script is currently attached to, to a new bound sheet utility library with helper functions for reading in Google Spreadsheet data - which is also working
+
+commit 977fb8d37b272321713eab918c56504216a87a93
+Author: Zach Friedman <zif@umd.edu>
+Date:   Mon Apr 9 17:53:09 2018 +0000
+
+    Got everything back to the point where it seems to be working again after removing unused tests, modules, etc
+    I did end up adding also the webpack plugin to add in hash values so that the file format of the webpack output
+    is now CombinedWebpackCode.[hash num].gs - was running into a problem where subsequent webpack bundles were
+    showing js libraries/scripts that had been deleted or updated. This as a workaround seems to force that
+    things get refreshed.
+    Also added anothet step to clasppush in the package.json so that when clasp automatically renamed the bundle from .gs to .js, after we push
+    everything, that it removes the .js version created by clasp so we don't have 2 versions if we do webpack bundles locally afterward with
+    the two being out of sync
+
+commit 145c8a6a72f2093741b78cae37274d9c6a2f3b5c
+Author: Zach Friedman <zif@umd.edu>
+Date:   Thu Apr 5 23:26:16 2018 +0000
+
+    moved a bunch of the clasp related steps to the /dist folder as that is really all we should be pushing to script.google.com (the webpack combined/global var file)
+
+commit 2b028a12b5732770712d0104242526af43ee2fbe
+Author: Zach Friedman <zif@umd.edu>
+Date:   Thu Apr 5 22:58:47 2018 +0000
+
+    Wanted to upload a baseline of what I had been testing...before I try to weed out some of the test files that arent really being used
+    and were just there to help me get Webpack and clasp configured
+
+commit dbf9298516e5581cfa0b98d753925c768d19fc2e
+Author: Zach Friedman <zif@umd.edu>
+Date:   Thu Apr 5 18:40:40 2018 -0400
+
+    Initial commit
