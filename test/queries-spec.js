@@ -533,32 +533,36 @@ describe("queries", function() {
                                   ]          
                                     )
     });      
-/*        
+        
 
-    it("should given sheet data (2d array w header) and the results of an API call on one of the AUTOSAVE rows, updates that autosave row with computedRefreshed date/timestamp", function () {
-      const awardTransAPICallReturned = JSON.parse(`{"award-amount-transactions.awardAmountTransactionId":773750,"award-amount-transactions.comments":null,"award-amount-transactions.documentNumber":"2455782","award-amount-transactions.noticeDate":1525233600000,"award-amount-transactions.awardNumber":"029053-00001","award-amount-transactions.transactionTypeCode":4,"award-amount-transactions._primaryKey":"773750"}`);
-      const retVal = queries.getPrimaryKeyOfAutoSavedRowWOldestRefreshDate("pkey","col4RefreshDt","col5AutoSaved",
+    it("should given realistic sheet data (2d array w header) and realistic results of an API call on one of the AUTOSAVE rows, updates that autosave row with computedRefreshed date/timestamp", function () {
+      const awardTransAPICallReturned = JSON.parse(`{"award-amount-transactions.awardAmountTransactionId":773750,"award-amount-transactions.comments":null,"award-amount-transactions.documentNumber":"2455782","award-amount-transactions.noticeDate":1525733600000,"award-amount-transactions.awardNumber":"029053-00001","award-amount-transactions.transactionTypeCode":4,"award-amount-transactions._primaryKey":"773750"}`);
+      const retVal = queries.overwriteRowMatchingPrimaryKeyWithApiReturnedData(awardTransAPICallReturned, "award-amount-transactions._primaryKey","award-amount-transactions.computedRefreshed",
         [
         ["award-amount-transactions.awardAmountTransactionId", "award-amount-transactions.comments", "award-amount-transactions.documentNumber","award-amount-transactions.noticeDate","award-amount-transactions.awardNumber", "award-amount-transactions.transactionTypeCode", "award-amount-transactions._primaryKey", "award-amount-transactions.computedRefreshed", "award-amount-transactions.computedIsAutoSaved"], 
-        [10101,"comment1", "123",Date.parse("2016-10-09T16:03:14.672Z"), "000123-00001", "1", "10", "", ""],
-        [773750, "", "2455782", Date.parse(1525233600000), "029053-00001","","773750", "", "AUTOSAVE"], 
-        [10102,"comment3", "223",Date.parse("2016-11-09T16:03:14.672Z"), "000223-00001", "", "20", "", "AUTOSAVE"]
+        ["10101","comment1", "123","1525233600000", "000123-00001", "1", "10", "", ""],
+        ["773750", "", "2455782", "1525234600000", "029053-00001","","773750", "", "AUTOSAVE"], 
+        ["10102","comment3", "223", "1525533600000", "000223-00001", "", "20", "", "AUTOSAVE"]
         ]);
         
       retVal.length.should.be.eql(4);
-      const computedRefreshedValueOfNewlyUpdatedColumn = retVal[3][8];
-        
-      retVal.should.be.eql(
+
+
+      //in order to do a comparison against set result data, need to blank out the col4RefreshDt that was updated with a changing refresh date
+      const retValWithRefreshDateBlankedOut = JSON.parse(JSON.stringify(retVal));
+      retValWithRefreshDateBlankedOut[2][7] = "BLANKEDOUT";
+      // note notice date is updated from API data 1525733600000 as well as transaction type code 4 - note null value from API data was replaced with "" as per normal for all queries (uses a replace step)
+      retValWithRefreshDateBlankedOut.should.be.eql(        
         [
         ["award-amount-transactions.awardAmountTransactionId", "award-amount-transactions.comments", "award-amount-transactions.documentNumber","award-amount-transactions.noticeDate","award-amount-transactions.awardNumber", "award-amount-transactions.transactionTypeCode", "award-amount-transactions._primaryKey", "award-amount-transactions.computedRefreshed", "award-amount-transactions.computedIsAutoSaved"], 
-        [10101,"comment1", "123",Date.parse("2016-10-09T16:03:14.672Z"), "000123-00001", "1", "10", "", ""],
-        [773750, "", "2455782", Date.parse(1525233600000), "029053-00001",4,"773750", Date.parse(computedRefreshedValueOfNewlyUpdatedColumn), ""], 
-        [10102,"comment3", "223",Date.parse("2016-11-09T16:03:14.672Z"), "000223-00001", "", "20", "", "AUTOSAVE"]
-        ]        
-        );
+        ["10101","comment1", "123","1525233600000", "000123-00001", "1", "10", "", ""],
+        ["773750", "", "2455782", "1525733600000", "029053-00001","4","773750", "BLANKEDOUT", "AUTOSAVE"], 
+        ["10102","comment3", "223", "1525533600000", "000223-00001", "", "20", "", "AUTOSAVE"]
+        ]
+        );       
     });  
   
-  */
+  
   });
   
   

@@ -228,6 +228,7 @@ module.exports = {
    * the data returned by the API call and 2) refresh the computedRefreshed date/time to the current date/time and
    * 
   * update the row matching the specified primary key in the passed in sheet data with the data in the recently rerun api query (js object) also passed in and marking the refresh date column with the current date/timestamp to indicate the row was updated  
+  * any null values are replaced by empty strings as with other query functions (keeping google sheet empty fields consistent)
   * @param {object} single js object returned by the API call with the key (primary key) specified, to be used to update the sheet data
   * @param {string} the name of the primary key column in the header row of the 2d array passed in
   * @param {string} the name of the last refresh date column in the header row of the 2d array passed in
@@ -239,6 +240,9 @@ module.exports = {
     //pull out the value of the primary key (object property) from the api data js object passed in - figured this was the safer way to go - we wouldnt want to update the wrong row
     const primaryKeyValueFromApiDataObj = apiReturnedJsObj[priKeyColName];   
                                                     console.log(`===*=*=*=*===primaryKeyValueFromApiDataObj: ${primaryKeyValueFromApiDataObj}`);    
+
+    //capture the current date/time (in milliseconds since Unix EPOCH) to be used as the refresh timestamp - easier than trying to do it within the alaSQL query (some reports of issues with formats in alasql)
+    const currentDateTimestamp = Date.now();
     //loop through the properties of the API data object passed in to create the SET col1 = val1, col2 = val2 portion of the SQL update statement - so that all fields in API data provided are updated - because its mapping over an array, commas are added between elements automatically by the map function
     //we may not want to turn non-string values/properies from the API returned data object (such as dates, numbers) into strings, so only putting single quotes around string properties 
     const dynamicallyGeneratedSetPortionOfSqlString = Object.entries(apiReturnedJsObj).map(([key, value]) => ` [${key}] = '${value}'`);
@@ -249,13 +253,14 @@ module.exports = {
                                                   //     else
                                                   //       return ` [${key}] = ${value}`;
                                                   //   });
-                                                  
-    
-    const currentDateTimestamp = Date.now();
                                                     console.log(`=*=*=*=*dynamicallyGeneratedSetPortionOfSqlString: ${dynamicallyGeneratedSetPortionOfSqlString}`);
-    const fullInsertStmt = `UPDATE tmptbl1 SET ${dynamicallyGeneratedSetPortionOfSqlString} , ${lastRefreshDateColName} = '${currentDateTimestamp}' WHERE [${priKeyColName}] = '${primaryKeyValueFromApiDataObj}'`;
+    const fullInsertStmt = `UPDATE tmptbl1 
+                            SET ${dynamicallyGeneratedSetPortionOfSqlString} , [${lastRefreshDateColName}] = '${currentDateTimestamp}' 
+                            WHERE [${priKeyColName}] = '${primaryKeyValueFromApiDataObj}'`;
                                                     console.log(`=*=** fullInsertStmt: ${fullInsertStmt}`);
-    return alasqlUtils.insertUpdDelFromTwoDimArr(fullInsertStmt, twoDArrWHeader);
+    const twoDArrWHeaderWUpdatedRow = alasqlUtils.insertUpdDelFromTwoDimArr(fullInsertStmt, twoDArrWHeader);
+    //all rows that contain a "null" value (presumably coming from API data that returned null for a property) should have the value replaced with empty strings (using that as a standard for updating the google sheets to keep things clean looking)
+    return arrayUtils.replaceAllOccurancesInTwoDimArr(twoDArrWHeaderWUpdatedRow, "null", "")
   }  
   
   
