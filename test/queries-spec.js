@@ -519,15 +519,19 @@ describe("queries", function() {
         ]);
         retVal[3][0].should.be.eql("CCC");
         retVal[3][2].should.be.eql("1");
-                                  // retVal.should.be.eql(
-                                  // [
-                                  // ["colA", "pkey", "colB","col4RefreshDt","col5AutoSaved"], 
-                                  // ["AA", "22", "7","", "AUTOSAVE"], 
-                                  // ["BB", "20", "8", "", "AUTOSAVE"], 
-                                  // ["CCC", "30", "1", "", "AUTOSAVE"], 
-                                  // ["DD", "11", "10", "", ""]
-                                  // ]          
-                                  //   )
+        
+        //in order to do a comparison against set result data, need to blank out the col4RefreshDt that was updated with a changing refresh date
+        const retValWithRefreshDateBlankedOut = JSON.parse(JSON.stringify(retVal));
+        retValWithRefreshDateBlankedOut[3][3] = "";
+        retValWithRefreshDateBlankedOut.should.be.eql(
+                                  [
+                                  ["colA", "pkey", "colB","col4RefreshDt","col5AutoSaved"], 
+                                  ["AA", "22", "7","", "AUTOSAVE"], 
+                                  ["BB", "20", "8", "", "AUTOSAVE"], 
+                                  ["CCC", "30", "1", "", "AUTOSAVE"], 
+                                  ["DD", "11", "10", "", ""]
+                                  ]          
+                                    )
     });      
 /*        
 
