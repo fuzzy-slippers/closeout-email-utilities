@@ -219,7 +219,46 @@ module.exports = {
     // otherwise if the 2d array passed in has no data return 0 - (figured this was better than undefined but would prevent worst case API calls against all records)       
     else 
       return 0; 
-  }
+  },
+  
+  
+  
+  /**
+   *  create query function that uses the insert/update/delete alasql function to update the row in question with 
+   * the data returned by the API call and 2) refresh the computedRefreshed date/time to the current date/time and
+   * 
+  * update the row matching the specified primary key in the passed in sheet data with the data in the recently rerun api query (js object) also passed in and marking the refresh date column with the current date/timestamp to indicate the row was updated  
+  * @param {object} single js object returned by the API call with the key (primary key) specified, to be used to update the sheet data
+  * @param {string} the name of the primary key column in the header row of the 2d array passed in
+  * @param {string} the name of the last refresh date column in the header row of the 2d array passed in
+  * @param {string[][]} a 2d array with a header row and data to run the query against (to update a row within)
+  * @return {string[][]} a 2d array with a header row matching the data passed in except the one row will have been updated based on the API data object passed in and with a refresh date updated
+  */    
+  overwriteRowMatchingPrimaryKeyWithApiReturnedData: (apiReturnedJsObj, priKeyColName, lastRefreshDateColName, twoDArrWHeader) => {
+    log.trace(`queries overwriteRowMatchingPrimaryKeyWithApiReturnedData: (${JSON.stringify(apiReturnedJsObj)}, ${priKeyColName}, ${lastRefreshDateColName}, ${JSON.stringify(twoDArrWHeader)}) called...`);
+    //pull out the value of the primary key (object property) from the api data js object passed in - figured this was the safer way to go - we wouldnt want to update the wrong row
+    const primaryKeyValueFromApiDataObj = apiReturnedJsObj[priKeyColName];   
+                                                    console.log(`===*=*=*=*===primaryKeyValueFromApiDataObj: ${primaryKeyValueFromApiDataObj}`);    
+    //loop through the properties of the API data object passed in to create the SET col1 = val1, col2 = val2 portion of the SQL update statement - so that all fields in API data provided are updated - because its mapping over an array, commas are added between elements automatically by the map function
+    //we may not want to turn non-string values/properies from the API returned data object (such as dates, numbers) into strings, so only putting single quotes around string properties 
+    const dynamicallyGeneratedSetPortionOfSqlString = Object.entries(apiReturnedJsObj).map(([key, value]) => 
+      {
+        if (typeof value === 'string')
+          return ` [${key}] = '${value}'`;
+        else
+          return ` [${key}] = ${value}`;
+      });
+    
+    const currentDateTimestamp = Date.now();
+                                                    console.log(`=*=*=*=*dynamicallyGeneratedSetPortionOfSqlString: ${dynamicallyGeneratedSetPortionOfSqlString}`);
+    const fullInsertStmt = `UPDATE tmptbl1 SET ${dynamicallyGeneratedSetPortionOfSqlString} , ${lastRefreshDateColName} = ${currentDateTimestamp} WHERE [${priKeyColName}] = ${primaryKeyValueFromApiDataObj}`;
+                                                    console.log(`=*=** fullInsertStmt: ${fullInsertStmt}`);
+    return alasqlUtils.insertUpdDelFromTwoDimArr(fullInsertStmt, twoDArrWHeader);
+  }  
+  
+  
+
+  
 
 };  
 

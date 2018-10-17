@@ -98,15 +98,15 @@ module.exports = {
         return arrRegexMatchesNonNumericWDashes[arrRegexMatchesNonNumericWDashes.length - 1];
     },    
     
-// Note: although it would logically be better to have the below functions inside the library for each validation, etc like the getAwardAmountTransactionByPrimaryKey inside missing-notice-dates
-// due to a quirk that when testing these specific api call with url functions we cant mock out the api call function if the module its in is required/imported, rather than in the module being tested - so combining them into a big module so the API call function apiGetCallKr cant be overwridden when testing any of the specific functions for each specific API url
+// // Note: although it would logically be better to have the below functions inside the library for each validation, etc like the getAwardAmountTransactionByPrimaryKey inside missing-notice-dates
+// // due to a quirk that when testing these specific api call with url functions we cant mock out the api call function if the module its in is required/imported, rather than in the module being tested - so combining them into a big module so the API call function apiGetCallKr cant be overwridden when testing any of the specific functions for each specific API url
     
-    /**
-     * make API call for single award-amount-transactions API by primary key and converts the results from JSON into a js object
-     * 
-     * @return {object} returns either a single award-amount-transaction object with noticeDate, etc or an object with an Error subobject with an errors array of strings if an error occured during the API call
-     */  
-    getAwardAmountTransactionByPrimaryKey: (primaryKey) => module.exports.apiGetCallKr("/award/api/v1/award-amount-transactions/" + primaryKey)
+//     /**
+//      * make API call for single award-amount-transactions API by primary key and converts the results from JSON into a js object
+//      * 
+//      * @return {object} returns either a single award-amount-transaction object with noticeDate, etc or an object with an Error subobject with an errors array of strings if an error occured during the API call
+//      */  
+//     getAwardAmountTransactionByPrimaryKey: (primaryKey) => module.exports.apiGetCallKr("/award/api/v1/award-amount-transactions/" + primaryKey)
     
 
 

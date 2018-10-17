@@ -87,6 +87,9 @@ module.exports = {
         log.trace(`7. add "award-amount-transactions.computedIsAutoSaved"" column `);
         const twoDArrDataWithComputedAutoSavedColumnAdded = queries.addColumnComputedAutoSave(`${endpointNameOnly}.computedIsAutoSaved`, `${endpointNameOnly}.transactionTypeCode`,  twoDArrDataWithComputedRefreshedColumnAdded);
         log.trace(`twoDArrDataWithComputedAutoSavedColumnAdded: ${JSON.stringify(twoDArrDataWithComputedAutoSavedColumnAdded)}`);        
+
+        //TODO: later need a separate function (take logic out of above) that goes through and sets/refreshes which columns have the AUTOSAVE flag (using an update alasql query - blanks, then sets...this will allow the AUTOSAVE marking logic to be decoupled from all the other steps and could potentially be updated or reused for other types of validations)
+        
         
         return twoDArrDataWithComputedAutoSavedColumnAdded;
     },
@@ -111,11 +114,20 @@ module.exports = {
         
         // 3. if there are no AUTOSAVE rows (no primary key is returned) then exit out of the function without proceeding/updating the sheet
         
-        // 4. Make API call using primary key from previous step 
+        // 4. Make API call using primary key from previous step
+        // will use:= apiGetCallKr("/award/api/v1/award-amount-transactions/" + primaryKey)
         
-        // 5. create query function that uses the insert/update/delete alasql function update the row in question with 
-        //  1) the data returned by the API call and 2) refresh the computedRefreshed date/time to the current date/time and 
-        //  3) blank out the AUTOSAVE in the couputedIsAutoSaved column  
+        // 5. make sure the API did not return an error - usually it should not since the document should exist but there could always be network errors, etc assuming that there is valid data, go on to next step
+        
+        // 5. create query function that uses the insert/update/delete alasql function to update the row in question with 
+        //  1) the data returned by the API call and 2) refresh the computedRefreshed date/time to the current date/time
+
+        
+        // 5b. (new query function/step) go through all rows and blank out the AUTOSAVE column and re-set the AUTOSAVE rows - in the couputedIsAutoSaved column if it is decided to no longer be an autosave (required transaction type is empty)
+        //TODO: need a separate function that goes through and sets/refreshes which columns have the AUTOSAVE flag (using an update alasql query - blanks, then sets...this will allow the AUTOSAVE marking logic to be decoupled from all the other steps and could potentially be updated or reused for other types of validations) - something like: functionname(string column to check, string value to check for (default would be empty string), name of the autosave column in the data, 2d array with header to update
+        
+        
+        // 6. run the filter function again to filter out null notice dates now that this row was updated (in case the updated data has a null notice date)
         
         // 6. update the google sheet tab (name specified) with the updated results
         // log.trace(`7.  update sheet with old data in the sheet + the new results/flagged records`);

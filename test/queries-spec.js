@@ -476,7 +476,87 @@ describe("queries", function() {
     });
     
   });  
+  
+        // 5. create query function that uses the insert/update/delete alasql function to update the row in question with 
+        //  1) the data returned by the API call and 2) refresh the computedRefreshed date/time to the current date/time and 
+        
+        // TODO NEXT....
+  describe("#overwriteRowMatchingPrimaryKeyWithApiReturnedData()", function() { 
+    
+    it("should given multiple rows but one matching the primary key of the API data object passed in (30), should have updated that row with ColA value matching the api data object passed in", function () {
+      const retVal = queries.overwriteRowMatchingPrimaryKeyWithApiReturnedData({"pkey":30, "colA":"CCC"},"pkey","col4RefreshDt",
+        [
+        ["colA", "pkey", "col4RefreshDt","col5AutoSaved"], 
+        ["AA", 22, "", "AUTOSAVE"], 
+        ["BB", 20, "", "AUTOSAVE"], 
+        ["CC", 30, "", "AUTOSAVE"], 
+        ["DD", 11, "", ""]
+        ]);
+        retVal[3][0].should.be.eql("CCC");
+    });  
+    
+    it("should given multiple rows but one matching the primary key of the API data object passed in (30), should have updated that row with some date/timestamp for the refresh date cell value", function () {
+      const retVal = queries.overwriteRowMatchingPrimaryKeyWithApiReturnedData({"pkey":30, "colA":"CCC"},"pkey","col4RefreshDt",
+        [
+        ["colA", "pkey", "col4RefreshDt","col5AutoSaved"], 
+        ["AA", 22, "", "AUTOSAVE"], 
+        ["BB", 20, "", "AUTOSAVE"], 
+        ["CC", 30, "", "AUTOSAVE"], 
+        ["DD", 11, "", ""]
+        ]);
+        retVal[3][2].should.not.eql("");
+        retVal[3][2].should.be.greaterThan(1539746195518); // refresh date added should be later than when this test was first set up - Date.now() of 1539746195518
+    });  
+    
+    it("should given multiple rows but one matching the primary key of the API data object passed in (30), should have updated both ColA and ColB values matching the api data object passed in", function () {
+      const retVal = queries.overwriteRowMatchingPrimaryKeyWithApiReturnedData({"pkey":30, "colA":"CCC", "colB":1},"pkey","col4RefreshDt",
+        [
+        ["colA", "pkey", "colB","col4RefreshDt","col5AutoSaved"], 
+        ["AA", 22, "7","", "AUTOSAVE"], 
+        ["BB", 20, "8", "", "AUTOSAVE"], 
+        ["CC", 30, "9", "", "AUTOSAVE"], 
+        ["DD", 11, "10", "", ""]
+        ]);
+        retVal[3][0].should.be.eql("CCC");
+        retVal[3][2].should.be.eql(1);
+                                  // retVal.should.be.eql(
+                                  // [
+                                  // ["colA", "pkey", "colB","col4RefreshDt","col5AutoSaved"], 
+                                  // ["AA", 22, "7","", "AUTOSAVE"], 
+                                  // ["BB", 20, "8", "", "AUTOSAVE"], 
+                                  // ["CCC", 30, 1, "", "AUTOSAVE"], 
+                                  // ["DD", 11, "10", "", ""]
+                                  // ]          
+                                  //  )
+    });      
+/*        
 
-
+    it("should given sheet data (2d array w header) and the results of an API call on one of the AUTOSAVE rows, updates that autosave row with computedRefreshed date/timestamp", function () {
+      const awardTransAPICallReturned = JSON.parse(`{"award-amount-transactions.awardAmountTransactionId":773750,"award-amount-transactions.comments":null,"award-amount-transactions.documentNumber":"2455782","award-amount-transactions.noticeDate":1525233600000,"award-amount-transactions.awardNumber":"029053-00001","award-amount-transactions.transactionTypeCode":4,"award-amount-transactions._primaryKey":"773750"}`);
+      const retVal = queries.getPrimaryKeyOfAutoSavedRowWOldestRefreshDate("pkey","col4RefreshDt","col5AutoSaved",
+        [
+        ["award-amount-transactions.awardAmountTransactionId", "award-amount-transactions.comments", "award-amount-transactions.documentNumber","award-amount-transactions.noticeDate","award-amount-transactions.awardNumber", "award-amount-transactions.transactionTypeCode", "award-amount-transactions._primaryKey", "award-amount-transactions.computedRefreshed", "award-amount-transactions.computedIsAutoSaved"], 
+        [10101,"comment1", "123",Date.parse("2016-10-09T16:03:14.672Z"), "000123-00001", "1", "10", "", ""],
+        [773750, "", "2455782", Date.parse(1525233600000), "029053-00001","","773750", "", "AUTOSAVE"], 
+        [10102,"comment3", "223",Date.parse("2016-11-09T16:03:14.672Z"), "000223-00001", "", "20", "", "AUTOSAVE"]
+        ]);
+        
+      retVal.length.should.be.eql(4);
+      const computedRefreshedValueOfNewlyUpdatedColumn = retVal[3][8];
+        
+      retVal.should.be.eql(
+        [
+        ["award-amount-transactions.awardAmountTransactionId", "award-amount-transactions.comments", "award-amount-transactions.documentNumber","award-amount-transactions.noticeDate","award-amount-transactions.awardNumber", "award-amount-transactions.transactionTypeCode", "award-amount-transactions._primaryKey", "award-amount-transactions.computedRefreshed", "award-amount-transactions.computedIsAutoSaved"], 
+        [10101,"comment1", "123",Date.parse("2016-10-09T16:03:14.672Z"), "000123-00001", "1", "10", "", ""],
+        [773750, "", "2455782", Date.parse(1525233600000), "029053-00001",4,"773750", Date.parse(computedRefreshedValueOfNewlyUpdatedColumn), ""], 
+        [10102,"comment3", "223",Date.parse("2016-11-09T16:03:14.672Z"), "000223-00001", "", "20", "", "AUTOSAVE"]
+        ]        
+        );
+    });  
+  
+  */
+  });
+  
+  
 });
 

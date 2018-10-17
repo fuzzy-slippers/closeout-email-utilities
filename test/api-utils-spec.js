@@ -48,6 +48,7 @@ describe("api-utils", function() {
       retObj.should.have.property("award-amount-transactions._primaryKey");
       retObj.should.have.property("award-amount-transactions.awardAmountTransactionId");
       retObj.should.have.property("award-amount-transactions.noticeDate");
+                                                                            //console.log(`=================================checking format of getApiCallKR award-amount-transactions retObj: ${JSON.stringify(retObj)}`);
     });     
     
     it("should if given a totally invalid url like /fakeApiUrl/ return an error object (no prepended column names)", function () {
