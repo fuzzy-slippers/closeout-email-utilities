@@ -487,10 +487,10 @@ describe("queries", function() {
       const retVal = queries.overwriteRowMatchingPrimaryKeyWithApiReturnedData({"pkey":30, "colA":"CCC"},"pkey","col4RefreshDt",
         [
         ["colA", "pkey", "col4RefreshDt","col5AutoSaved"], 
-        ["AA", 22, "", "AUTOSAVE"], 
-        ["BB", 20, "", "AUTOSAVE"], 
-        ["CC", 30, "", "AUTOSAVE"], 
-        ["DD", 11, "", ""]
+        ["AA", "22", "", "AUTOSAVE"], 
+        ["BB", "20", "", "AUTOSAVE"], 
+        ["CC", "30", "", "AUTOSAVE"], 
+        ["DD", "11", "", ""]
         ]);
         retVal[3][0].should.be.eql("CCC");
     });  
@@ -499,10 +499,10 @@ describe("queries", function() {
       const retVal = queries.overwriteRowMatchingPrimaryKeyWithApiReturnedData({"pkey":30, "colA":"CCC"},"pkey","col4RefreshDt",
         [
         ["colA", "pkey", "col4RefreshDt","col5AutoSaved"], 
-        ["AA", 22, "", "AUTOSAVE"], 
-        ["BB", 20, "", "AUTOSAVE"], 
-        ["CC", 30, "", "AUTOSAVE"], 
-        ["DD", 11, "", ""]
+        ["AA", "22", "", "AUTOSAVE"], 
+        ["BB", "20", "", "AUTOSAVE"], 
+        ["CC", "30", "", "AUTOSAVE"], 
+        ["DD", "11", "", ""]
         ]);
         retVal[3][2].should.not.eql("");
         retVal[3][2].should.be.greaterThan(1539746195518); // refresh date added should be later than when this test was first set up - Date.now() of 1539746195518
@@ -512,22 +512,22 @@ describe("queries", function() {
       const retVal = queries.overwriteRowMatchingPrimaryKeyWithApiReturnedData({"pkey":30, "colA":"CCC", "colB":1},"pkey","col4RefreshDt",
         [
         ["colA", "pkey", "colB","col4RefreshDt","col5AutoSaved"], 
-        ["AA", 22, "7","", "AUTOSAVE"], 
-        ["BB", 20, "8", "", "AUTOSAVE"], 
-        ["CC", 30, "9", "", "AUTOSAVE"], 
-        ["DD", 11, "10", "", ""]
+        ["AA", "22", "7","", "AUTOSAVE"], 
+        ["BB", "20", "8", "", "AUTOSAVE"], 
+        ["CC", "30", "9", "", "AUTOSAVE"], 
+        ["DD", "11", "10", "", ""]
         ]);
         retVal[3][0].should.be.eql("CCC");
-        retVal[3][2].should.be.eql(1);
+        retVal[3][2].should.be.eql("1");
                                   // retVal.should.be.eql(
                                   // [
                                   // ["colA", "pkey", "colB","col4RefreshDt","col5AutoSaved"], 
-                                  // ["AA", 22, "7","", "AUTOSAVE"], 
-                                  // ["BB", 20, "8", "", "AUTOSAVE"], 
-                                  // ["CCC", 30, 1, "", "AUTOSAVE"], 
-                                  // ["DD", 11, "10", "", ""]
+                                  // ["AA", "22", "7","", "AUTOSAVE"], 
+                                  // ["BB", "20", "8", "", "AUTOSAVE"], 
+                                  // ["CCC", "30", "1", "", "AUTOSAVE"], 
+                                  // ["DD", "11", "10", "", ""]
                                   // ]          
-                                  //  )
+                                  //   )
     });      
 /*        
 

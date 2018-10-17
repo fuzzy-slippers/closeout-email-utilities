@@ -241,17 +241,19 @@ module.exports = {
                                                     console.log(`===*=*=*=*===primaryKeyValueFromApiDataObj: ${primaryKeyValueFromApiDataObj}`);    
     //loop through the properties of the API data object passed in to create the SET col1 = val1, col2 = val2 portion of the SQL update statement - so that all fields in API data provided are updated - because its mapping over an array, commas are added between elements automatically by the map function
     //we may not want to turn non-string values/properies from the API returned data object (such as dates, numbers) into strings, so only putting single quotes around string properties 
-    const dynamicallyGeneratedSetPortionOfSqlString = Object.entries(apiReturnedJsObj).map(([key, value]) => 
-      {
-        if (typeof value === 'string')
-          return ` [${key}] = '${value}'`;
-        else
-          return ` [${key}] = ${value}`;
-      });
+    const dynamicallyGeneratedSetPortionOfSqlString = Object.entries(apiReturnedJsObj).map(([key, value]) => ` [${key}] = '${value}'`);
+                                                  // const dynamicallyGeneratedSetPortionOfSqlString = Object.entries(apiReturnedJsObj).map(([key, value]) => 
+                                                  //   {
+                                                  //     if (typeof value === 'string')
+                                                  //       return ` [${key}] = '${value}'`;
+                                                  //     else
+                                                  //       return ` [${key}] = ${value}`;
+                                                  //   });
+                                                  
     
     const currentDateTimestamp = Date.now();
                                                     console.log(`=*=*=*=*dynamicallyGeneratedSetPortionOfSqlString: ${dynamicallyGeneratedSetPortionOfSqlString}`);
-    const fullInsertStmt = `UPDATE tmptbl1 SET ${dynamicallyGeneratedSetPortionOfSqlString} , ${lastRefreshDateColName} = ${currentDateTimestamp} WHERE [${priKeyColName}] = ${primaryKeyValueFromApiDataObj}`;
+    const fullInsertStmt = `UPDATE tmptbl1 SET ${dynamicallyGeneratedSetPortionOfSqlString} , ${lastRefreshDateColName} = '${currentDateTimestamp}' WHERE [${priKeyColName}] = '${primaryKeyValueFromApiDataObj}'`;
                                                     console.log(`=*=** fullInsertStmt: ${fullInsertStmt}`);
     return alasqlUtils.insertUpdDelFromTwoDimArr(fullInsertStmt, twoDArrWHeader);
   }  
