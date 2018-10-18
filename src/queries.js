@@ -3,6 +3,7 @@
  */
 const alasqlUtils = require("./alasql-utils.js");
 const arrayUtils = require("./array-utils.js");
+const apiUtils = require("./api-utils.js");
 const log = require("../src/log-utils.js");
 
 module.exports = {
@@ -237,30 +238,28 @@ module.exports = {
   */    
   overwriteRowMatchingPrimaryKeyWithApiReturnedData: (apiReturnedJsObj, priKeyColName, lastRefreshDateColName, twoDArrWHeader) => {
     log.trace(`queries overwriteRowMatchingPrimaryKeyWithApiReturnedData: (${JSON.stringify(apiReturnedJsObj)}, ${priKeyColName}, ${lastRefreshDateColName}, ${JSON.stringify(twoDArrWHeader)}) called...`);
-    //pull out the value of the primary key (object property) from the api data js object passed in - figured this was the safer way to go - we wouldnt want to update the wrong row
-    const primaryKeyValueFromApiDataObj = apiReturnedJsObj[priKeyColName];   
-                                                    console.log(`===*=*=*=*===primaryKeyValueFromApiDataObj: ${primaryKeyValueFromApiDataObj}`);    
-
-    //capture the current date/time (in milliseconds since Unix EPOCH) to be used as the refresh timestamp - easier than trying to do it within the alaSQL query (some reports of issues with formats in alasql)
-    const currentDateTimestamp = Date.now();
-    //loop through the properties of the API data object passed in to create the SET col1 = val1, col2 = val2 portion of the SQL update statement - so that all fields in API data provided are updated - because its mapping over an array, commas are added between elements automatically by the map function
-    //we may not want to turn non-string values/properies from the API returned data object (such as dates, numbers) into strings, so only putting single quotes around string properties 
-    const dynamicallyGeneratedSetPortionOfSqlString = Object.entries(apiReturnedJsObj).map(([key, value]) => ` [${key}] = '${value}'`);
-                                                  // const dynamicallyGeneratedSetPortionOfSqlString = Object.entries(apiReturnedJsObj).map(([key, value]) => 
-                                                  //   {
-                                                  //     if (typeof value === 'string')
-                                                  //       return ` [${key}] = '${value}'`;
-                                                  //     else
-                                                  //       return ` [${key}] = ${value}`;
-                                                  //   });
-                                                    console.log(`=*=*=*=*dynamicallyGeneratedSetPortionOfSqlString: ${dynamicallyGeneratedSetPortionOfSqlString}`);
-    const fullInsertStmt = `UPDATE tmptbl1 
-                            SET ${dynamicallyGeneratedSetPortionOfSqlString} , [${lastRefreshDateColName}] = '${currentDateTimestamp}' 
-                            WHERE [${priKeyColName}] = '${primaryKeyValueFromApiDataObj}'`;
-                                                    console.log(`=*=** fullInsertStmt: ${fullInsertStmt}`);
-    const twoDArrWHeaderWUpdatedRow = alasqlUtils.insertUpdDelFromTwoDimArr(fullInsertStmt, twoDArrWHeader);
-    //all rows that contain a "null" value (presumably coming from API data that returned null for a property) should have the value replaced with empty strings (using that as a standard for updating the google sheets to keep things clean looking)
-    return arrayUtils.replaceAllOccurancesInTwoDimArr(twoDArrWHeaderWUpdatedRow, "null", "")
+    //if the api date object passed in indicates the API call generated an error (property) or the api data object is empty - return the 2d array/sheet data unchanged if no API data to update with
+    if (apiUtils.hasErrorProperty(apiReturnedJsObj) || Object.keys(apiReturnedJsObj).length === 0)
+      return twoDArrWHeader;
+    //api data looks good, return updated 2d array/sheet data
+    else {
+      //pull out the value of the primary key (object property) from the api data js object passed in - figured this was the safer way to go - we wouldnt want to update the wrong row
+      const primaryKeyValueFromApiDataObj = apiReturnedJsObj[priKeyColName];   
+                                                      //console.log(`===*=*=*=*===primaryKeyValueFromApiDataObj: ${primaryKeyValueFromApiDataObj}`);    
+      //capture the current date/time (in milliseconds since Unix EPOCH) to be used as the refresh timestamp - easier than trying to do it within the alaSQL query (some reports of issues with formats in alasql)
+      const currentDateTimestamp = Date.now();
+      //loop through the properties of the API data object passed in to create the SET col1 = val1, col2 = val2 portion of the SQL update statement - so that all fields in API data provided are updated - because its mapping over an array, commas are added between elements automatically by the map function
+      //we may not want to turn non-string values/properies from the API returned data object (such as dates, numbers) into strings, so only putting single quotes around string properties 
+      const dynamicallyGeneratedSetPortionOfSqlString = Object.entries(apiReturnedJsObj).map(([key, value]) => ` [${key}] = '${value}'`);
+                                                      //console.log(`=*=*=*=*dynamicallyGeneratedSetPortionOfSqlString: ${dynamicallyGeneratedSetPortionOfSqlString}`);
+      const fullInsertStmt = `UPDATE tmptbl1 
+                              SET ${dynamicallyGeneratedSetPortionOfSqlString} , [${lastRefreshDateColName}] = '${currentDateTimestamp}' 
+                              WHERE [${priKeyColName}] = '${primaryKeyValueFromApiDataObj}'`;
+                                                      //console.log(`=*=** fullInsertStmt: ${fullInsertStmt}`);
+      const twoDArrWHeaderWUpdatedRow = alasqlUtils.insertUpdDelFromTwoDimArr(fullInsertStmt, twoDArrWHeader);
+      //all rows that contain a "null" value (presumably coming from API data that returned null for a property) should have the value replaced with empty strings (using that as a standard for updating the google sheets to keep things clean looking)
+      return arrayUtils.replaceAllOccurancesInTwoDimArr(twoDArrWHeaderWUpdatedRow, "null", "");
+    }
   }  
   
   

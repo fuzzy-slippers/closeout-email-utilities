@@ -41,7 +41,7 @@ describe("queries", function() {
       queries.filterJustRowsWhereColIsNullOrBlank("endpoint-name.Col3", []).should.be.eql([]);
     });    
     
-    it("should given an array with a header and one data row with no null values, just returns the header row (as no rows with null values in the col specified found)", function () {
+    it("should given an array with a header and one data row with no null values, returns empty array", function () {
       queries.filterJustRowsWhereColIsNullOrBlank("endpoint-name.Col3", [["endpoint-name.Col1", "endpoint-name.Col2", "endpoint-name.Col3"], ["A","AA", "AAA"]]).should.be.eql([]);
     });    
     
@@ -532,10 +532,110 @@ describe("queries", function() {
                                   ["DD", "11", "10", "", ""]
                                   ]          
                                     )
-    });      
-        
+    });
+    
+   it("should given 2d array data but api data only contains the property key and some data columns in the 2d array/sheet data not in the API data returned, return the 2d array data unchanged", function () {
+      const retVal = queries.overwriteRowMatchingPrimaryKeyWithApiReturnedData({"pkey":30, "colB":"New ColB Value"},"pkey","col4RefreshDt",
+        [
+        ["colA", "pkey", "colB","col4RefreshDt","col5AutoSaved"], 
+        ["AA", "22", "7","", "AUTOSAVE"], 
+        ["BB", "20", "8", "", "AUTOSAVE"], 
+        ["CC", "30", "9", "", "AUTOSAVE"], 
+        ["DD", "11", "10", "", ""]
+        ]);
+        //in order to do a comparison against set result data, need to blank out the col4RefreshDt that was updated with a changing refresh date
+        const retValWithRefreshDateBlankedOut = JSON.parse(JSON.stringify(retVal));
+        retValWithRefreshDateBlankedOut[3][3] = "BLANKEDOUT";
+        retValWithRefreshDateBlankedOut.should.be.eql(
+                                  [
+                                  ["colA", "pkey", "colB","col4RefreshDt","col5AutoSaved"], 
+                                  ["AA", "22", "7","", "AUTOSAVE"], 
+                                  ["BB", "20", "8", "", "AUTOSAVE"], 
+                                  ["CC", "30", "New ColB Value", "BLANKEDOUT", "AUTOSAVE"], 
+                                  ["DD", "11", "10", "", ""]
+                                  ]          
+                                    )
+    });    
+    
+    it("should given an empty 2d array with no data but API data, return that same empty 2d array", function () {
+        queries.overwriteRowMatchingPrimaryKeyWithApiReturnedData({"pkey":30, "colA":"CCC"},"pkey","col4RefreshDt",[[]])
+        .should.eql([]);
+    });   
+    
+    it("should given an empty 1d array with no data but API data, return that same empty 1d array", function () {
+        queries.overwriteRowMatchingPrimaryKeyWithApiReturnedData({"pkey":30, "colA":"CCC"},"pkey","col4RefreshDt",[])
+        .should.eql([]);
+    });
+    
+    it("should given 2d array data but an empty API data object, return the 2d array data unchanged", function () {
+      const retVal = queries.overwriteRowMatchingPrimaryKeyWithApiReturnedData({},"pkey","col4RefreshDt",
+        [
+        ["colA", "pkey", "col4RefreshDt","col5AutoSaved"], 
+        ["AA", "22", "", "AUTOSAVE"], 
+        ["BB", "20", "", "AUTOSAVE"], 
+        ["CC", "30", "", "AUTOSAVE"], 
+        ["DD", "11", "", ""]
+        ])
+        .should.be.eql(
+        [
+        ["colA", "pkey", "col4RefreshDt","col5AutoSaved"], 
+        ["AA", "22", "", "AUTOSAVE"], 
+        ["BB", "20", "", "AUTOSAVE"], 
+        ["CC", "30", "", "AUTOSAVE"], 
+        ["DD", "11", "", ""]
+        ]          
+        );
+    });
+    
+    it("should given 2d array data but the api object returned has an error property (something went wrong with the API call), return the 2d array data unchanged", function () {
+      const retVal = queries.overwriteRowMatchingPrimaryKeyWithApiReturnedData({"Error":{"errors":["not found for key -1"]}},"pkey","col4RefreshDt",
+        [
+        ["colA", "pkey", "col4RefreshDt","col5AutoSaved"], 
+        ["AA", "22", "", "AUTOSAVE"], 
+        ["BB", "20", "", "AUTOSAVE"], 
+        ["CC", "30", "", "AUTOSAVE"], 
+        ["DD", "11", "", ""]
+        ])
+        .should.be.eql(
+        [
+        ["colA", "pkey", "col4RefreshDt","col5AutoSaved"], 
+        ["AA", "22", "", "AUTOSAVE"], 
+        ["BB", "20", "", "AUTOSAVE"], 
+        ["CC", "30", "", "AUTOSAVE"], 
+        ["DD", "11", "", ""]
+        ]          
+        );
+    });    
+    
+    it("should given 2d array data that is just the header row but passed in a API data object with data, returns back an empty array (blank sheet)", function () {
+      const retVal = queries.overwriteRowMatchingPrimaryKeyWithApiReturnedData({"pkey":30, "colA":"CCC"},"pkey","col4RefreshDt",
+        [
+        ["colA", "pkey", "col4RefreshDt","col5AutoSaved"]
+        ])
+        .should.be.eql([]);
+    });    
 
-    it("should given realistic sheet data (2d array w header) and realistic results of an API call on one of the AUTOSAVE rows, updates that autosave row with computedRefreshed date/timestamp", function () {
+    it("should given 2d array data but randome api data that does not contain a primary key property, return the 2d array data unchanged", function () {
+      const retVal = queries.overwriteRowMatchingPrimaryKeyWithApiReturnedData({"randompropertynotuseful":1},"pkey","col4RefreshDt",
+        [
+        ["colA", "pkey", "col4RefreshDt","col5AutoSaved"], 
+        ["AA", "22", "", "AUTOSAVE"], 
+        ["BB", "20", "", "AUTOSAVE"], 
+        ["CC", "30", "", "AUTOSAVE"], 
+        ["DD", "11", "", ""]
+        ])
+        .should.be.eql(
+        [
+        ["colA", "pkey", "col4RefreshDt","col5AutoSaved"], 
+        ["AA", "22", "", "AUTOSAVE"], 
+        ["BB", "20", "", "AUTOSAVE"], 
+        ["CC", "30", "", "AUTOSAVE"], 
+        ["DD", "11", "", ""]
+        ]          
+        );
+    });    
+
+    it("should given realistic sheet data (2d array w header) and realistic results of an API call on one of the AUTOSAVE rows, updates that autosave row with computedRefreshed date/timestamp, notice date and transaction type new values", function () {
       const awardTransAPICallReturned = JSON.parse(`{"award-amount-transactions.awardAmountTransactionId":773750,"award-amount-transactions.comments":null,"award-amount-transactions.documentNumber":"2455782","award-amount-transactions.noticeDate":1525733600000,"award-amount-transactions.awardNumber":"029053-00001","award-amount-transactions.transactionTypeCode":4,"award-amount-transactions._primaryKey":"773750"}`);
       const retVal = queries.overwriteRowMatchingPrimaryKeyWithApiReturnedData(awardTransAPICallReturned, "award-amount-transactions._primaryKey","award-amount-transactions.computedRefreshed",
         [
@@ -546,8 +646,7 @@ describe("queries", function() {
         ]);
         
       retVal.length.should.be.eql(4);
-
-
+      
       //in order to do a comparison against set result data, need to blank out the col4RefreshDt that was updated with a changing refresh date
       const retValWithRefreshDateBlankedOut = JSON.parse(JSON.stringify(retVal));
       retValWithRefreshDateBlankedOut[2][7] = "BLANKEDOUT";
@@ -560,7 +659,29 @@ describe("queries", function() {
         ["10102","comment3", "223", "1525533600000", "000223-00001", "", "20", "", "AUTOSAVE"]
         ]
         );       
-    });  
+    }); 
+    
+    it("should given realistic sheet data (2d array w header) but only single row and realistic results of an API call on one of the AUTOSAVE rows, updates that autosave row with computedRefreshed date/timestamp, notice date and transaction type new values", function () {
+      const awardTransAPICallReturned = JSON.parse(`{"award-amount-transactions.awardAmountTransactionId":773750,"award-amount-transactions.comments":null,"award-amount-transactions.documentNumber":"2455782","award-amount-transactions.noticeDate":1525733600000,"award-amount-transactions.awardNumber":"029053-00001","award-amount-transactions.transactionTypeCode":4,"award-amount-transactions._primaryKey":"773750"}`);
+      const retVal = queries.overwriteRowMatchingPrimaryKeyWithApiReturnedData(awardTransAPICallReturned, "award-amount-transactions._primaryKey","award-amount-transactions.computedRefreshed",
+        [
+        ["award-amount-transactions.awardAmountTransactionId", "award-amount-transactions.comments", "award-amount-transactions.documentNumber","award-amount-transactions.noticeDate","award-amount-transactions.awardNumber", "award-amount-transactions.transactionTypeCode", "award-amount-transactions._primaryKey", "award-amount-transactions.computedRefreshed", "award-amount-transactions.computedIsAutoSaved"], 
+        ["773750", "", "2455782", "1525234600000", "029053-00001","","773750", "", "AUTOSAVE"], 
+        ]);
+      
+      //in order to do a comparison against set result data, need to blank out the col4RefreshDt that was updated with a changing refresh date
+      const retValWithRefreshDateBlankedOut = JSON.parse(JSON.stringify(retVal));
+      retValWithRefreshDateBlankedOut[1][7] = "BLANKEDOUT";
+      // note notice date is updated from API data 1525733600000 as well as transaction type code 4 - note null value from API data was replaced with "" as per normal for all queries (uses a replace step)
+      retValWithRefreshDateBlankedOut.should.be.eql(        
+        [
+        ["award-amount-transactions.awardAmountTransactionId", "award-amount-transactions.comments", "award-amount-transactions.documentNumber","award-amount-transactions.noticeDate","award-amount-transactions.awardNumber", "award-amount-transactions.transactionTypeCode", "award-amount-transactions._primaryKey", "award-amount-transactions.computedRefreshed", "award-amount-transactions.computedIsAutoSaved"], 
+        ["773750", "", "2455782", "1525733600000", "029053-00001","4","773750", "BLANKEDOUT", "AUTOSAVE"], 
+        ]
+        );       
+    });    
+    
+    
   
   
   });
