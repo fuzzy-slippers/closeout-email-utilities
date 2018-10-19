@@ -87,52 +87,73 @@ module.exports = {
         log.trace(`7. add "award-amount-transactions.computedIsAutoSaved"" column `);
         const twoDArrDataWithComputedAutoSavedColumnAdded = queries.addColumnComputedAutoSave(`${endpointNameOnly}.computedIsAutoSaved`, `${endpointNameOnly}.transactionTypeCode`,  twoDArrDataWithComputedRefreshedColumnAdded);
         log.trace(`twoDArrDataWithComputedAutoSavedColumnAdded: ${JSON.stringify(twoDArrDataWithComputedAutoSavedColumnAdded)}`);        
-
-        //TODO: later need a separate function (take logic out of above) that goes through and sets/refreshes which columns have the AUTOSAVE flag (using an update alasql query - blanks, then sets...this will allow the AUTOSAVE marking logic to be decoupled from all the other steps and could potentially be updated or reused for other types of validations)
+        //TODO!!!!!!!!: later need a separate function (take logic out of above) that goes through and sets/refreshes which columns have the AUTOSAVE flag (using an update alasql query - blanks, then sets...this will allow the AUTOSAVE marking logic to be decoupled from all the other steps and could potentially be updated or reused for other types of validations)
         
         
         return twoDArrDataWithComputedAutoSavedColumnAdded;
     },
     
     
-    /**
-     * this function operates on one row at a time (so only does rows worth of API calls to check if data has changed) - look for oldest timestamp with AUTOSAVE status and does API call to see if data has changed, and updates the array and sheet with that new data
+    
+    
+    /** 
+     * separate scheduled task to refresh an AUTOSAVE row in the sheet - this function operates on one row at a time (so only does rows worth of API calls to check if data has changed) - look for oldest timestamp with AUTOSAVE status and does API call to see if data has changed, and updates the array and sheet with that new data
      * Note: final documents should not be updated/changing (but may want to design it in a way that it would be easy to update these rows too later if we find out they can)
      * 
      * @param {string} a string with the name of the tab/sheet within the google sheet the program that should be updated (updates single row that is non-final/pending, the pending row one with the max primary key value)
      */   
     updateRefreshOnePendingRowInSheet: (sheetNameToUpdate) => {
-        // log.trace(`missing-notice-dates addAdditionalFlaggedEmptyTimeAndMoneyNoticeDatesToSheet(${sheetNameToUpdate}) called...`);
+        log.trace(`missing-notice-dates updateRefreshOnePendingRowInSheet(${sheetNameToUpdate}) called...`);
+        
+        //since we are specifically looking for missing notice dates, this data comes from the award-amount-transactions API endpoint so we are hard coding that path within the function
+        const endpointUriStr = "/award/api/v1/award-amount-transactions/";
+        const endpointNameOnly = apiUtils.extractApiEndpointNameFromUri(endpointUriStr);    
+        const primaryKeyColName = `${endpointNameOnly}._primaryKey`;
+        const lastRefreshDateColName = `${endpointNameOnly}.computedRefreshed`;
+        const isAutoSavedColName = `${endpointNameOnly}.computedIsAutoSaved`;
         
         // //1. read data from sheet
-        // log.trace(`1. read data from sheet`); 
-        // const prevSheetDataTwoDimArrWHeader = googleAppsScriptWrappers.readDataInSheetWHeaderRowByName(sheetNameToUpdate); 
-        // log.trace(`prevSheetDataTwoDimArrWHeader: ${JSON.stringify(prevSheetDataTwoDimArrWHeader)}`);
+        log.trace(`1. read data from sheet <(updateRefreshOnePendingRowInSheet func)>)`); 
+        const prevSheetDataTwoDimArrWHeader = googleAppsScriptWrappers.readDataInSheetWHeaderRowByName(sheetNameToUpdate); 
+        log.trace(`prevSheetDataTwoDimArrWHeader: ${JSON.stringify(prevSheetDataTwoDimArrWHeader)} <(updateRefreshOnePendingRowInSheet func)>`);
         
-        // 2. create a 2d array copy of data by filtering only on 1) rows that are AUTOSAVES and 2) look for the row 
-        // with the oldest update timestamp value and 3) return its primary key value only 
+        // 2. create a 2d array copy of data by filtering only on 1) rows that are AUTOSAVES and 2) look for the row with the oldest update timestamp value and 3) return its primary key value only 
+        log.trace(`2. query for the primary key of the oldest AUTOSAVE row based on the refresh timestamp/dates <(updateRefreshOnePendingRowInSheet func)>)`); 
+        const primKeyAutoSaveRowToUpdate = queries.getPrimaryKeyOfAutoSavedRowWOldestRefreshDate(primaryKeyColName, lastRefreshDateColName, isAutoSavedColName, prevSheetDataTwoDimArrWHeader);
         
         // 3. if there are no AUTOSAVE rows (no primary key is returned) then exit out of the function without proceeding/updating the sheet
-        
-        // 4. Make API call using primary key from previous step
-        // will use:= apiGetCallKr("/award/api/v1/award-amount-transactions/" + primaryKey)
-        
-        // 5. make sure the API did not return an error - usually it should not since the document should exist but there could always be network errors, etc assuming that there is valid data, go on to next step
-        
-        // 5. create query function that uses the insert/update/delete alasql function to update the row in question with 
-        //  1) the data returned by the API call and 2) refresh the computedRefreshed date/time to the current date/time
-
-        
-        // 5b. (new query function/step) go through all rows and blank out the AUTOSAVE column and re-set the AUTOSAVE rows - in the couputedIsAutoSaved column if it is decided to no longer be an autosave (required transaction type is empty)
-        //TODO: need a separate function that goes through and sets/refreshes which columns have the AUTOSAVE flag (using an update alasql query - blanks, then sets...this will allow the AUTOSAVE marking logic to be decoupled from all the other steps and could potentially be updated or reused for other types of validations) - something like: functionname(string column to check, string value to check for (default would be empty string), name of the autosave column in the data, 2d array with header to update
-        
-        
-        // 6. run the filter function again to filter out null notice dates now that this row was updated (in case the updated data has a null notice date)
-        
-        // 6. update the google sheet tab (name specified) with the updated results
-        // log.trace(`7.  update sheet with old data in the sheet + the new results/flagged records`);
-        // googleAppsScriptWrappers.updNamedSheetWArrWHeaderRow(sheetNameToUpdate, combinationOfExistingDataPlusNewApiResults);
-        // log.trace(`sheetNameToUpdate: ${sheetNameToUpdate}`);
+        log.trace(`3. check if there are no AUTOSAVE rows (primKeyAutoSaveRowToUpdate is zero/false) in which case do not update anything and exit the function - primKeyAutoSaveRowToUpdate currently showing: ${primKeyAutoSaveRowToUpdate} <(updateRefreshOnePendingRowInSheet func)>)`); 
+        if (!primKeyAutoSaveRowToUpdate) 
+            return; //if primary key value returned is 0 (false) exit without doing/updating anything in the sheet - for now just returning undefined but may later want to come up with a value to return when the sheet is not updated
+        //otherwise if the primary key of one of the AUTOSAVE rows was returned, proceed with refreshing that row in the sheet/data
+        else {        
+            // 4. Make API call to get current values in KR for AUTOSAVED row using primary key from previous step
+            log.trace(`4. Make API call to get current values in KR for AUTOSAVED row using primary key from previous step <(updateRefreshOnePendingRowInSheet func)>)`); 
+            const apiResultSinglePrimKeyJsObj = apiUtils.apiGetCallKr(endpointUriStr + primKeyAutoSaveRowToUpdate);
+            
+            // 5. make sure the API did not return an error - usually it should not since the document should exist but there could always be network errors, etc assuming that there is valid data, go on to next step
+            log.trace(`5. make sure the API did not return an error <(updateRefreshOnePendingRowInSheet func)>)`);
+            if (apiUtils.hasErrorProperty(apiResultSinglePrimKeyJsObj)) 
+                return; //if inspecting the results of the API call indicate an error was thrown (such as a network error) exit without doing/updating anything in the sheet - will hopefully update the row in a future run when the APIs are functioning again
+            //otherwise if the API call succeeded in bringing back data in KR for the autosave row specified, proceed with trying to get that row updated in the sheet
+            else {
+                // 6. query function updates the chosen AUTOSAVE row with  1) the data returned by the API call and 2) refresh the computedRefreshed date/time to the current date/time
+                log.trace(`6. query function updates the chosen AUTOSAVE row with  1) the data returned by the API call and 2) refresh the computedRefreshed date/time to the current date/time <(updateRefreshOnePendingRowInSheet func)>)`);
+                const twoDArrWHeaderUpdatedChosenAutoSaveRow = queries.overwriteRowMatchingPrimaryKeyWithApiReturnedData(apiResultSinglePrimKeyJsObj, primaryKeyColName, lastRefreshDateColName, prevSheetDataTwoDimArrWHeader);
+                    
+                // 7. update the auto save columns - clear that column and recalculate which rows should be set to AUTOSAVE based on the column that indicates if its a final document (if required field is blank, has PENDING value, etc)
+                log.trace(`7. update the auto save columns - clear that column and recalculate which rows should be set to AUTOSAVE <(updateRefreshOnePendingRowInSheet func)>)`);
+                const twoDArrWHeaderAutoSaveColRefreshed = queries.refreshAllAutosaveColumnData(isAutoSavedColName, `${endpointNameOnly}.transactionTypeCode`, "", twoDArrWHeaderUpdatedChosenAutoSaveRow);
+                
+                // 8. run the filter function again to filter out null notice dates now that data was changed (in case the updated row now no longer has a null notice date)
+                log.trace(`8. run the filter function again to filter out null notice dates now that data was changed <(updateRefreshOnePendingRowInSheet func)>)`);
+                const twoDArrWHeaderRefilteredOnNullNoticeDateRowsOnly = queries.filterJustRowsWhereColIsNullOrBlank(`${endpointNameOnly}.noticeDate`, twoDArrWHeaderAutoSaveColRefreshed); 
+                
+                // 9. update the google sheet tab (name specified) with the updated results
+                log.trace(`9. update the google sheet tab (tab named "${sheetNameToUpdate}") with the updated results`);
+                googleAppsScriptWrappers.updNamedSheetWArrWHeaderRow(sheetNameToUpdate, twoDArrWHeaderRefilteredOnNullNoticeDateRowsOnly);
+            }
+        }
 
     }    
     

@@ -262,29 +262,14 @@ module.exports = {
   // */    
   refreshAllAutosaveColumnData: (autoSaveRefreshColName, determineIfAutoSaveColName, determineIfAutoSaveColValue, twoDArrWHeader) => {
     log.trace(`queries refreshAllAutosaveColumnData: (${autoSaveRefreshColName}, ${determineIfAutoSaveColName}, ${determineIfAutoSaveColValue}, ${JSON.stringify(twoDArrWHeader)}) called...`);
-    
-    //const headerRowMinusAutoSaveRefreshColName
+
+    // use the generateListOfColumnNamesInAlaSqlSelectFormat function to get the explicit list of column names [colA], [colB] rather than using SELECT *
     const headerRowFieldsInSqlSelectFormat = module.exports.generateListOfColumnNamesInAlaSqlSelectFormat(twoDArrWHeader);
-                                                        console.log(`&&&&&&&&&&&&&&& headerRowFieldsInSqlSelectFormat: ${headerRowFieldsInSqlSelectFormat}`);
-                                                        
-    // const headerRowFieldsInSqlSelectFormatLeftOfAutoSaveCol = module.exports.generateListOfColumnNamesInAlaSqlSelectFormat(twoDArrWHeader);
-    //                                                     console.log(`&&&&&&&&&&&&&&& headerRowFieldsInSqlSelectFormat: ${headerRowFieldsInSqlSelectFormat}`);                                                        
-
-    // // const caseStatementAutoSaveLogic = `'foo' AS [${autoSaveRefreshColName}]`;
-    // //                                                     console.log(`&&&&&&&&&&&&&&& caseStatementAutoSaveLogic: ${caseStatementAutoSaveLogic}`);
-
-    // // const headerRowFieldsAutoSaveReplacedByComputedField = module.exports.generateListOfColumnNamesInAlaSqlSelectFormat(twoDArrWHeader);
-    // //                                                     console.log(`&&&&&&&&&&&&&&& headerRowFieldsInSqlSelectFormat: ${headerRowFieldsInSqlSelectFormat}`);    
-    
+    //(we are taking advantage of a quirk in alasql (at least for now) that lets you query select A, B, C, 'FOO' AS B from tmptbl1 and the results woud show: {normal value of A}, 'foo' as B column values, {normal value of C} and in the original column order A B C)
     const twoDArrWHeaderWUpdatedRow = alasqlUtils.selectFromTwoDimArr(`
                                       SELECT ${headerRowFieldsInSqlSelectFormat}, CASE WHEN [${determineIfAutoSaveColName}] = '${determineIfAutoSaveColValue}' THEN 'AUTOSAVE' ELSE '' END AS [${autoSaveRefreshColName}]
                                       FROM tmptbl1
                                       `, twoDArrWHeader);
-                                      
-                                       console.log(`&&&&&&&&&&&&&&& sql query run is: 
-                                      SELECT ${headerRowFieldsInSqlSelectFormat}, CASE WHEN [${determineIfAutoSaveColName}] = '${determineIfAutoSaveColValue}' THEN 'AUTOSAVE' ELSE '' END AS [${autoSaveRefreshColName}]
-                                      FROM tmptbl1
-                                      `);    
     return twoDArrWHeaderWUpdatedRow;
   } 
   
