@@ -752,7 +752,45 @@ describe("queries", function() {
         ["", "20", "RequiredAndIsNotEmpty", ""], 
         ["", "30", "", "AUTOSAVE"]
         ]);
+    }); 
+    
+    it("should given a 2d array this time with the auto save refresh column in the middle of the header row, not on the right most side of the 2d array/sheet data (simulating additional rows added in future steps)", function () {
+      queries.refreshAllAutosaveColumnData("end-point-name.autoSaveCol","end-point-name.colRequiredShouldNotBeEmptyIndicatesAutosave","",
+        [
+        ["end-point-name.colA", "end-point-name.autoSaveCol", "end-point-name.pkey", "end-point-name.colRequiredShouldNotBeEmptyIndicatesAutosave"], 
+        ["", "AUTOSAVE", "22", ""], 
+        ["", "", "20", ""], 
+        ["", "", "30", "RequiredAndIsNotEmpty"]
+        ])
+        .should.be.eql(
+        [
+        ["end-point-name.colA", "end-point-name.autoSaveCol", "end-point-name.pkey", "end-point-name.colRequiredShouldNotBeEmptyIndicatesAutosave"], 
+        ["", "AUTOSAVE", "22", ""], 
+        ["", "AUTOSAVE", "20", ""], 
+        ["", "", "30", "RequiredAndIsNotEmpty"]
+        ]);
     });    
+    
+    it("should given a 2d array this time with the auto save refresh column on the far left side, again not on the right most side of the 2d array/sheet data (simulating additional rows added in future steps) - changed from testing for empty string to indicatespending", function () {
+      queries.refreshAllAutosaveColumnData("end-point-name.autoSaveCol","end-point-name.colShouldNotShowPending","indicatespending",
+        [
+        ["end-point-name.autoSaveCol", "end-point-name.pkey", "end-point-name.colShouldNotShowPending", "end-point-name.cola"], 
+        ["AUTOSAVE", "22", "indicatespending", "foo1"], 
+        ["","20", "", "foo2"], 
+        ["AUTOSAVE", "30", "indicatespending", "foo3"], 
+        ["", "40", "", ""], 
+        ["", "50", "indicatespending", "foo4"]
+        ])
+        .should.be.eql(
+        [
+        ["end-point-name.autoSaveCol", "end-point-name.pkey", "end-point-name.colShouldNotShowPending", "end-point-name.cola"], 
+        ["AUTOSAVE", "22", "indicatespending", "foo1"], 
+        ["","20", "", "foo2"], 
+        ["AUTOSAVE", "30", "indicatespending", "foo3"], 
+        ["", "40", "", ""], 
+        ["AUTOSAVE", "50", "indicatespending", "foo4"]
+        ]);
+    });       
     
     it("should given a 2d array with only one row that should be updated to AUTOSAVE (required field specified is empty)", function () {
       queries.refreshAllAutosaveColumnData("autoSaveCol","colRequiredShouldNotBeEmptyIndicatesAutosave","",
