@@ -477,10 +477,6 @@ describe("queries", function() {
     
   });  
   
-        // 5. create query function that uses the insert/update/delete alasql function to update the row in question with 
-        //  1) the data returned by the API call and 2) refresh the computedRefreshed date/time to the current date/time and 
-        
-        // TODO NEXT....
   describe("#overwriteRowMatchingPrimaryKeyWithApiReturnedData()", function() { 
     
     it("should given multiple rows but one matching the primary key of the API data object passed in (30), should have updated that row with ColA value matching the api data object passed in", function () {
@@ -679,12 +675,96 @@ describe("queries", function() {
         ["773750", "", "2455782", "1525733600000", "029053-00001","4","773750", "BLANKEDOUT", "AUTOSAVE"], 
         ]
         );       
-    });    
-    
-    
-  
+    });
   
   });
+  
+  describe("#refreshAllAutosaveColumnData()", function() { 
+    it("should given a 2d array with all of the rows in the indicated column to check to see if its an autosave showing that they were all autosaves, should update the specified autosave columns with all rows set as AUTOSAVE", function () {
+      queries.refreshAllAutosaveColumnData("autoSaveCol","valueToCheckForIndicatesItWasAutosave","PENDINGNOTFINAL",
+        [
+        ["valueToCheckForIndicatesItWasAutosave", "pkey", "colA","autoSaveCol"], 
+        ["PENDINGNOTFINAL", "22", "", "AUTOSAVE"], 
+        ["PENDINGNOTFINAL", "20", "", ""], 
+        ["PENDINGNOTFINAL", "30", "", "AUTOSAVE"], 
+        ["PENDINGNOTFINAL", "11", "", ""]
+        ])
+        .should.be.eql(
+        [
+        ["valueToCheckForIndicatesItWasAutosave", "pkey", "colA","autoSaveCol"], 
+        ["PENDINGNOTFINAL", "22", "", "AUTOSAVE"], 
+        ["PENDINGNOTFINAL", "20", "", "AUTOSAVE"], 
+        ["PENDINGNOTFINAL", "30", "", "AUTOSAVE"], 
+        ["PENDINGNOTFINAL", "11", "", "AUTOSAVE"]
+        ]);
+    });  
+    
+    it("should given a 2d array with none of the rows in the indicated column to check to see if its an autosave showing that they were all autosaves, should update the specified autosave columns with all rows set as AUTOSAVE", function () {
+      queries.refreshAllAutosaveColumnData("autoSaveCol","valueToCheckForIndicatesItWasAutosave","WILLNEVERMATCH",
+        [
+        ["valueToCheckForIndicatesItWasAutosave", "pkey", "colA","autoSaveCol"], 
+        ["likefinaldoc", "22", "", "AUTOSAVE"], 
+        ["likefinaldoc", "20", "", ""], 
+        ["likefinaldoc", "30", "", "AUTOSAVE"], 
+        ["likefinaldoc", "11", "", ""]
+        ])
+        .should.be.eql(
+        [
+        ["valueToCheckForIndicatesItWasAutosave", "pkey", "colA","autoSaveCol"], 
+        ["likefinaldoc", "22", "", ""], 
+        ["likefinaldoc", "20", "", ""], 
+        ["likefinaldoc", "30", "", ""], 
+        ["likefinaldoc", "11", "", ""]
+        ]);
+    }); 
+    
+    it("should given a 2d array with the indicated column to check and value to check for to indicate an AUTOSAVE being a blank/empty (required) field, mark all those rows with empty values for that colum as AUTOSAVE rows and removes AUTOSAVE from rows where that column is not empty", function () {
+      queries.refreshAllAutosaveColumnData("autoSaveCol","colRequiredShouldNotBeEmptyIndicatesAutosave","",
+        [
+        ["colA", "pkey", "colRequiredShouldNotBeEmptyIndicatesAutosave","autoSaveCol"], 
+        ["", "22", "RequiredAndIsNotEmpty", "AUTOSAVE"], 
+        ["", "20", "", ""], 
+        ["", "30", "", "AUTOSAVE"], 
+        ["", "11", "", ""]
+        ])
+        .should.be.eql(
+        [
+        ["colA", "pkey", "colRequiredShouldNotBeEmptyIndicatesAutosave","autoSaveCol"], 
+        ["", "22", "RequiredAndIsNotEmpty", ""], 
+        ["", "20", "", "AUTOSAVE"], 
+        ["", "30", "", "AUTOSAVE"], 
+        ["", "11", "", "AUTOSAVE"]
+        ]);
+    });  
+    
+    it("should given a 2d array with only one row that should be updated to AUTOSAVE (required field specified is empty)", function () {
+      queries.refreshAllAutosaveColumnData("autoSaveCol","colRequiredShouldNotBeEmptyIndicatesAutosave","",
+        [
+        ["valueToCheckForIndicatesItWasAutosave", "pkey", "colRequiredShouldNotBeEmptyIndicatesAutosave","autoSaveCol"], 
+        ["", "22", "", ""] 
+        ])
+        .should.be.eql(
+        [
+        ["valueToCheckForIndicatesItWasAutosave", "pkey", "colRequiredShouldNotBeEmptyIndicatesAutosave","autoSaveCol"], 
+        ["", "22", "", "AUTOSAVE"] 
+        ]);
+    });    
+    
+//TODO: need at least 2 more tests 1) similar test to above but with column names that have dot endpoint format and 
+// 2) reordering of column names so that autosave column is not at the end
+    
+    it("should given an empty 2d array, should return an empty 2d array (no autosave rows to add)", function () {
+      queries.refreshAllAutosaveColumnData("autoSaveCol","colToCheckIfItsAnAutosave","", [[]])
+      .should.be.eql([]);
+    });    
+
+    it("should given an empty 1d array, should return an empty 1d array (no autosave rows to add)", function () {
+      queries.refreshAllAutosaveColumnData("autoSaveCol","colToCheckIfItsAnAutosave","", [])
+      .should.be.eql([]);
+    });     
+  
+  });  
+  
   
   
 });

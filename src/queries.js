@@ -69,16 +69,6 @@ module.exports = {
     const columnNamesFirstTable = module.exports.generateListOfColumnNamesInAlaSqlSelectFormatFirstNonEmptyTwoDArr(twoDArrWHeader, secondTwoDArrWHeader, thirdTwoDArrWHeader);
     const columnNamesSecondTable = module.exports.generateListOfColumnNamesInAlaSqlSelectFormatFirstNonEmptyTwoDArr(secondTwoDArrWHeader, thirdTwoDArrWHeader);
 
-    ////attempting to simplify
-    // const columnNamesFirstTable =   (twoDArrWHeader.length > 0 ? module.exports.generateListOfColumnNamesInAlaSqlSelectFormat(twoDArrWHeader) : 
-    //                                                           secondTwoDArrWHeader.length > 0 ? module.exports.generateListOfColumnNamesInAlaSqlSelectFormat(secondTwoDArrWHeader) : 
-    //                                                           thirdTwoDArrWHeader.length > 0 ? module.exports.generateListOfColumnNamesInAlaSqlSelectFormat(thirdTwoDArrWHeader) : "*"
-    //                                 );
-    // const columnNamesSecondTable = (secondTwoDArrWHeader.length > 0 ? module.exports.generateListOfColumnNamesInAlaSqlSelectFormat(secondTwoDArrWHeader): 
-    //                                                           thirdTwoDArrWHeader.length > 0 ? module.exports.generateListOfColumnNamesInAlaSqlSelectFormat(thirdTwoDArrWHeader) : "*"
-    //                                 );
-
-
     return alasqlUtils.selectFromTwoDimArr(`
       
           SELECT ${columnNamesFirstTable}
@@ -225,10 +215,7 @@ module.exports = {
   
   
   /**
-   *  create query function that uses the insert/update/delete alasql function to update the row in question with 
-   * the data returned by the API call and 2) refresh the computedRefreshed date/time to the current date/time and
-   * 
-  * update the row matching the specified primary key in the passed in sheet data with the data in the recently rerun api query (js object) also passed in and marking the refresh date column with the current date/timestamp to indicate the row was updated  
+  * update the row matching the specified primary key with the passed in sheet data with the data in the recently rerun api query (js object) also passed in and marking the refresh date column with the current date/timestamp to indicate the row was updated  
   * any null values are replaced by empty strings as with other query functions (keeping google sheet empty fields consistent)
   * @param {object} single js object returned by the API call with the key (primary key) specified, to be used to update the sheet data
   * @param {string} the name of the primary key column in the header row of the 2d array passed in
@@ -260,10 +247,46 @@ module.exports = {
       //all rows that contain a "null" value (presumably coming from API data that returned null for a property) should have the value replaced with empty strings (using that as a standard for updating the google sheets to keep things clean looking)
       return arrayUtils.replaceAllOccurancesInTwoDimArr(twoDArrWHeaderWUpdatedRow, "null", "");
     }
-  }  
+  },  
   
+        // 5b. (new query function/step) go through all rows and blank out the AUTOSAVE column and re-set the AUTOSAVE rows - in the couputedIsAutoSaved column if it is decided to no longer be an autosave (required transaction type is empty)
+        //TODO: need a separate function that goes through and sets/refreshes which columns have the AUTOSAVE flag (using an update alasql query - blanks, then sets...this will allow the AUTOSAVE marking logic to be decoupled from all the other steps and could potentially be updated or reused for other types of validations) - something like: functionname(string column to check, string value to check for (default would be empty string), name of the autosave column in the data, 2d array with header to update
   
+  // /**
+  // * goes through all rows of the auto save refresh column, blanks out the AUTOSAVE values and recalculates whether or not each row is an AUTOSAVE row based on the column and values to look for that are passed in
+  // * @param {object} the name of the column that contains AUTOSAVE info (to update/refresh) 
+  // * @param {string} the name of the column to check when determining/calculating if a row is an AUTOSAVE or final doc
+  // * @param {string} the value to match against (i.e. "" or "PENDING", etc) used to determine/calculate if each row should be marked AUTOSAVE
+  // * @param {string[][]} a 2d array with a header row and data to run the query against (to clear/update the AUTOSAVE columns)
+  // * @return {string[][]} a 2d array with a header row matching the data passed in except the one row will have been updated based on the API data object passed in and with a refresh date updated
+  // */    
+  refreshAllAutosaveColumnData: (autoSaveRefreshColName, determineIfAutoSaveColName, determineIfAutoSaveColValue, twoDArrWHeader) => {
+    log.trace(`queries refreshAllAutosaveColumnData: (${autoSaveRefreshColName}, ${determineIfAutoSaveColName}, ${determineIfAutoSaveColValue}, ${JSON.stringify(twoDArrWHeader)}) called...`);
+    
+    //const headerRowMinusAutoSaveRefreshColName
+    const headerRowFieldsInSqlSelectFormat = module.exports.generateListOfColumnNamesInAlaSqlSelectFormat(twoDArrWHeader);
+                                                        console.log(`&&&&&&&&&&&&&&& headerRowFieldsInSqlSelectFormat: ${headerRowFieldsInSqlSelectFormat}`);
+                                                        
+    // const headerRowFieldsInSqlSelectFormatLeftOfAutoSaveCol = module.exports.generateListOfColumnNamesInAlaSqlSelectFormat(twoDArrWHeader);
+    //                                                     console.log(`&&&&&&&&&&&&&&& headerRowFieldsInSqlSelectFormat: ${headerRowFieldsInSqlSelectFormat}`);                                                        
 
+    // // const caseStatementAutoSaveLogic = `'foo' AS [${autoSaveRefreshColName}]`;
+    // //                                                     console.log(`&&&&&&&&&&&&&&& caseStatementAutoSaveLogic: ${caseStatementAutoSaveLogic}`);
+
+    // // const headerRowFieldsAutoSaveReplacedByComputedField = module.exports.generateListOfColumnNamesInAlaSqlSelectFormat(twoDArrWHeader);
+    // //                                                     console.log(`&&&&&&&&&&&&&&& headerRowFieldsInSqlSelectFormat: ${headerRowFieldsInSqlSelectFormat}`);    
+    
+    const twoDArrWHeaderWUpdatedRow = alasqlUtils.selectFromTwoDimArr(`
+                                      SELECT ${headerRowFieldsInSqlSelectFormat}, CASE WHEN [${determineIfAutoSaveColName}] = '${determineIfAutoSaveColValue}' THEN 'AUTOSAVE' ELSE '' END AS [${autoSaveRefreshColName}]
+                                      FROM tmptbl1
+                                      `, twoDArrWHeader);
+                                      
+                                       console.log(`&&&&&&&&&&&&&&& sql query run is: 
+                                      SELECT ${headerRowFieldsInSqlSelectFormat}, CASE WHEN [${determineIfAutoSaveColName}] = '${determineIfAutoSaveColValue}' THEN 'AUTOSAVE' ELSE '' END AS [${autoSaveRefreshColName}]
+                                      FROM tmptbl1
+                                      `);    
+    return twoDArrWHeaderWUpdatedRow;
+  } 
   
 
 };  
