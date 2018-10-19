@@ -737,6 +737,23 @@ describe("queries", function() {
         ]);
     });  
     
+    it("should given a 2d array but this time with the header row havign dot enpoint names, should still pick out the rows with empty values in the required field to determine which to mark AUTOSAVE", function () {
+      queries.refreshAllAutosaveColumnData("end-point-name.autoSaveCol","end-point-name.colRequiredShouldNotBeEmptyIndicatesAutosave","",
+        [
+        ["end-point-name.colA", "end-point-name.pkey", "end-point-name.colRequiredShouldNotBeEmptyIndicatesAutosave","end-point-name.autoSaveCol"], 
+        ["", "22", "", "AUTOSAVE"], 
+        ["", "20", "RequiredAndIsNotEmpty", ""], 
+        ["", "30", "", ""]
+        ])
+        .should.be.eql(
+        [
+        ["end-point-name.colA", "end-point-name.pkey", "end-point-name.colRequiredShouldNotBeEmptyIndicatesAutosave","end-point-name.autoSaveCol"], 
+        ["", "22", "", "AUTOSAVE"], 
+        ["", "20", "RequiredAndIsNotEmpty", ""], 
+        ["", "30", "", "AUTOSAVE"]
+        ]);
+    });    
+    
     it("should given a 2d array with only one row that should be updated to AUTOSAVE (required field specified is empty)", function () {
       queries.refreshAllAutosaveColumnData("autoSaveCol","colRequiredShouldNotBeEmptyIndicatesAutosave","",
         [
