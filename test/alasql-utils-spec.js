@@ -171,7 +171,35 @@ describe("alasql-utils", function() {
                               ["", "watermelon"], 
                               ["pineapple", ""], 
                               ["",""]]); 
-    });     
+    });  
+    
+    it("should if passed test 2d array and a valid update sql statement to change all the col2 values, should reflect those new col2 values", function () {
+      const origTwoDimArr = [["col1", "col2"], 
+                             ["avocado", "orange"], 
+                             ["", "watermelon"], 
+                             ["pineapple", ""]];
+      const testUpdateSqlStmt = "UPDATE tmptbl1 SET [col2] = 'col2 Updated'";
+      const retVal = alasqlUtils.insertUpdDelFromTwoDimArr(testUpdateSqlStmt, origTwoDimArr);
+      retVal.should.deepEqual([["col1", "col2"], 
+                              ["avocado", "col2 Updated"], 
+                              ["", "col2 Updated"], 
+                              ["pineapple", "col2 Updated"]
+                              ]); 
+    });      
+    
+    
+    it("should if passed test 2d array and a valid update sql statement to update the row with the highest primary key (uses subselect and casting string IDs as Numbers), should see the changes to that single row", function () {
+      const origTwoDimArr = [["end-point-name.col1", "end-point-name.col2"], 
+                             ["avocado", "7"], 
+                             ["", "20"], 
+                             ["pineapple", "9"]];
+      const testUpdateSqlStmt = "UPDATE tmptbl1 SET [end-point-name.col1] = 'highest primary key row updated' WHERE CAST([end-point-name.col2] AS NUMBER) = (SELECT MAX(CAST([end-point-name.col2] AS NUMBER)) FROM tmptbl1)";
+      const retVal = alasqlUtils.insertUpdDelFromTwoDimArr(testUpdateSqlStmt, origTwoDimArr);
+      retVal.should.deepEqual([["end-point-name.col1", "end-point-name.col2"], 
+                              ["avocado", "7"], 
+                              ["highest primary key row updated", "20"], 
+                              ["pineapple", "9"]]); 
+    });          
     
     
   });    

@@ -80,6 +80,7 @@ module.exports = {
         const tempDb = this.createNewDatabase_();
         this.addTablePopulatedByTwoDimArrWithHeaderRowData_(tempDb, "tmptbl1", twoDimArrWHeader);
         const rowsAffected = tempDb.exec(sqlSingleInsertUpdDelStmt);
+                                                                console.log(`rowsAffected: ${JSON.stringify(rowsAffected)}`);
         const resultObjArr = tempDb.exec("SELECT * FROM tmptbl1;");
                                                                 console.log(`resultObjArr: ${JSON.stringify(resultObjArr)}`);        
         const resultTwoDimArr = arrayUtils.convertOneDimObjArrToTwoDimArrWithHeaderRow(resultObjArr); 
