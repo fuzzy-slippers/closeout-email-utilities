@@ -182,7 +182,7 @@ module.exports = {
   * @param {string} the name of the last refresh date column in the header row of the 2d array passed in
   * @param {string} the name of the is auto saved column in the header row of the 2d array passed in
   * @param {string[][]} a 2d array with a header row and data to run the query against
-  * @return {string} the primary key value of the AUTOSAVE row that was refreshed the longest ago 
+  * @return {number} the primary key value of the AUTOSAVE row that was refreshed the longest ago
   */    
   getPrimaryKeyOfAutoSavedRowWOldestRefreshDate: (primKeyColName, lastRefreshDateColName, isAutoSavedColName, twoDArrWHeader) => {
     log.trace(`queries getPrimaryKeyOfAutoSavedRowWOldestRefreshDate: (${primKeyColName}, ${lastRefreshDateColName}, ${isAutoSavedColName}, ${JSON.stringify(twoDArrWHeader)}) called...`);
@@ -192,18 +192,30 @@ module.exports = {
                                               `SELECT MIN([${primKeyColName}]) AS minPriKeyIfMultWSameRefreshDt
                                               FROM tmptbl1 
                                               WHERE [${isAutoSavedColName}] = 'AUTOSAVE'
-                                              AND [${lastRefreshDateColName}] = 
+                                              AND CAST([${lastRefreshDateColName}] AS NUMBER) = 
                                                 (
-                                                  SELECT MIN([${lastRefreshDateColName}])
+                                                  SELECT MIN(CAST([${lastRefreshDateColName}] AS NUMBER))
                                                   FROM tmptbl1
                                                   WHERE [${isAutoSavedColName}] = 'AUTOSAVE' 
                                                 )
                                               `, twoDArrWHeader);
+                                              //                             console.log(`@@@@@@@@@@@@@@@@ sql query used: 
+                                              // SELECT MIN([${primKeyColName}]) AS minPriKeyIfMultWSameRefreshDt
+                                              // FROM tmptbl1 
+                                              // WHERE [${isAutoSavedColName}] = 'AUTOSAVE'
+                                              // AND CAST([${lastRefreshDateColName}] AS NUMBER) = 
+                                              //   (
+                                              //     SELECT MIN(CAST([${lastRefreshDateColName}] AS NUMBER))
+                                              //     FROM tmptbl1
+                                              //     WHERE [${isAutoSavedColName}] = 'AUTOSAVE' 
+                                              //   )
+                                              //                             `);                                                                          ;                                              
+                                                                          console.log(`@@@@@@@@@@@@@@@@ resultsTwoDimArrFromSelectQuery: ${JSON.stringify(resultsTwoDimArrFromSelectQuery)}`);
       //we dont care about the header row, just return the single "data" value in the 2nd "data" row ( minPriKeyIfMultWSameRefreshDt not column header)                                              
       const valueOfMinPriKeyIfMultWSameRefresDtReturned = resultsTwoDimArrFromSelectQuery[1][0];
       //alaSql will return null if no AUTOSAVE rows found, so only returning if not null, otherwise return 0
       if (valueOfMinPriKeyIfMultWSameRefresDtReturned)
-        return valueOfMinPriKeyIfMultWSameRefresDtReturned;
+        return Number(valueOfMinPriKeyIfMultWSameRefresDtReturned); //if the primary key is a string containing the numeric primary key, convert it to a number (allows keeping return values consistent as numbers)
       else 
         return 0;
     }
@@ -211,8 +223,6 @@ module.exports = {
     else 
       return 0; 
   },
-  
-  
   
   /**
   * update the row matching the specified primary key with the passed in sheet data with the data in the recently rerun api query (js object) also passed in and marking the refresh date column with the current date/timestamp to indicate the row was updated  
@@ -248,9 +258,6 @@ module.exports = {
       return arrayUtils.replaceAllOccurancesInTwoDimArr(twoDArrWHeaderWUpdatedRow, "null", "");
     }
   },  
-  
-        // 5b. (new query function/step) go through all rows and blank out the AUTOSAVE column and re-set the AUTOSAVE rows - in the couputedIsAutoSaved column if it is decided to no longer be an autosave (required transaction type is empty)
-        //TODO: need a separate function that goes through and sets/refreshes which columns have the AUTOSAVE flag (using an update alasql query - blanks, then sets...this will allow the AUTOSAVE marking logic to be decoupled from all the other steps and could potentially be updated or reused for other types of validations) - something like: functionname(string column to check, string value to check for (default would be empty string), name of the autosave column in the data, 2d array with header to update
   
   // /**
   // * goes through all rows of the auto save refresh column, blanks out the AUTOSAVE values and recalculates whether or not each row is an AUTOSAVE row based on the column and values to look for that are passed in

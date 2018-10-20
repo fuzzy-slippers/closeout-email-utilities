@@ -382,18 +382,15 @@ describe("queries", function() {
   });   
   
   
-        // 2. create a 2d array copy of data by filtering only on 1) rows that are AUTOSAVES and 2) look for the row 
-        // with the oldest update timestamp value and 3) return its primary key value only   
-  
    describe("#getPrimaryKeyOfAutoSavedRowWOldestRefreshDate()", function() {
     it("should given data with several rows marked as AUTOSAVE and various integers instead of real dates/timestamps, return the primary key with the oldest/most stale integer (mocked as integers for now)", function () {
-      queries.getPrimaryKeyOfAutoSavedRowWOldestRefreshDate("pkey","col4RefreshDt","col5AutoSaved",
+      queries.getPrimaryKeyOfAutoSavedRowWOldestRefreshDate("pkey","colRefreshDt","colAutoSaved",
         [
-        ["pkey", "col2", "col3","col4RefreshDt","col5AutoSaved"], 
-        [1,"AA", "",30, "AUTOSAVE"], 
-        [2, "BB", "", "", ""], 
-        [3, "CC", "", 10, "AUTOSAVE"], 
-        [4, "DD", "", "", ""]
+        ["pkey", "colB", "colC","colRefreshDt","colAutoSaved"], 
+        ["1","AA", "","30", "AUTOSAVE"], 
+        ["2", "BB", "", "77", ""], 
+        ["3", "CC", "", "10", "AUTOSAVE"], 
+        ["4", "DD", "", "777", ""]
         ])
       .should.be.eql(3);
     });  
@@ -430,6 +427,17 @@ describe("queries", function() {
         ["CC", "", 21, Date.parse("2016-10-09T16:03:14.672Z"), "AUTOSAVE"], 
         ["DD", "", 11, "", ""]
         ]).should.be.eql(20);
+    });
+    
+    it("should given multiple AUTOSAVE rows that all have an empty refresh date/timestamp, choose the one with the lowest primary key ", function () {
+      queries.getPrimaryKeyOfAutoSavedRowWOldestRefreshDate("pkey","col4RefreshDt","col5AutoSaved",
+        [
+        ["col2", "col3", "pkey", "col4RefreshDt","col5AutoSaved"], 
+        ["AA", "", "22", "", "AUTOSAVE"], 
+        ["BB", "", "20", "", "AUTOSAVE"], 
+        ["CC", "", "4", "", "AUTOSAVE"], 
+        ["DD", "", "31", "", "AUTOSAVE"]
+        ]).should.be.eql(4);
     });    
     
     
