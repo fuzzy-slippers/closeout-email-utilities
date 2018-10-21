@@ -111,7 +111,57 @@ describe("array-utils", function() {
     it(`should if passed an empty array return an empty array`, function () {
       arrayUtils.replaceAllOccurancesInTwoDimArr([]).should.be.eql([]);
     });     
-  });    
+  }); 
+  
+  describe("#convertTwoDimArrToAllStrings()", function() {
+    it("should if passed js Numbers convert them to the string equivalent", function () {
+      arrayUtils.convertTwoDimArrToAllStrings([[1,2,3],
+                                               [4,5,6]])
+      .should.be.eql(
+                                              [["1","2","3"],
+                                               ["4","5","6"]]);
+    }); 
+    
+    it("should if passed js strings already should return them unchanged", function () {
+      arrayUtils.convertTwoDimArrToAllStrings([["column 1","column 2"],
+                                               ["Apple","Orange"]])
+      .should.be.eql(
+                                              [["column 1","column 2"],
+                                               ["Apple","Orange"]]);
+    });      
+    
+    it("should if passed js nulls and undefined values, return them as empty strings", function () {
+      arrayUtils.convertTwoDimArrToAllStrings([["column 1","column 2"],
+                                               [null,undefined]])
+      .should.be.eql(
+                                              [["column 1","column 2"],
+                                               ["",""]]);
+    });
+    
+    it(`should if passed js boolean true/false values, return them as "true"/"false"`, function () {
+      arrayUtils.convertTwoDimArrToAllStrings([["column 1","column 2"],
+                                               [true,false]])
+      .should.be.eql(
+                                              [["column 1","column 2"],
+                                               ["true","false"]]);
+    });    
+    
+    it(`should if passed js boolean true/false values, return them as "true"/"false"`, function () {
+      arrayUtils.convertTwoDimArrToAllStrings([["column 1","column 2"],
+                                               [true,false]])
+      .should.be.eql(
+                                              [["column 1","column 2"],
+                                               ["true","false"]]);
+    })    
+    
+    it(`should if passed js object values (should not really happen from google sheets data, but just in case including), return the JSON.stringify versions of those individual objects`, function () {
+      arrayUtils.convertTwoDimArrToAllStrings([["column 1","column 2"],
+                                               [{a:1},{b:2,c:"CCCC"}]])
+      .should.be.eql(
+                                              [["column 1","column 2"],
+                                               [`{"a":1}`,`{"b":2,"c":"CCCC"}`]]);
+    })     
+  });   
 
   describe("#trimAllCellsInTwoDimArr()", function() {
     it("should if passed a 2d array with strings but nothing that would be changed by a trim, return the array unchanged", function () {

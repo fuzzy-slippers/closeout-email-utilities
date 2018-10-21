@@ -156,6 +156,34 @@ module.exports = {
         }  
      },     
 
+
+    /**
+     * goes through every cell in a 2d array (including the header row) and converts each cell to a JS string - null/undefined values become empty strings, js objects are turned into json
+     * 
+     * @param {object[][]} a two dimentional array to go through and convert each cell to strings
+     * @return {object[][]} the two dimentional array passed in with each cell converted to a js string
+     */     
+     convertTwoDimArrToAllStrings: (twoDimArr) => {
+        log.trace(`array-utils convertToStringAllCellsInTwoDimArr(${JSON.stringify(twoDimArr)}) called...`);
+        //if it's not a 2d array, just return the array unchanged (based on https://stackoverflow.com/questions/31104879/how-to-check-if-array-is-multidimensional-jquery)
+        if (!twoDimArr[0] || twoDimArr[0].constructor !== Array)
+          return twoDimArr;
+        else {
+          return twoDimArr.map( function(row) {
+              return row.map( function( cell ) { 
+                  //if already a string, return that cell value unchanged
+                  if (typeof cell === 'string')
+                    return cell;
+                  //check not null/undefined (cant use truthy check as 0's and false values will be converted to empty strings which we dont want)
+                  else if (cell !== null && cell !== undefined)
+                    return JSON.stringify(cell);
+                  //if is null/undefined convert to empty string (stringify default is "null"/undefined which we don't want  
+                  else
+                    return ""
+              } );
+          } );
+        }  
+     }, 
     
 
 }
