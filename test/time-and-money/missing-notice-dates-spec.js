@@ -45,7 +45,7 @@ missingNoticeDates.__set__({
           if (twoDimArrWHeader.length === 0)
           {
                                                               console.log(`RETURNING 8000 when empty array with no header passed in...pretending when no header passed it there is really a last primary key of 8000 in the google property store from last time (for example if someone clears the sheet but there were prior runs)`)
-            return 8000; // google property store returns null if no property exists yet under that name
+            return "8000"; // google property store returns null if no property exists yet under that name
           }
           else if (JSON.stringify(twoDimArrWHeader) === JSON.stringify([["award-amount-transactions.NoMockedPropertyInGooglePropertyStoreItsNull", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey"]]))
           {
@@ -55,60 +55,60 @@ missingNoticeDates.__set__({
           else if (JSON.stringify(twoDimArrWHeader) === JSON.stringify([["award-amount-transactions.UseMockedPropertyValueSevenThousand","award-amount-transactions.ColB","award-amount-transactions._primaryKey"]]))
           {
                                                               console.log(`RETURNING 7000 - from mock latestByPrimaryKey.findMaxPrimaryKeyValueInData`)
-            return 7000;
+            return "7000";
           }
           else if (JSON.stringify(twoDimArrWHeader) === JSON.stringify(
             [["award-amount-transactions.UseMockedPropertyValueSevenThousand", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey"],
-            ["existing sheet data row 1","A",10],
-            ["existing sheet data row 2","B",20]]
+            ["existing sheet data row 1","A","10"],
+            ["existing sheet data row 2","B","20"]]
             )
           )
           {
                                                               console.log(`RETURNING 7000 - from mock latestByPrimaryKey.findMaxPrimaryKeyValueInData`)
-            return 7000;
+            return "7000";
           }          
           else if (JSON.stringify(twoDimArrWHeader) === JSON.stringify(
             [["award-amount-transactions.UseMockedPropertyValueNineThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey"],
-            ["existing sheet data row 1","A",10],
-            ["existing sheet data row 2","B",20]]))
+            ["existing sheet data row 1","A","10"],
+            ["existing sheet data row 2","B","20"]]))
           {
                                                               console.log(`RETURNING 9000 - from mock latestByPrimaryKey.findMaxPrimaryKeyValueInData`)
-            return 9000;
+            return "9000";
           } 
           else if (JSON.stringify(twoDimArrWHeader) === JSON.stringify(
             [["award-amount-transactions.UseMockedPropertyValueTenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey"],
-            ["existing sheet data row 1","",10],
-            ["existing sheet data row 2","",20]]))
+            ["existing sheet data row 1","","10"],
+            ["existing sheet data row 2","","20"]]))
           {
                                                               console.log(`RETURNING 10000 - from mock latestByPrimaryKey.findMaxPrimaryKeyValueInData`)
-            return 10000;
+            return "10000";
           }     
           else if (JSON.stringify(twoDimArrWHeader) === JSON.stringify(          
           [["award-amount-transactions.UseMockedPropertyValueElevenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey"],
-          ["existing sheet data row 1","",10],
-          ["existing sheet data row 2","",20],
-          ["existing sheet data row 3","",30]]))
+          ["existing sheet data row 1","","10"],
+          ["existing sheet data row 2","","20"],
+          ["existing sheet data row 3","","30"]]))
           {
                                                               console.log(`RETURNING 11000 - from mock latestByPrimaryKey.findMaxPrimaryKeyValueInData`)
-            return 11000;
+            return "11000";
           }
           else if (JSON.stringify(twoDimArrWHeader) === JSON.stringify(             
           [["award-amount-transactions.UseMockedPropertyValueElevenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey"],
-          ["existing sheet data row 1","",10],
+          ["existing sheet data row 1","","10"],
           ["existing sheet data row 2","2026-06-26"],
-          ["existing sheet data row 3","",30]])) 
+          ["existing sheet data row 3","","30"]])) 
           {
                                                               console.log(`RETURNING 11000 also - from mock latestByPrimaryKey.findMaxPrimaryKeyValueInData`)
-            return 11000;
+            return "11000";
           }
           else if (JSON.stringify(twoDimArrWHeader) === JSON.stringify(             
           [["award-amount-transactions.UseMockedPropertyValueElevenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey", "extraSpreadsheetColumn1", "extraSpreadsheetColumn2", "extraSpreadsheetColumn3"],
-          ["existing sheet data row 1","",10,"manually entered into sheet 1", "", ""],
-          ["existing sheet data row 2","",20,"manually entered into sheet 1", "manually entered into sheet 2", ""],
-          ["existing sheet data row 3","",30,"manually entered into sheet 1", "manually entered into sheet 2", "manually entered into sheet 3"]])) 
+          ["existing sheet data row 1","","10","manually entered into sheet 1", "", ""],
+          ["existing sheet data row 2","","20","manually entered into sheet 1", "manually entered into sheet 2", ""],
+          ["existing sheet data row 3","","30","manually entered into sheet 1", "manually entered into sheet 2", "manually entered into sheet 3"]])) 
           {
                                                               console.log(`RETURNING 11000 also - from mock latestByPrimaryKey.findMaxPrimaryKeyValueInData`)
-            return 11000;
+            return "11000";
           }          
           else
             return "findMaxPrimaryKeyValueInData twoDimArrWHeader DID NOT MATCH ANYTHING";
@@ -117,23 +117,23 @@ missingNoticeDates.__set__({
         // have to mock out gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys due to calls insde to other modules such as apiUtils.hasErrorProperty and arrayUtils.lastArrElement
         gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys: (maxPreviouslyUsedPrimaryKey, relativeUriPath) => {
                                                             console.log(`************************inside rewiring of latestByPrimaryKey.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys, maxPreviouslyUsedPrimaryKey detected as: ${maxPreviouslyUsedPrimaryKey}*********************`)      
-          if (maxPreviouslyUsedPrimaryKey === 7000)                                     
-            return [["award-amount-transactions.UseMockedPropertyValueSevenThousand","award-amount-transactions.ColB","award-amount-transactions._primaryKey"],[1,2,7001]];
-          else if (maxPreviouslyUsedPrimaryKey === 8000) {
-                                                            console.log(`-=-----------============-===========RETURNING [["award-amount-transactions.NoMockedPropertyInGooglePropertyStoreItsNull", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey"]["A","B",8001]]`);
-            return [["award-amount-transactions.NoMockedPropertyInGooglePropertyStoreItsNull", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey"],["A","B",8001]];
+          if (maxPreviouslyUsedPrimaryKey === "7000")                                     
+            return [["award-amount-transactions.UseMockedPropertyValueSevenThousand","award-amount-transactions.ColB","award-amount-transactions._primaryKey"],["1","2","7001"]];
+          else if (maxPreviouslyUsedPrimaryKey === "8000") {
+                                                            console.log(`-=-----------============-===========RETURNING [["award-amount-transactions.NoMockedPropertyInGooglePropertyStoreItsNull", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey"]["A","B","8001"]]`);
+            return [["award-amount-transactions.NoMockedPropertyInGooglePropertyStoreItsNull", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey"],["A","B","8001"]];
           }
-          else if (maxPreviouslyUsedPrimaryKey === 9000) {
-                                                            console.log(`-=-=-=-=-=-=--=-=-=RETURNING [["award-amount-transactions.UseMockedPropertyValueNineThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey"],["from mocked API data row 3","",9001]]`);
-            return [["award-amount-transactions.UseMockedPropertyValueNineThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey"],["from mocked API data row 3","",9001]];
+          else if (maxPreviouslyUsedPrimaryKey === "9000") {
+                                                            console.log(`-=-=-=-=-=-=--=-=-=RETURNING [["award-amount-transactions.UseMockedPropertyValueNineThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey"],["from mocked API data row 3","","9001"]]`);
+            return [["award-amount-transactions.UseMockedPropertyValueNineThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey"],["from mocked API data row 3","","9001"]];
           }      
-          else if (maxPreviouslyUsedPrimaryKey === 10000) {
-                                                            console.log(`-=-=-=-=-=-=--=-=-=RETURNING [["award-amount-transactions.UseMockedPropertyValueTenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey"],["will be excluded since noticce date is not blank/null","2026-05-31",10001]]`);
-            return [["award-amount-transactions.UseMockedPropertyValueTenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey"],["will be excluded since noticce date is not blank/null","2026-05-31",10001]];
+          else if (maxPreviouslyUsedPrimaryKey === "10000") {
+                                                            console.log(`-=-=-=-=-=-=--=-=-=RETURNING [["award-amount-transactions.UseMockedPropertyValueTenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey"],["will be excluded since noticce date is not blank/null","2026-05-31","10001"]]`);
+            return [["award-amount-transactions.UseMockedPropertyValueTenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey"],["will be excluded since noticce date is not blank/null","2026-05-31","10001"]];
           } 
-          else if (maxPreviouslyUsedPrimaryKey === 11000) {
+          else if (maxPreviouslyUsedPrimaryKey === "11000") {
                                                             console.log(`-=-=-=-=-=-=--=-=-=RETURNING [["award-amount-transactions.UseMockedPropertyValueElevenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey"],["from mocked API data row 3","null",11001]]`);
-            return [["award-amount-transactions.UseMockedPropertyValueElevenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey"],["from mocked API data row 4",null,11001]];
+            return [["award-amount-transactions.UseMockedPropertyValueElevenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey"],["from mocked API data row 4","","11001"]];
           }          
           else (maxPreviouslyUsedPrimaryKey === null)
             return ["DID NOT MATCH ANY maxPreviouslyUsedPrimaryKey values"];
@@ -149,7 +149,7 @@ describe("missing-notice-dates", function() {
     it("should when previous array (sheet) data is empty with just a header row with a 'UseMockedPropertyValueSevenThousand' and 'award-amount-transactions._primaryKey' columns (with mocked last primary key value of 7000), should return an array with mocked data for primary key 7000", function () {
       missingNoticeDates.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates(
         [["award-amount-transactions.UseMockedPropertyValueSevenThousand", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey"]])
-        .should.be.eql([["award-amount-transactions.UseMockedPropertyValueSevenThousand","award-amount-transactions.ColB","award-amount-transactions._primaryKey","award-amount-transactions.computedRefreshed","award-amount-transactions.computedIsAutoSaved"],[1,2,7001,"",""]]);
+        .should.be.eql([["award-amount-transactions.UseMockedPropertyValueSevenThousand","award-amount-transactions.ColB","award-amount-transactions._primaryKey","award-amount-transactions.computedRefreshed","award-amount-transactions.computedIsAutoSaved"],["1","2","7001","",""]]);
     });    
 
     it("should when the previous array (sheet) data is empty with just a header row (and a mocked last primary key value is not yet in the google property store - its null), set the sheet to empty array - corresponds to the scenario that google property store is empty and the spreadsheet passed in is empty", function () {
@@ -161,79 +161,79 @@ describe("missing-notice-dates", function() {
     it("should when the previous array (sheet) data is empty with no header rows (and a mocked last primary key value IS in the google property store - 8000), set the sheet to pretend data listed for primary key 8000", function () {
       missingNoticeDates.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates(
         []).should.be.eql(
-        [["award-amount-transactions.NoMockedPropertyInGooglePropertyStoreItsNull", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey","award-amount-transactions.computedRefreshed","award-amount-transactions.computedIsAutoSaved"],["A","B",8001,"",""]]);
+        [["award-amount-transactions.NoMockedPropertyInGooglePropertyStoreItsNull", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey","award-amount-transactions.computedRefreshed","award-amount-transactions.computedIsAutoSaved"],["A","B","8001","",""]]);
     }); 
     
     
     it("should when previous array (sheet) data has two rows already (and use mocked last primary key value of 7000 to simulate an additional row of data), should return an array with the original sheet data plus the mocked data for primary key 7000", function () {
       missingNoticeDates.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates(
         [["award-amount-transactions.UseMockedPropertyValueSevenThousand", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey"],
-        ["existing sheet data row 1","A",10],
-        ["existing sheet data row 2","B",20]])
+        ["existing sheet data row 1","A","10"],
+        ["existing sheet data row 2","B","20"]])
         .should.be.eql([["award-amount-transactions.UseMockedPropertyValueSevenThousand", "award-amount-transactions.ColB", "award-amount-transactions._primaryKey","award-amount-transactions.computedRefreshed","award-amount-transactions.computedIsAutoSaved"],
-        ["existing sheet data row 1","A",10,"",""],
-        ["existing sheet data row 2","B",20,"",""],
-        [1,2,7001,"",""]]);
+        ["existing sheet data row 1","A","10","",""],
+        ["existing sheet data row 2","B","20","",""],
+        ["1","2","7001","",""]]);
     });    
     
     it("should when previous array (sheet) data (2 rows) have award-amount-transactions.noticeDate and award-amount-transactions._primaryKey columns (and use mocked last primary key value of 9000 to simulate an additional row of data with a null notice date), should return an array with the original sheet data plus the mocked data for primary key 9000", function () {
       missingNoticeDates.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates(
         [["award-amount-transactions.UseMockedPropertyValueNineThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey",],
-        ["existing sheet data row 1","A",10],
-        ["existing sheet data row 2","B",20]])
+        ["existing sheet data row 1","A","10"],
+        ["existing sheet data row 2","B","20"]])
         .should.be.eql([["award-amount-transactions.UseMockedPropertyValueNineThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey","award-amount-transactions.computedRefreshed","award-amount-transactions.computedIsAutoSaved"],
-        ["existing sheet data row 1","A",10,"",""],
-        ["existing sheet data row 2","B",20,"",""],
-        ["from mocked API data row 3","",9001,"",""]]);
+        ["existing sheet data row 1","A","10","",""],
+        ["existing sheet data row 2","B","20","",""],
+        ["from mocked API data row 3","","9001","",""]]);
     });  
 
     it("should when previous array (sheet) data (2 rows) have award-amount-transactions.noticeDate and mocked API row returned has notice date that is NOT NULL/BLANK so is excluded from results (mocked primary key 10000)", function () {
       missingNoticeDates.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates(
         [["award-amount-transactions.UseMockedPropertyValueTenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey"],
-        ["existing sheet data row 1","",10],
-        ["existing sheet data row 2","",20]])
+        ["existing sheet data row 1","","10"],
+        ["existing sheet data row 2","","20"]])
         .should.be.eql([["award-amount-transactions.UseMockedPropertyValueTenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey","award-amount-transactions.computedRefreshed","award-amount-transactions.computedIsAutoSaved"],
-        ["existing sheet data row 1","",10,"",""],
-        ["existing sheet data row 2","",20,"",""]]);
+        ["existing sheet data row 1","","10","",""],
+        ["existing sheet data row 2","","20","",""]]);
     }); 
     
     
     it("should when previous array (sheet) data (3 rows) have award-amount-transactions.noticeDate and mocked API row returned has notice date that is null it is not excluded from results (mocked primary key 11000)", function () {
       missingNoticeDates.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates(
         [["award-amount-transactions.UseMockedPropertyValueElevenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey"],
-        ["existing sheet data row 1","",10],
-        ["existing sheet data row 2","",20],
-        ["existing sheet data row 3","",30]])
+        ["existing sheet data row 1","","10"],
+        ["existing sheet data row 2","","20"],
+        ["existing sheet data row 3","","30"]])
         .should.be.eql([["award-amount-transactions.UseMockedPropertyValueElevenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey","award-amount-transactions.computedRefreshed","award-amount-transactions.computedIsAutoSaved"],
-        ["existing sheet data row 1","",10,"",""],
-        ["existing sheet data row 2","",20,"",""],
-        ["existing sheet data row 3","",30,"",""],
-        ["from mocked API data row 4","",11001,"",""]]);
+        ["existing sheet data row 1","","10","",""],
+        ["existing sheet data row 2","","20","",""],
+        ["existing sheet data row 3","","30","",""],
+        ["from mocked API data row 4","","11001","",""]]);
     });    
     
     it("should when previous array (sheet) data (3 rows) have award-amount-transactions.noticeDate entered in one row but not the others and mocked API row returned has notice date that is null it is not excluded from results (mocked primary key again using 11000) - should not include the row in the mocked spreadsheet existing data that had a notice date entered", function () {
       missingNoticeDates.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates(
         [["award-amount-transactions.UseMockedPropertyValueElevenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey"],
-        ["existing sheet data row 1","",10],
+        ["existing sheet data row 1","","10"],
         ["existing sheet data row 2","2026-06-26"],
-        ["existing sheet data row 3","",30]])
+        ["existing sheet data row 3","","30"]])
         .should.be.eql([["award-amount-transactions.UseMockedPropertyValueElevenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey","award-amount-transactions.computedRefreshed","award-amount-transactions.computedIsAutoSaved"],
-        ["existing sheet data row 1","",10,"",""],
-        ["existing sheet data row 3","",30,"",""],
-        ["from mocked API data row 4","",11001,"",""]]);
+        ["existing sheet data row 1","","10","",""],
+        ["existing sheet data row 3","","30","",""],
+        ["from mocked API data row 4","","11001","",""]]);
     });   
     
     it("should when previous array (sheet) data (3 rows) has extra columns, simulating manually entered data into the google sheet for example, the results will include both those extra columns for the spreadsheet data and the appropriate columns for the mocked API data (which would have the normal amount of columns) (mocked primary key 11000)", function () {
       missingNoticeDates.updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates(
         [["award-amount-transactions.UseMockedPropertyValueElevenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey", "extraSpreadsheetColumn1", "extraSpreadsheetColumn2", "extraSpreadsheetColumn3"],
-        ["existing sheet data row 1","",10,"manually entered into sheet 1", "", ""],
-        ["existing sheet data row 2","",20,"manually entered into sheet 1", "manually entered into sheet 2", ""],
-        ["existing sheet data row 3","",30,"manually entered into sheet 1", "manually entered into sheet 2", "manually entered into sheet 3"]])
+        ["existing sheet data row 1","","10","manually entered into sheet 1", "", ""],
+        ["existing sheet data row 2","","20","manually entered into sheet 1", "manually entered into sheet 2", ""],
+        ["existing sheet data row 3","","30","manually entered into sheet 1", "manually entered into sheet 2", "manually entered into sheet 3"]])
         .should.be.eql(        [["award-amount-transactions.UseMockedPropertyValueElevenThousand", "award-amount-transactions.noticeDate", "award-amount-transactions._primaryKey", "extraSpreadsheetColumn1", "extraSpreadsheetColumn2", "extraSpreadsheetColumn3","award-amount-transactions.computedRefreshed","award-amount-transactions.computedIsAutoSaved"],
-        ["existing sheet data row 1","",10,"manually entered into sheet 1", "", "","",""],
-        ["existing sheet data row 2","",20,"manually entered into sheet 1", "manually entered into sheet 2", "","",""],
-        ["existing sheet data row 3","",30,"manually entered into sheet 1", "manually entered into sheet 2", "manually entered into sheet 3","",""],
-        ["from mocked API data row 4","",11001,"","","","",""]]);
+        ["existing sheet data row 1","","10","manually entered into sheet 1", "", "","",""],
+        ["existing sheet data row 2","","20","manually entered into sheet 1", "manually entered into sheet 2", "","",""],
+        ["existing sheet data row 3","","30","manually entered into sheet 1", "manually entered into sheet 2", "manually entered into sheet 3","",""],
+        ["from mocked API data row 4","","11001","","","","",""]]);
     });     
      
     

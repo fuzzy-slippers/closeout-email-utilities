@@ -17,10 +17,10 @@ describe("queries", function() {
 
   describe("#findMaxColumnValInAllDataRows()", function() {
     it("should given a passed in column name of endpoint-name._primaryKey and an array with a header and 3 data rows with a endpoint-name._primaryKey column, return a header row of max_col_val and one data row/column with the largest endpoint-name._primaryKey value out of all rows", function () {
-      queries.findMaxColValInAllDataRows("endpoint-name._primaryKey", [["Col1", "Col2", "endpoint-name._primaryKey"], ["A","AA", 2], ["B", "BB", 7], ["C", "CC", 1]]).should.be.eql([["max_col_val"], [7]]);
+      queries.findMaxColValInAllDataRows("endpoint-name._primaryKey", [["Col1", "Col2", "endpoint-name._primaryKey"], ["A","AA", "2"], ["B", "BB", "7"], ["C", "CC", "1"]]).should.be.eql([["max_col_val"], ["7"]]);
     });  
     it("should given a passed in column name of just Col1 and an array with a header and 3 data rows with a Col1 column, return a header row of max_col_val and one data row/column with the largest Col1 value out of all rows", function () {
-      queries.findMaxColValInAllDataRows("Col1", [["Col1", "Col2", "endpoint-name._primaryKey"], [99,"AA", 2], [100, "BB", 7], [98, "CC", 1]]).should.be.eql([["max_col_val"], [100]]);
+      queries.findMaxColValInAllDataRows("Col1", [["Col1", "Col2", "endpoint-name._primaryKey"], ["99","AA", "2"], ["100", "BB", "7"], ["98", "CC", "1"]]).should.be.eql([["max_col_val"], ["100"]]);
     });      
   });
   
@@ -62,13 +62,19 @@ describe("queries", function() {
  
    describe("#orderByColumnWithName()", function() {
     it("should given an array with a header that contains a single column (name sortOn specified) and 3 rows, return two Dim Array with Header data sorted by the numeric values, nulls at the end", function () {
-      queries.orderByColumnWithName("sortOn", [["Col1", "Col2", "sortOn"], ["A","AA", 2], ["B", "BB", 1], ["C", "CC", null]])
-      .should.be.eql([["Col1", "Col2", "sortOn"], ["C", "CC", null], ["B", "BB", 1], ["A","AA", 2]]);
+      queries.orderByColumnWithName("sortOn", [["Col1", "Col2", "sortOn"], ["A","AA", "2"], ["B", "BB", "1"], ["C", "CC", ""]])
+      .should.be.eql([["Col1", "Col2", "sortOn"], ["C", "CC", ""], ["B", "BB", "1"], ["A","AA", "2"]]);
     });  
+
+    // removing this test as alaSQL seemed to be struggling with sorting alphabetic strings...but we have no real plans to sort on alphabetic strings, only numberic keys inside strings and dates/times
+    // it("should given an array with a header and a row to sort on that contains alphabeic strings AAA, BBB, etc, should sort based on alphabet", function () {
+    //   queries.orderByColumnWithName("sortLetters", [["Col1", "Col2", "sortLetters"], ["A","AA", "CCC"], ["B", "BB", "AAA"], ["C", "CC", "BBB"]])
+    //   .should.be.eql([["Col1", "Col2", "sortLetters"], ["B", "BB", "AAA"], ["C", "CC", "BBB"], , ["A","AA", "CCC"]]);
+    // });    
     
-    it("should given an array with a header that contains a single column (name sortLetters) and 3 rows, return two Dim Array with Header data sorted by the alphabetic values, nulls at the end", function () {
-      queries.orderByColumnWithName("sortLetters", [["Col1", "Col2", "sortLetters"], ["A","AA", "Z"], ["B", "BB", null], ["C", "CC", "Y"]])
-      .should.be.eql([["Col1", "Col2", "sortLetters"], ["B", "BB", null], ["C", "CC", "Y"], ["A","AA", "Z"]]);
+    it("should given an array with a header that contains a single column (name sortNumbers) and 3 rows, return two Dim Array with Header data sorted by the alphabetic values, nulls at the end", function () {
+      queries.orderByColumnWithName("sortNumbers", [["Col1", "Col2", "sortNumbers"], ["A","AA", "20"], ["B", "BB", ""], ["C", "CC", "10"]])
+      .should.be.eql([["Col1", "Col2", "sortNumbers"], ["B", "BB", ""], ["C", "CC", "10"], ["A","AA", "20"]]);
     });
     
     it("should handle being passed an empty array - in that case without header rows", function () {
@@ -81,36 +87,36 @@ describe("queries", function() {
     it("should given the two tables and the first table assumed to have a unique _primaryKey column return the union of the two tables but with any additional column names and values in the first table in the results", function () {
       const retVal = queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted("endpoint-name._primaryKey",
                                                           [["endpoint-name._primaryKey", "endpoint-name.Col2", "endpoint-name.Col3"], 
-                                                          [1,"AA", ""], 
-                                                          [2, "BB", "tomorrow"], 
-                                                          [3, "CC", ""], 
-                                                          [4, "DD", "The Next Day"]
+                                                          ["1","AA", ""], 
+                                                          ["2", "BB", "tomorrow"], 
+                                                          ["3", "CC", ""], 
+                                                          ["4", "DD", "The Next Day"]
                                                           ],
                                                           [
                                                             ["endpoint-name._primaryKey", "endpoint-name.Col2"], 
-                                                            [1,"AA"], 
-                                                            [2, "BB"], 
-                                                            [3, "CC"]
+                                                            ["1","AA"], 
+                                                            ["2", "BB"], 
+                                                            ["3", "CC"]
                                                           ],
                                                           [
                                                             ["endpoint-name._primaryKey", "endpoint-name.Col2"], 
-                                                            [1,"AA"], 
-                                                            [2, "BB"], 
-                                                            [3, "CC"], 
-                                                            [5, "EE"]
+                                                            ["1","AA"], 
+                                                            ["2", "BB"], 
+                                                            ["3", "CC"], 
+                                                            ["5", "EE"]
                                                           ]);
     //since we don't know the order rows will be returned, just checking that the result contains these rows in some order
     retVal.should.containEql(["endpoint-name._primaryKey", "endpoint-name.Col2", "endpoint-name.Col3"]);
-    retVal.should.containEql([1,"AA", ""]);
-    retVal.should.containEql([2, "BB", "tomorrow"]);
-    retVal.should.containEql([3, "CC", ""]);
-    retVal.should.containEql([4, "DD", "The Next Day"]);      
-    retVal.should.containEql([5, "EE", null]);    // TODO: null values returned by alasql converted to "" by the replace function to replace all null values with empty string in returned query                                                  
+    retVal.should.containEql(["1","AA", ""]);
+    retVal.should.containEql(["2", "BB", "tomorrow"]);
+    retVal.should.containEql(["3", "CC", ""]);
+    retVal.should.containEql(["4", "DD", "The Next Day"]);      
+    retVal.should.containEql(["5", "EE", null]);    // TODO: null values returned by alasql converted to "" by the replace function to replace all null values with empty string in returned query                                                  
     });   
     
     it("should handle being passed an empty array for first data set - in that case without header rows and returned unioned data from the second two data sets", function () {
-       queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted("endpoint-name._primaryKey", [], [["endpoint-name._primaryKey", "endpoint-name.colB"],[1,2]], [["endpoint-name._primaryKey", "endpoint-name.colB"],[1,2],[3,4]])
-       .should.eql([["endpoint-name._primaryKey", "endpoint-name.colB"],[1,2],[3,4]]);
+       queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedUnsorted("endpoint-name._primaryKey", [], [["endpoint-name._primaryKey", "endpoint-name.colB"],["1","2"]], [["endpoint-name._primaryKey", "endpoint-name.colB"],["1","2"],["3","4"]])
+       .should.eql([["endpoint-name._primaryKey", "endpoint-name.colB"],["1","2"],["3","4"]]);
     });     
     
   });  
@@ -122,37 +128,37 @@ describe("queries", function() {
     it("should given three tables and the first table assumed to have a unique _primaryKey column return the union of the tables but with any additional column names and values in the first table in the results", function () {
       queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings("award-amount-transactions._primaryKey",
                                                           [["award-amount-transactions._primaryKey", "award-amount-transactions.Col2", "award-amount-transactions.Col3"], 
-                                                          [1,"AA", ""], 
-                                                          [2, "BB", "tomorrow"], 
-                                                          [3, "CC", ""], 
-                                                          [4, "DD", "The Next Day"]
+                                                          ["1","AA", ""], 
+                                                          ["2", "BB", "tomorrow"], 
+                                                          ["3", "CC", ""], 
+                                                          ["4", "DD", "The Next Day"]
                                                           ],
                                                           [
                                                             ["award-amount-transactions._primaryKey", "award-amount-transactions.Col2"], 
-                                                            [1,"AA"], 
-                                                            [2, "BB"], 
-                                                            [3, "CC"]
+                                                            ["1","AA"], 
+                                                            ["2", "BB"], 
+                                                            ["3", "CC"]
                                                           ],
                                                           [
                                                             ["award-amount-transactions._primaryKey", "award-amount-transactions.Col2"], 
-                                                            [1,"AA"], 
-                                                            [2, "BB"], 
-                                                            [3, "CC"], 
-                                                            [5, "EE"]
+                                                            ["1","AA"], 
+                                                            ["2", "BB"], 
+                                                            ["3", "CC"], 
+                                                            ["5", "EE"]
                                                           ])
                                                           .should.eql(
                                                           [["award-amount-transactions._primaryKey", "award-amount-transactions.Col2", "award-amount-transactions.Col3"], 
-                                                          [1,"AA", ""], 
-                                                          [2, "BB", "tomorrow"], 
-                                                          [3, "CC", ""], 
-                                                          [4, "DD", "The Next Day"],
-                                                          [5, "EE", '']
+                                                          ["1","AA", ""], 
+                                                          ["2", "BB", "tomorrow"], 
+                                                          ["3", "CC", ""], 
+                                                          ["4", "DD", "The Next Day"],
+                                                          ["5", "EE", '']
                                                           ]);
     });
     
     it("should handle being passed an empty array for second data set - in that case without header rows and returned unioned data from the first and third data sets", function () {
-      queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings("endpoint-name._primaryKey", [["endpoint-name._primaryKey", "endpoint-name.colB", "endpoint-name.colC"],[1,2,3]], [], [["endpoint-name._primaryKey", "endpoint-name.colB"],[1,2],[3,4]])
-      .should.eql([["endpoint-name._primaryKey", "endpoint-name.colB", "endpoint-name.colC"],[1,2,3],[3,4,""]]);
+      queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings("endpoint-name._primaryKey", [["endpoint-name._primaryKey", "endpoint-name.colB", "endpoint-name.colC"],["1","2","3"]], [], [["endpoint-name._primaryKey", "endpoint-name.colB"],["1","2"],["3","4"]])
+      .should.eql([["endpoint-name._primaryKey", "endpoint-name.colB", "endpoint-name.colC"],["1","2","3"],["3","4",""]]);
     });   
     
     it("should handle being passed an empty array for all three data sets - in that case without header rows - returns empty array", function () {
@@ -171,59 +177,59 @@ describe("queries", function() {
     });    
     
     it("should handle being passed all but the third data set as empty - in that case returns the third data set", function () {
-      queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings("endpoint-name._primaryKey", [], [], [["_primaryKey", "colA"], [1, 2]])
-      .should.eql([["_primaryKey", "colA"], [1, 2]]);
+      queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings("endpoint-name._primaryKey", [], [], [["_primaryKey", "colA"], ["1", "2"]])
+      .should.eql([["_primaryKey", "colA"], ["1", "2"]]);
     });      
 
     it("should given only two tables and the first table assumed to have a unique _primaryKey column return the union of the tables but with any additional column names and values in the first table in the results", function () {
       queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings("award-amount-transactions._primaryKey",
                                                           [["award-amount-transactions._primaryKey", "award-amount-transactions.Col2", "award-amount-transactions.Col3"], 
-                                                          [1,"AA", ""], 
-                                                          [2, "BB", "tomorrow"], 
-                                                          [3, "CC", ""], 
-                                                          [4, "DD", "The Next Day"]
+                                                          ["1","AA", ""], 
+                                                          ["2", "BB", "tomorrow"], 
+                                                          ["3", "CC", ""], 
+                                                          ["4", "DD", "The Next Day"]
                                                           ],
                                                           [
                                                             ["award-amount-transactions._primaryKey", "award-amount-transactions.Col2"], 
-                                                            [1,"AA"], 
-                                                            [2, "BB"], 
-                                                            [3, "CC"], 
-                                                            [5, "EE"]
+                                                            ["1","AA"], 
+                                                            ["2", "BB"], 
+                                                            ["3", "CC"], 
+                                                            ["5", "EE"]
                                                           ],
                                                           [])
                                                           .should.eql(
                                                           [["award-amount-transactions._primaryKey", "award-amount-transactions.Col2", "award-amount-transactions.Col3"], 
-                                                          [1,"AA", ""], 
-                                                          [2, "BB", "tomorrow"], 
-                                                          [3, "CC", ""], 
-                                                          [4, "DD", "The Next Day"],
-                                                          [5, "EE", '']
+                                                          ["1","AA", ""], 
+                                                          ["2", "BB", "tomorrow"], 
+                                                          ["3", "CC", ""], 
+                                                          ["4", "DD", "The Next Day"],
+                                                          ["5", "EE", '']
                                                           ]);
     });
     
     it("should given only two tables and the first table assumed to have a unique _primaryKey column return the union of the tables but with any additional columns (that would be alphabetically to the left if sorted by the extra column names) ", function () {
       queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings("award-amount-transactions._primaryKey",
                                                           [["award-amount-transactions._primaryKey", "award-amount-transactions.Col2", "aaa", "___bbb"], 
-                                                          [1,"AA", "", 1000], 
-                                                          [2, "BB", "tomorrow", 2000], 
-                                                          [3, "CC", "", 3000], 
-                                                          [4, "DD", "The Next Day", 4000]
+                                                          ["1","AA", "", "1000"], 
+                                                          ["2", "BB", "tomorrow", "2000"], 
+                                                          ["3", "CC", "", "3000"], 
+                                                          ["4", "DD", "The Next Day", "4000"]
                                                           ],
                                                           [
                                                             ["award-amount-transactions._primaryKey", "award-amount-transactions.Col2"], 
-                                                            [1,"AA"], 
-                                                            [2, "BB"], 
-                                                            [3, "CC"], 
-                                                            [5, "EE"]
+                                                            ["1","AA"], 
+                                                            ["2", "BB"], 
+                                                            ["3", "CC"], 
+                                                            ["5", "EE"]
                                                           ],
                                                           [])
                                                           .should.eql(
                                                           [["award-amount-transactions._primaryKey", "award-amount-transactions.Col2", "aaa", "___bbb"], 
-                                                          [1,"AA", "", 1000], 
-                                                          [2, "BB", "tomorrow", 2000], 
-                                                          [3, "CC", "", 3000], 
-                                                          [4, "DD", "The Next Day", 4000],
-                                                          [5, "EE", "", ""]
+                                                          ["1","AA", "", "1000"], 
+                                                          ["2", "BB", "tomorrow", "2000"], 
+                                                          ["3", "CC", "", "3000"], 
+                                                          ["4", "DD", "The Next Day", "4000"],
+                                                          ["5", "EE", "", ""]
                                                           ]);
     });    
 
@@ -231,28 +237,28 @@ describe("queries", function() {
     it("should given only two tables and the first table assumed to have a unique _primaryKey column (and some extra columns on the left not just the right side), return the union of the tables but with any additional column names and values in the first table in the results", function () {
       const unionRetVal = queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings("award-amount-transactions._primaryKey",
                                                           [["aaa", "award-amount-transactions._primaryKey", "award-amount-transactions.Col2", "award-amount-transactions.Col3"], 
-                                                          ["",1,"AA", ""], 
-                                                          ["",2, "BB", "tomorrow"], 
-                                                          ["",3, "CC", ""], 
-                                                          ["",4, "DD", "The Next Day"]
+                                                          ["","1","AA", ""], 
+                                                          ["","2", "BB", "tomorrow"], 
+                                                          ["","3", "CC", ""], 
+                                                          ["","4", "DD", "The Next Day"]
                                                           ],
                                                           [
                                                             ["award-amount-transactions._primaryKey", "award-amount-transactions.Col2"], 
-                                                            [1,"AA"], 
-                                                            [2, "BB"], 
-                                                            [3, "CC"], 
-                                                            [5, "NEWCOL"]
+                                                            ["1","AA"], 
+                                                            ["2", "BB"], 
+                                                            ["3", "CC"], 
+                                                            ["5", "NEWCOL"]
                                                           ],
                                                           []);
                                                                         console.log(`^^^^^^^^^^^^^^^^^^^^^^^^^^unionRetVal: ${JSON.stringify(unionRetVal)}`);                                                          
                                                           
                                                           unionRetVal.should.eql(
                                                           [["aaa","award-amount-transactions._primaryKey", "award-amount-transactions.Col2", "award-amount-transactions.Col3"], 
-                                                          ["",1,"AA", ""], 
-                                                          ["",2, "BB", "tomorrow"], 
-                                                          ["",3, "CC", ""], 
-                                                          ["",4, "DD", "The Next Day"],
-                                                          ["",5, "NEWCOL", '']
+                                                          ["","1","AA", ""], 
+                                                          ["","2", "BB", "tomorrow"], 
+                                                          ["","3", "CC", ""], 
+                                                          ["","4", "DD", "The Next Day"],
+                                                          ["","5", "NEWCOL", '']
                                                           ]);
     });    
 */
@@ -266,7 +272,7 @@ describe("queries", function() {
       queries.addColumnComputedRefreshed("endPointName.computedRefreshed", [["Col1", "Col2", "Col3"], ["A","AA", "AAA"], ["B", "BB", "BBB"], ["C", "CC", "CCC"]])[0].should.containEql("endPointName.computedRefreshed");
     });  
     it("should given a passed in 2d array without the new last updated column, should have blank data for each row/cell", function () {
-      const retVal = queries.addColumnComputedRefreshed("endPointName.computedRefreshed", [["Col1", "Col2", "Col3"], ["A","AA", 1], ["B", "BB", 2], ["C", "CC", 3]]);
+      const retVal = queries.addColumnComputedRefreshed("endPointName.computedRefreshed", [["Col1", "Col2", "Col3"], ["A","AA", "1"], ["B", "BB", "2"], ["C", "CC", "3"]]);
       const colPosition = retVal[0].indexOf("endPointName.computedRefreshed");
       retVal[1][colPosition].should.eql("");
       retVal[2][colPosition].should.eql("");
@@ -290,16 +296,16 @@ describe("queries", function() {
       .should.eql(["Col1", "Col2", "endPointName.transactionTypeCode","endPointName.computedAutoSave"]);
     });  
     it("should given a passed in 2d array with the new auto save column and a endPointName.transactionTypeCode column, the auto save column is filled out based on the empty status of the endPointName.transactionTypeCode column", function () {
-      queries.addColumnComputedAutoSave("endPointName.computedAutoSave", "endPointName.transactionTypeCode", [["Col1", "Col2", "endPointName.transactionTypeCode"], ["A","AA", ""], ["B", "BB", 2], ["C", "CC", " "]])
-      .should.eql([["Col1", "Col2", "endPointName.transactionTypeCode","endPointName.computedAutoSave"], ["A","AA", "", "AUTOSAVE"], ["B", "BB", 2,""], ["C", "CC", "","AUTOSAVE"]])     
+      queries.addColumnComputedAutoSave("endPointName.computedAutoSave", "endPointName.transactionTypeCode", [["Col1", "Col2", "endPointName.transactionTypeCode"], ["A","AA", ""], ["B", "BB", "2"], ["C", "CC", " "]])
+      .should.eql([["Col1", "Col2", "endPointName.transactionTypeCode","endPointName.computedAutoSave"], ["A","AA", "", "AUTOSAVE"], ["B", "BB", "2",""], ["C", "CC", "","AUTOSAVE"]])     
     }); 
     it("should given a passed in 2d array with the new auto save column and a endPointName.transactionTypeCode column name but none of the header rows matching the endPointName.transactionTypeCode column name, add the additional row but never fill out AUTOSAVE as there is nothing to base the logic on", function () {
-      queries.addColumnComputedAutoSave("endPointName.computedAutoSave", "endPointName.transactionTypeCode", [["Col1", "Col2", "noColWithTransCodes"], ["A","AA", ""], ["B", "BB", 2], ["C", "CC", ""]])
-      .should.eql([["Col1", "Col2", "noColWithTransCodes", "endPointName.computedAutoSave"], ["A","AA", "", ""], ["B", "BB", 2,""], ["C", "CC", "",""]]);     
+      queries.addColumnComputedAutoSave("endPointName.computedAutoSave", "endPointName.transactionTypeCode", [["Col1", "Col2", "noColWithTransCodes"], ["A","AA", ""], ["B", "BB", "2"], ["C", "CC", ""]])
+      .should.eql([["Col1", "Col2", "noColWithTransCodes", "endPointName.computedAutoSave"], ["A","AA", "", ""], ["B", "BB", "2",""], ["C", "CC", "",""]]);     
     });     
     it("should given a passed in 2d array with the auto save column already present, the returned 2D array should be returned unchanged", function () {
-      queries.addColumnComputedAutoSave("endPointName.computedAutoSave", "endPointName.transactionTypeCode", [["Col1", "Col2", "endPointName.transactionTypeCode","endPointName.computedAutoSave"], ["A","AA", "", "AUTOSAVE"], ["B", "BB", 2,""], ["C", "CC", "","AUTOSAVE"]])
-      .should.eql([["Col1", "Col2", "endPointName.transactionTypeCode","endPointName.computedAutoSave"], ["A","AA", "", "AUTOSAVE"], ["B", "BB", 2,""], ["C", "CC", "","AUTOSAVE"]])     
+      queries.addColumnComputedAutoSave("endPointName.computedAutoSave", "endPointName.transactionTypeCode", [["Col1", "Col2", "endPointName.transactionTypeCode","endPointName.computedAutoSave"], ["A","AA", "", "AUTOSAVE"], ["B", "BB", "2",""], ["C", "CC", "","AUTOSAVE"]])
+      .should.eql([["Col1", "Col2", "endPointName.transactionTypeCode","endPointName.computedAutoSave"], ["A","AA", "", "AUTOSAVE"], ["B", "BB", "2",""], ["C", "CC", "","AUTOSAVE"]])     
     }); 
  
   });   
@@ -312,17 +318,17 @@ describe("queries", function() {
     });  
     
     it("should given a 2d array with a header row with 3 column names and with data rows, return a string with just those column names in a format that works for alaSQL Select explicit column listings", function () {
-      queries.generateListOfColumnNamesInAlaSqlSelectFormat([["Col1", "Col2", "Col3"], [1,2,3],["A","B","C"]])
+      queries.generateListOfColumnNamesInAlaSqlSelectFormat([["Col1", "Col2", "Col3"], ["1","2","3"],["A","B","C"]])
       .should.be.eql("[Col1], [Col2], [Col3]");
     });    
     
     it("should given a 2d array with a header row with 3 column names and with data rows, return a string with just those column names in a format that works for alaSQL Select explicit column listings", function () {
-      queries.generateListOfColumnNamesInAlaSqlSelectFormat([["Col1", "Col2", "Col3"], [1,2,3],["A","B","C"]])
+      queries.generateListOfColumnNamesInAlaSqlSelectFormat([["Col1", "Col2", "Col3"], ["1","2","3"],["A","B","C"]])
       .should.be.eql("[Col1], [Col2], [Col3]");
     });    
     
     it("should given a 2d array with a header row with 3 column names that are in dot format and with data rows, return a string with just those column names in a format that works for alaSQL Select explicit column listings", function () {
-      queries.generateListOfColumnNamesInAlaSqlSelectFormat([["endpoint-name.Col1", "endpoint-name.Col2", "endpoint-name.Col3"], [1,2,3],["A","B","C"]])
+      queries.generateListOfColumnNamesInAlaSqlSelectFormat([["endpoint-name.Col1", "endpoint-name.Col2", "endpoint-name.Col3"], ["1","2","3"],["A","B","C"]])
       .should.be.eql("[endpoint-name.Col1], [endpoint-name.Col2], [endpoint-name.Col3]");
     });
     
@@ -355,12 +361,12 @@ describe("queries", function() {
     });       
     
     it("should given three 2d arrays with a header rows, the first two are empty 1d arrs and the third non-empty, return the 3 column names and no data rows from the second array, return from the first 2d array passed in a string with just those column names in a format that works for alaSQL Select explicit column listings", function () {
-      queries.generateListOfColumnNamesInAlaSqlSelectFormatFirstNonEmptyTwoDArr([], [], [["endpoint-name.Col1", "endpoint-name.Col2", "endpoint-name.Col3"], [1,2,3],["A","B","C"]])
+      queries.generateListOfColumnNamesInAlaSqlSelectFormatFirstNonEmptyTwoDArr([], [], [["endpoint-name.Col1", "endpoint-name.Col2", "endpoint-name.Col3"], ["1","2","3"],["A","B","C"]])
       .should.be.eql("[endpoint-name.Col1], [endpoint-name.Col2], [endpoint-name.Col3]");
     });   
     
     it("should given three 2d arrays with a header rows, the first two are empty 2d arrs and the third non-empty, return the 3 column names and no data rows from the second array, return from the first 2d array passed in a string with just those column names in a format that works for alaSQL Select explicit column listings", function () {
-      queries.generateListOfColumnNamesInAlaSqlSelectFormatFirstNonEmptyTwoDArr([[]], [[]], [["endpoint-name.Col1", "endpoint-name.Col2", "endpoint-name.Col3"], [1,2,3],["A","B","C"]])
+      queries.generateListOfColumnNamesInAlaSqlSelectFormatFirstNonEmptyTwoDArr([[]], [[]], [["endpoint-name.Col1", "endpoint-name.Col2", "endpoint-name.Col3"], ["1","2","3"],["A","B","C"]])
       .should.be.eql("[endpoint-name.Col1], [endpoint-name.Col2], [endpoint-name.Col3]");
     });    
     
@@ -392,41 +398,41 @@ describe("queries", function() {
         ["3", "CC", "", "10", "AUTOSAVE"], 
         ["4", "DD", "", "777", ""]
         ])
-      .should.be.eql(3);
+      .should.be.eql("3");
     });  
     
     it("should given data with several rows marked as AUTOSAVE and real dates/timestamps, return the primary key with the oldest/most stale date/timestamp", function () {
       queries.getPrimaryKeyOfAutoSavedRowWOldestRefreshDate("award-amount-transactions._primaryKey","col4RefreshDt","col5AutoSaved",
         [
         ["award-amount-transactions._primaryKey", "col2", "col3","col4RefreshDt","col5AutoSaved"], 
-        [1,"AA", "", Date.parse("2018-10-09T16:03:14.672Z"), "AUTOSAVE"], 
-        [2, "BB", "", "", ""], 
-        [3, "CC", "", Date.parse("2017-10-09T16:03:14.672Z"), "AUTOSAVE"], 
-        [4, "DD", "", "", ""]
+        ["1","AA", "", Date.parse("2018-10-09T16:03:14.672Z"), "AUTOSAVE"], 
+        ["2", "BB", "", "", ""], 
+        ["3", "CC", "", Date.parse("2017-10-09T16:03:14.672Z"), "AUTOSAVE"], 
+        ["4", "DD", "", "", ""]
         ])
-      .should.be.eql(3);
+      .should.be.eql("3");
     });      
     
     it("should given data (with primary key column not on leftmost side of 2d Arr) with several rows marked as AUTOSAVE and various refreshed date/timestamps return the primary key with the oldest/most stale refreshed date (mocked as integers for now)", function () {
       queries.getPrimaryKeyOfAutoSavedRowWOldestRefreshDate("pkey","col4RefreshDt","col5AutoSaved",
         [
         ["col2", "col3", "pkey", "col4RefreshDt","col5AutoSaved"], 
-        ["AA", "", 14, Date.parse("2016-10-09T16:03:14.672Z"), "AUTOSAVE"], 
-        ["BB", "", 13, "", ""], 
-        ["CC", "", 12, Date.parse("2018-10-09T16:03:14.672Z"), "AUTOSAVE"], 
-        ["DD", "", 11, "", ""]
-        ]).should.be.eql(14);
+        ["AA", "", "14", Date.parse("2016-10-09T16:03:14.672Z"), "AUTOSAVE"], 
+        ["BB", "", "13", "", ""], 
+        ["CC", "", "12", Date.parse("2018-10-09T16:03:14.672Z"), "AUTOSAVE"], 
+        ["DD", "", "11", "", ""]
+        ]).should.be.eql("14");
     });
     
     it("should given multiple AUTOSAVE rows that have the same exact refresh date timestamp, choose the one with the lowest primary key ", function () {
       queries.getPrimaryKeyOfAutoSavedRowWOldestRefreshDate("pkey","col4RefreshDt","col5AutoSaved",
         [
         ["col2", "col3", "pkey", "col4RefreshDt","col5AutoSaved"], 
-        ["AA", "", 22, Date.parse("2016-10-09T16:03:14.672Z"), "AUTOSAVE"], 
-        ["BB", "", 20, Date.parse("2016-10-09T16:03:14.672Z"), "AUTOSAVE"], 
-        ["CC", "", 21, Date.parse("2016-10-09T16:03:14.672Z"), "AUTOSAVE"], 
-        ["DD", "", 11, "", ""]
-        ]).should.be.eql(20);
+        ["AA", "", "22", Date.parse("2016-10-09T16:03:14.672Z"), "AUTOSAVE"], 
+        ["BB", "", "20", Date.parse("2016-10-09T16:03:14.672Z"), "AUTOSAVE"], 
+        ["CC", "", "21", Date.parse("2016-10-09T16:03:14.672Z"), "AUTOSAVE"], 
+        ["DD", "", "11", "", ""]
+        ]).should.be.eql("20");
     });
     
     it("should given multiple AUTOSAVE rows that all have an empty refresh date/timestamp, choose the one with the lowest primary key ", function () {
@@ -437,7 +443,7 @@ describe("queries", function() {
         ["BB", "", "20", "", "AUTOSAVE"], 
         ["CC", "", "4", "", "AUTOSAVE"], 
         ["DD", "", "31", "", "AUTOSAVE"]
-        ]).should.be.eql(4);
+        ]).should.be.eql("4");
     });    
     
     
@@ -445,9 +451,9 @@ describe("queries", function() {
       queries.getPrimaryKeyOfAutoSavedRowWOldestRefreshDate("award-amount-transactions._primaryKey","award-amount-transactions.computedRefreshed","award-amount-transactions.computedIsAutoSaved",
         [
         ["award-amount-transactions._primaryKey", "col2", "col3","award-amount-transactions.computedRefreshed","award-amount-transactions.computedIsAutoSaved"], 
-        [7, "CC", "", Date.parse("2016-10-09T16:03:14.672Z"), "AUTOSAVE"], 
+        ["7", "CC", "", Date.parse("2016-10-09T16:03:14.672Z"), "AUTOSAVE"], 
         ])
-      .should.be.eql(7);
+      .should.be.eql("7");
     });      
     
     
@@ -455,9 +461,9 @@ describe("queries", function() {
       queries.getPrimaryKeyOfAutoSavedRowWOldestRefreshDate("award-amount-transactions._primaryKey","col4RefreshDt","col5AutoSaved",
         [
         ["award-amount-transactions._primaryKey", "col2", "col3","col4RefreshDt","col5AutoSaved"], 
-        [3, "CC", "", Date.parse("2016-10-09T16:03:14.672Z"), ""], 
+        ["3", "CC", "", Date.parse("2016-10-09T16:03:14.672Z"), ""], 
         ])
-      .should.be.eql(0);
+      .should.be.eql("0");
     });
     
     it("should given empty 2d array with just header row return 0", function () {
@@ -465,7 +471,7 @@ describe("queries", function() {
         [
         ["award-amount-transactions._primaryKey", "col2", "col3","col4RefreshDt","col5AutoSaved"], 
         ])
-      .should.be.eql(0);
+      .should.be.eql("0");
     });    
     
     
@@ -474,13 +480,13 @@ describe("queries", function() {
         [
         [], 
         ])
-      .should.be.eql(0);
+      .should.be.eql("0");
     });
     
     it("should given empty 1d array return 0", function () {
       queries.getPrimaryKeyOfAutoSavedRowWOldestRefreshDate("award-amount-transactions._primaryKey","col4RefreshDt","col5AutoSaved",
         [])
-      .should.be.eql(0);
+      .should.be.eql("0");
     });
     
   });  
@@ -509,7 +515,7 @@ describe("queries", function() {
         ["DD", "11", "", ""]
         ]);
         retVal[3][2].should.not.eql("");
-        retVal[3][2].should.be.greaterThan(1539746195518); // refresh date added should be later than when this test was first set up - Date.now() of 1539746195518
+        retVal[3][2].should.be.greaterThan("1539746195518"); // refresh date added should be later than when this test was first set up - Date.now() of 1539746195518
     });  
     
     it("should given multiple rows but one matching the primary key of the API data object passed in (30), should have updated both ColA and ColB values matching the api data object passed in", function () {

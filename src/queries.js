@@ -25,7 +25,8 @@ module.exports = {
   * @param {string[][]} the original data to query against - must have column headers as the first row and have one column with a header that matches the name specified in colToFindMax param
   * @return {string[][]} a 2d array with just a header row with a single generated column header "max_col_val" and a single row that contains one column with the highest (max) value found in all rows of the passed in data set for the column name specied in the colToFindMax param
   */  
-  findMaxColValInAllDataRows: (colToFindMax, twoDArrWHeader) => alasqlUtils.selectFromTwoDimArr(`SELECT MAX([${colToFindMax}]) AS max_col_val FROM tmptbl1`, twoDArrWHeader),
+  //note: does the max calculation as a number (to make sure it gets the highest value) but then converts back to a string (now that we are treating all cell values as strings)
+  findMaxColValInAllDataRows: (colToFindMax, twoDArrWHeader) => alasqlUtils.selectFromTwoDimArr(`SELECT CAST(max_col_val AS VARCHAR) AS max_col_val FROM (SELECT MAX(CAST([${colToFindMax}] AS NUMBER)) AS max_col_val FROM tmptbl1)`, twoDArrWHeader),
 
 
   /**
@@ -42,13 +43,17 @@ module.exports = {
   
   /**
   * sort (order by) the data passed in based on the column name specified (order by using ASC ordering) with any rows with a null value in the column to sort on appearing first in the results
-  *
+  * note: all values are converted to numbers, then sorted - null values are converted to a very high number so that they will appear at the bottom
+  * 
   * @param {string} the column name to sort/order by on 
   * @param {string[][]} the original data sort - must have column headers as the first row and have one column with header name that matches the first parameter
   * @return {string[][]} a 2d array with a header row - data sorted based on the column name specified
   */    
-  orderByColumnWithName: (colToSortOn, twoDArrWHeader) => alasqlUtils.selectFromTwoDimArr(`SELECT * FROM tmptbl1 ORDER BY [${colToSortOn}] ASC`, twoDArrWHeader),
-   
+  orderByColumnWithName: (colToSortOn, twoDArrWHeader) => {
+    //to make sure nulls sort at the top of the sheet, convert everything to strings first and nulls/undefined values to empty string - CAN LIKELY REMOVE LATER ONCE ALL SHEET DATA IS READ/WRITTEN AS STRINGS
+    const twoDArrWHeaderConvertedToAllStrings = arrayUtils.convertTwoDimArrToAllStrings(twoDArrWHeader);
+    return alasqlUtils.selectFromTwoDimArr(`SELECT * FROM tmptbl1 ORDER BY CAST([${colToSortOn}] AS NUMBER) ASC`, twoDArrWHeaderConvertedToAllStrings);
+  }, 
   
   
   /**
@@ -213,15 +218,15 @@ module.exports = {
                                                                           console.log(`@@@@@@@@@@@@@@@@ resultsTwoDimArrFromSelectQuery: ${JSON.stringify(resultsTwoDimArrFromSelectQuery)}`);
       //we dont care about the header row, just return the single "data" value in the 2nd "data" row ( minPriKeyIfMultWSameRefreshDt not column header)                                              
       const valueOfMinPriKeyIfMultWSameRefresDtReturned = resultsTwoDimArrFromSelectQuery[1][0];
-      //alaSql will return null if no AUTOSAVE rows found, so only returning if not null, otherwise return 0
+      //alaSql will return null if no AUTOSAVE rows found, so only returning the query result if it's not null, otherwise return 0
       if (valueOfMinPriKeyIfMultWSameRefresDtReturned)
-        return Number(valueOfMinPriKeyIfMultWSameRefresDtReturned); //if the primary key is a string containing the numeric primary key, convert it to a number (allows keeping return values consistent as numbers)
+        return valueOfMinPriKeyIfMultWSameRefresDtReturned.toString(); // make sure it's returning a string - for example if the max primary key is 5 we should return "5"
       else 
-        return 0;
+        return "0";
     }
     // otherwise if the 2d array passed in has no data return 0 - (figured this was better than undefined but would prevent worst case API calls against all records)       
     else 
-      return 0; 
+      return "0"; 
   },
   
   /**

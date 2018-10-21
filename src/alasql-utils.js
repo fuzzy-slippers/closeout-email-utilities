@@ -14,15 +14,36 @@ module.exports = {
      *
      * @return {object} returns a database object that can then be populated with other private helper functions
      */   
-    createNewDatabase_: () => new alasql.Database()
-    ,
+    createNewDatabase_: () => new alasql.Database(),
+    
+    // {
+    //                                                                                     // // adding custom alaSql function to use for sorting...so that 1 or "1" will be sorted as 1, "AAA" will be sorted as "AAA" and null will be sorted as 0 - alaSql did not seem to be converting them this way if they were strings with numeric vs non-numeric values
+    //                                                                                     // alasql.fn.alaSqlCustFuncSortStringsAsNativeTypes = function(strVal) { 
+    //                                                                                     //     if (strVal === "AAA") 
+    //                                                                                     //         return 1;
+    //                                                                                     //     else if (strVal === "BBB")
+    //                                                                                     //         return 2;
+    //                                                                                     //     else if (strVal === "CCC")
+    //                                                                                     //         return 3;
+    //                                                                                     //     // //if the value is null, undefined, 0, false etc, return the sort value 0
+    //                                                                                     //     // if (!strVal)
+    //                                                                                     //     //     return 0;
+    //                                                                                     //     // // otherwise for strings containing numbers inside, convert to numeric value for sorting - based on: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/parseInt#A_stricter_parse_function
+    //                                                                                     //     // if (/^(\-|\+)?([0-9]+|Infinity)$/.test(strVal))
+    //                                                                                     //     //     return Number(strVal);
+    //                                                                                     //     // // for all other strings, return them as strings [alasql can sort on "AAA" but was struggling with CAST("AAA" AS NUMBER)...] 
+    //                                                                                     //     // else if (strVal) 
+    //                                                                                     //     //     return 
+    //                                                                                     // };        
+    //     return new alasql.Database();
+    // },
     
     /**
      * Adds a new table into the passed in db, using the table name and two dimentional array data also passed in, converts to the data format needed to populate the db table natively 
      *
      * @param {object} an existing database that may or may not have any tables added so far, that should have this new table added to it
      * @param {string} the name we want to use for the new table we want to add to the database
-     * @return {} the result of the exponential calculation
+     * @return {object} the alasql database object itself
      * Takes a database object, a proposed table name and two dimentional array data (raw format of google sheets) and 
      */
     addTablePopulatedByTwoDimArrWithHeaderRowData_: (db, tableNameToAdd, twoDimArrDataWithHeader) => {

@@ -68,7 +68,10 @@ module.exports = {
         //remove the last element from the array which was found to be an error object (hit the end of valid records by primary key value)
         arrApiCallsJsObjs.pop();
         //convert from a 1d array of js objects to a 2d array with a header row as that is the useful format of the data (alasql queries, google sheets, etc)
-        return arrayUtils.convertOneDimObjArrToTwoDimArrWithHeaderRow(arrApiCallsJsObjs);
+        const twoDArrWHeaderAllData =  arrayUtils.convertOneDimObjArrToTwoDimArrWithHeaderRow(arrApiCallsJsObjs);
+        //in case any of the API data is still in non string format convert return values into 2d array of string values (and also in case there are null values in the API data, convert to empty strings)
+        return arrayUtils.convertTwoDimArrToAllStrings(twoDArrWHeaderAllData);
+        
     },     
     
      
