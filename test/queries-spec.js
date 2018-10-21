@@ -105,7 +105,7 @@ describe("queries", function() {
     retVal.should.containEql([2, "BB", "tomorrow"]);
     retVal.should.containEql([3, "CC", ""]);
     retVal.should.containEql([4, "DD", "The Next Day"]);      
-    retVal.should.containEql([5, "EE", null]);                                                     
+    retVal.should.containEql([5, "EE", null]);    // TODO: null values returned by alasql converted to "" by the replace function to replace all null values with empty string in returned query                                                  
     });   
     
     it("should handle being passed an empty array for first data set - in that case without header rows and returned unioned data from the second two data sets", function () {
@@ -832,3 +832,4 @@ describe("queries", function() {
   
 });
 
+ 

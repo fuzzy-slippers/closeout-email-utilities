@@ -247,14 +247,17 @@ module.exports = {
       const currentDateTimestamp = Date.now();
       //loop through the properties of the API data object passed in to create the SET col1 = val1, col2 = val2 portion of the SQL update statement - so that all fields in API data provided are updated - because its mapping over an array, commas are added between elements automatically by the map function
       //we may not want to turn non-string values/properies from the API returned data object (such as dates, numbers) into strings, so only putting single quotes around string properties 
+      //note that this will not include any of the computed columns (as the API data wont have those fields), but we can explicitly add the ones we need below 
       const dynamicallyGeneratedSetPortionOfSqlString = Object.entries(apiReturnedJsObj).map(([key, value]) => ` [${key}] = '${value}'`);
                                                       //console.log(`=*=*=*=*dynamicallyGeneratedSetPortionOfSqlString: ${dynamicallyGeneratedSetPortionOfSqlString}`);
+      //put together the SQL to update the one row that we have API data for and only those fields that are in the API data, not columns added to the sheet
+      //(Note: we do explicitly update the refresh update/timestamp but not the AUTOSAVE info, the AUTOSAVE info is refreshed separately for the whole sheet as an outside step instead)
       const fullInsertStmt = `UPDATE tmptbl1 
                               SET ${dynamicallyGeneratedSetPortionOfSqlString} , [${lastRefreshDateColName}] = '${currentDateTimestamp}' 
                               WHERE [${priKeyColName}] = '${primaryKeyValueFromApiDataObj}'`;
                                                       //console.log(`=*=** fullInsertStmt: ${fullInsertStmt}`);
       const twoDArrWHeaderWUpdatedRow = alasqlUtils.insertUpdDelFromTwoDimArr(fullInsertStmt, twoDArrWHeader);
-      //all rows that contain a "null" value (presumably coming from API data that returned null for a property) should have the value replaced with empty strings (using that as a standard for updating the google sheets to keep things clean looking)
+      //TODO: REMOVE AT SOME POINT AS ALREADY HAPPENING INSIDE THE ALASQLUTIL QUERY FUNCTION ABOVE all rows that contain a "null" value (presumably coming from API data that returned null for a property) should have the value replaced with empty strings (using that as a standard for updating the google sheets to keep things clean looking)
       return arrayUtils.replaceAllOccurancesInTwoDimArr(twoDArrWHeaderWUpdatedRow, "null", "");
     }
   },  

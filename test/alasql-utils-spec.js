@@ -64,8 +64,14 @@ describe("alasql-utils", function() {
       const origTwoDimArr = [["column1", "column2"], ["avocado", "orange"], [null, "watermelon"], ["pineapple", null]];
       const testSqlStmt = "SELECT * FROM tmptbl1 WHERE column1 IS NOT NULL;";
       alasqlUtils.selectFromTwoDimArr(testSqlStmt, origTwoDimArr).should
-      .deepEqual([["column1", "column2"], ["avocado", "orange"],  ["pineapple", null]]);      
+      .deepEqual([["column1", "column2"], ["avocado", "orange"],  ["pineapple", null]]); //TODO: switch to nulls in result sets being replaced with ""      
     });
+    it("should if passed test 2d array with empty (string) in first column and a sql statement with WHERE excluding empty strings, return 2d array with null rows removed", function () {
+      const origTwoDimArr = [["column1", "column2"], ["avocado", "orange"], ["", "watermelon"], ["pineapple", ""]];
+      const testSqlStmt = "SELECT * FROM tmptbl1 WHERE column1 <> '';";
+      alasqlUtils.selectFromTwoDimArr(testSqlStmt, origTwoDimArr).should
+      .deepEqual([["column1", "column2"], ["avocado", "orange"],  ["pineapple", ""]]);      
+    });    
     
     it("should if passed 2 2d arrays (1 row each) and a join sql statement doing an inner join both to get the rows expected where the keys match", function () {
       const firstTwoDimArr = [["keyvalue", "column2"], [1, "orange"]];
@@ -200,6 +206,35 @@ describe("alasql-utils", function() {
                               ["highest primary key row updated", "20"], 
                               ["pineapple", "9"]]); 
     });          
+    
+    it("should if passed test 2d array and a valid update sql statement (real example causing possible issues), should update row by prim key to trans type and refresh timestamp expected", function () {
+      const origTwoDimArr = [["award-amount-transactions.awardAmountTransactionId","award-amount-transactions.comments","award-amount-transactions.documentNumber","award-amount-transactions.noticeDate","award-amount-transactions.awardNumber","award-amount-transactions.transactionTypeCode","award-amount-transactions._primaryKey","award-amount-transactions.computedRefreshed","award-amount-transactions.computedIsAutoSaved"],
+                              ["774545","","2510913","","000000-00000","7","774545","",""],
+                              ["774546","","2511089","","000000-00000","","774546","","AUTOSAVE"],
+                              ["774548","","2511091","","000000-00000","","774548","","AUTOSAVE"],
+                              ["774549","","2511092","","000000-00000","12","774549","",""],
+                              ["774550","","2511191","","000000-00000","","774550","","AUTOSAVE"],
+                              ["774551","","2511192","","000000-00000","","774551","","AUTOSAVE"],
+                              ["774552","award 2no notice date, no trans line","2511193","","000000-00000","12","774552","",""],
+                              ["774553","","2511592","","029175-00001","4","774553","",""],
+                              ["774557","","2511726","","029176-00001","4","774557","",""],
+                              ["774558","","2511730","","000000-00000","","774558","","AUTOSAVE"]];
+      const testUpdateSqlStmt = `UPDATE tmptbl1
+                                 SET [award-amount-transactions.awardAmountTransactionId] = '774546', [award-amount-transactions.comments] = 'null', [award-amount-transactions.documentNumber] = '2511089', [award-amount-transactions.noticeDate] = 'null', [award-amount-transactions.awardNumber] = '000000-00000', [award-amount-transactions.transactionTypeCode] = '7', [award-amount-transactions._primaryKey] = '774546' , [award-amount-transactions.computedRefreshed] = '1540070286515' 
+                                 WHERE [award-amount-transactions._primaryKey] = '774546'`;
+      const retVal = alasqlUtils.insertUpdDelFromTwoDimArr(testUpdateSqlStmt, origTwoDimArr);
+      retVal.should.deepEqual([["award-amount-transactions.awardAmountTransactionId","award-amount-transactions.comments","award-amount-transactions.documentNumber","award-amount-transactions.noticeDate","award-amount-transactions.awardNumber","award-amount-transactions.transactionTypeCode","award-amount-transactions._primaryKey","award-amount-transactions.computedRefreshed","award-amount-transactions.computedIsAutoSaved"],
+                              ["774545","","2510913","","000000-00000","7","774545","",""],
+                              ["774546","","2511089","","000000-00000","7","774546","1540070286515","AUTOSAVE"],
+                              ["774548","","2511091","","000000-00000","","774548","","AUTOSAVE"],
+                              ["774549","","2511092","","000000-00000","12","774549","",""],
+                              ["774550","","2511191","","000000-00000","","774550","","AUTOSAVE"],
+                              ["774551","","2511192","","000000-00000","","774551","","AUTOSAVE"],
+                              ["774552","award 2no notice date, no trans line","2511193","","000000-00000","12","774552","",""],
+                              ["774553","","2511592","","029175-00001","4","774553","",""],
+                              ["774557","","2511726","","029176-00001","4","774557","",""],
+                              ["774558","","2511730","","000000-00000","","774558","","AUTOSAVE"]]);
+    });    
     
     
   });    
