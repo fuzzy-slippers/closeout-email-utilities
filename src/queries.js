@@ -215,7 +215,7 @@ module.exports = {
                                               //     WHERE [${isAutoSavedColName}] = 'AUTOSAVE' 
                                               //   )
                                               //                             `);                                                                          ;                                              
-                                                                          console.log(`@@@@@@@@@@@@@@@@ resultsTwoDimArrFromSelectQuery: ${JSON.stringify(resultsTwoDimArrFromSelectQuery)}`);
+                                                                          //console.log(`@@@@@@@@@@@@@@@@ resultsTwoDimArrFromSelectQuery: ${JSON.stringify(resultsTwoDimArrFromSelectQuery)}`);
       //we dont care about the header row, just return the single "data" value in the 2nd "data" row ( minPriKeyIfMultWSameRefreshDt not column header)                                              
       const valueOfMinPriKeyIfMultWSameRefresDtReturned = resultsTwoDimArrFromSelectQuery[1][0];
       //alaSql will return null if no AUTOSAVE rows found, so only returning the query result if it's not null, otherwise return 0

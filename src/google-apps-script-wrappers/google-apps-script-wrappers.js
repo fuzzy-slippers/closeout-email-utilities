@@ -37,7 +37,6 @@ module.exports = {
         //decided for keeping things clean/easier to reason about, converting all cells read in from the google sheet into strings (2d array of strings)
         return arrayUtils.convertTwoDimArrToAllStrings(twoDArrWithHeaderRow);
     },
-    //TODO...add step of converting all cells from the sheet into JS Strings (will make it easier to work with the data via AlaSql queries as we will not have to guess if something needs single quotes)
 
     /**
      * a wrapper around GAS bound function - see actual library for function parameters/details: https://script.google.com/a/umd.edu/d/1px_6cTYvd1bbaQd2ZKtM2UGCe9tx-_1xslSy2ITOT9yA33okfeFShq50/edit

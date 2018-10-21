@@ -62,18 +62,33 @@ module.exports = {
      * apiUtils.apiGetCallKrWDotEndpointNames("/award/api/v1/award-types/");
      * 
      * @param {string} the relative path of the API endpoint/URI to call (list of endpoints at https://umd-sbx.kuali.co/res/apidocs/)
+     * @param {boolean} optional way to bypass caching features in case we are trying to call the same API endpoint/key combo over and over to see if the record in KR has changed over time, allows us to bypass our caching mechanism and request fresh results (should be used sparingly only when absolutely needed for checking on new results)
      * @return {object} is a js object (or array of objects) of the JSON returned by the API GET call with properties (but with enpoint names and dots prepended to property names) or a js object with an Error property if there were any errors encountered (however all errors are caught so the program execution continues)
      * 
      */  
-    apiGetCallKr: (relativeUriPath) => {
-        log.trace(`api-utils apiGetCallKr(${relativeUriPath}) called...`);  
-        //use apiGetCallKr to actually make the API call and format the data returned (depending on the API called will either be a js object or an array of js objects)
-        const apiGetCallKrRetObjOrArr = module.exports.apiGetCallKrNoPrefixes(relativeUriPath);
+    apiGetCallKr: (relativeUriPath, bypassCache = false) => {
+        log.trace(`api-utils apiGetCallKr(${relativeUriPath}, ${bypassCache}) called...`);  
+
         //get the endpoint name from the API path (for example "award-types" from "award/api/v1/award-types/")
         const endpointName = module.exports.extractApiEndpointNameFromUri(relativeUriPath);
-        //use the prependAllObjKeys function to add the endpoint name (with a period separator) on the left side of every object property (column name) returned from the API
-        return objUtils.prependAllArrOfObjKeys(apiGetCallKrRetObjOrArr, endpointName.concat("."));
+        //if the optional bypassCache paramater is true, add additional ?preventCaching=<current date/timestamp> to end of the URL to force the caching is bypassed (works by changing the endpoint URL each time with the new date/timestamp)
+        if (bypassCache) {
+            //use apiGetCallKr to actually make the API call and format the data returned (depending on the API called will either be a js object or an array of js objects)
+            const apiGetCallKrRetObjOrArr = module.exports.apiGetCallKrNoPrefixes(`${relativeUriPath}?preventCaching=${Date.now()}`);
+            //use the prependAllObjKeys function to add the endpoint name (with a period separator) on the left side of every object property (column name) returned from the API
+            return objUtils.prependAllArrOfObjKeys(apiGetCallKrRetObjOrArr, endpointName.concat("."));            
+        }
+        // otherwise make a normal call that uses cached results on subsequent calls of the same API for efficiency/peformance reasons
+        else {
+            //use apiGetCallKr to actually make the API call and format the data returned (depending on the API called will either be a js object or an array of js objects)
+            const apiGetCallKrRetObjOrArr = module.exports.apiGetCallKrNoPrefixes(relativeUriPath);
+            //use the prependAllObjKeys function to add the endpoint name (with a period separator) on the left side of every object property (column name) returned from the API
+            return objUtils.prependAllArrOfObjKeys(apiGetCallKrRetObjOrArr, endpointName.concat("."));             
+        }
+                    
+
     },
+
     
     /**
      * pulls out the just the endpoint name from a partial or full URL string passed in
