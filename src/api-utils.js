@@ -19,7 +19,7 @@ module.exports = {
     hasErrorProperty: (jsObj) => jsObj.hasOwnProperty("Error"),    
 
     /**
-     * DEPRICATED (ZF) - use apiGetCallKrWDotEndpointNames for most if not all situations as we want all sheet columns to have the API endpoint name prepended before the column name for good joins and no overwriting column names that are the same from different API endpoints 
+     * DEPRICATED (ZF) - use apiGetCallKrWDotEndpointNames (which calls this helper function) for most if not all situations as we want all sheet columns to have the API endpoint name prepended before the column name for good joins and no overwriting column names that are the same from different API endpoints 
      * utility function that calls the wrapped callKrGetApiWithWait method and converts the results from JSON into a js object (or return a js object with an Error property if there was any kind of error with the API call or parsing the results as JSON)
      * 
      * @param {string} the relative path of the API endpoint/URI to call (list of endpoints at https://umd-sbx.kuali.co/res/apidocs/)
@@ -31,7 +31,7 @@ module.exports = {
         try {
             //call the API with the primary key after the slash (no url variables needed for API calls with the primary key specified)
             const returnedByApiCall = googleAppsScriptWrappers.callKrGetApiWithWait(relativeUriPath);
-                                                 // console.log(`from node - initial raw result returned from api call (jsonReturnedByApiCall var) shows: ${returnedByApiCall}`);
+            log.trace(`initial raw result returned from api call, returnedByApiCall: ${returnedByApiCall}`);
             try {
                 //if valid json is returned back (should be when there is data found and returned from the API) - convert the raw json returned to a javascript object - we want to return back a javascript object
                 const jsObjToReturn = JSON.parse(returnedByApiCall);    
