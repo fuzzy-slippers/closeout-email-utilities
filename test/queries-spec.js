@@ -285,7 +285,12 @@ describe("queries", function() {
       functionFirstRunResults[0].length.should.eql(4);
       functionSecondRunResults[0].length.should.eql(4);
       functionThirdRunResults[0].length.should.eql(4);
-    });     
+    });  
+    
+    it("should given a passed in 2d array with the refreshed column already present and with update timestamps already in some rows, should not overwrite any of the existing data/timestamps", function () {
+      queries.addColumnComputedRefreshed("endPointName.computedRefreshed", [["Col1", "Col2", "endPointName.computedRefreshed", "Col3"], ["A","AA", "", "1"], ["B", "BB", "1540173874056", "2"], ["C", "CC", "1540173874055", "3"]])
+      .should.be.eql([["Col1", "Col2", "endPointName.computedRefreshed", "Col3"], ["A","AA", "", "1"], ["B", "BB", "1540173874056", "2"], ["C", "CC", "1540173874055", "3"]]);
+    });    
  
   });  
   

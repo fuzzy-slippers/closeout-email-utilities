@@ -131,7 +131,12 @@ module.exports = {
   */    
   addColumnComputedRefreshed: (colName, twoDArrWHeader) => {
     log.trace(`queries addColumnComputedLastUpdated: (${colName}, ${JSON.stringify(twoDArrWHeader)}) called...`);
-    return alasqlUtils.selectFromTwoDimArr(`SELECT ${module.exports.generateListOfColumnNamesInAlaSqlSelectFormat(twoDArrWHeader)}, '' AS [${colName}] FROM tmptbl1`, twoDArrWHeader);
+    //if the column is already present, leave the 2d array/sheet data unchanged (first checking that the twoDArrWHeader is valid and a 2d array)
+    if (twoDArrWHeader && twoDArrWHeader[0] && twoDArrWHeader[0].includes(colName))
+      return twoDArrWHeader;
+    //if the column does not yet seem to be present, add it with blank placeholder values in each data cell in that column
+    else
+      return alasqlUtils.selectFromTwoDimArr(`SELECT ${module.exports.generateListOfColumnNamesInAlaSqlSelectFormat(twoDArrWHeader)}, '' AS [${colName}] FROM tmptbl1`, twoDArrWHeader);
   },  
   
   /**

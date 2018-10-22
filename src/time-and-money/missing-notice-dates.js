@@ -78,7 +78,7 @@ module.exports = {
         const combinationOfExistingDataPlusNewApiResults = queries.unionUsingFirstTablePrimaryKeyExtraColumnsInFirstTablePreservedSortedNullsAsBlankStrings(`${endpointNameOnly}._primaryKey`,  prevSheetDataTwoDimArrWHeader, justRowsNullNoticeDatesTwoDimArrWHeader);
         log.trace(`combinationOfExistingDataPlusNewApiResults: ${JSON.stringify(combinationOfExistingDataPlusNewApiResults)}`);
         
-        //6. add "award-amount-transactions.computedRefreshed" column
+        //6. add "award-amount-transactions.computedRefreshed" column if the column not already present
         log.trace(`6. add award-amount-transactions.computedRefreshed empty column`);
         const twoDArrDataWithComputedRefreshedColumnAdded = queries.addColumnComputedRefreshed(`${endpointNameOnly}.computedRefreshed`, combinationOfExistingDataPlusNewApiResults);
         log.trace(`twoDArrDataWithComputedRefreshedColumnAdded: ${JSON.stringify(twoDArrDataWithComputedRefreshedColumnAdded)}`);
