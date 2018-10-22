@@ -22,7 +22,7 @@ function  updateSheetAdditionalMissingNoticeDate() {
  * second function to be scheduled (periodically or possibly to run after updates)
  * goes through and tries to update one of the AUTOSAVE rows that are pending KR documents to see if they have been finalized (by querying the APIs for more up to date data for that row) - just does one row each time this is run but calling over and over should eventually refresh all AUTOSAVE rows - it uses the oldest refresh timestamp to make sure they all get refreshed
  */
-function  updateRefreshOneAutoSaveRowInSheet() {
+function  updateOneAutoSaveRowInSheet() {
   var startTime = "updateRefreshOnePendingRowInSheet started at " + new Date();
   console.log("--------------------------------------------------------------------------------------");
   Logger.log(startTime);console.log(startTime);  
