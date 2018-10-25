@@ -493,7 +493,46 @@ describe("queries", function() {
         [])
       .should.be.eql("0");
     });
+
+    it("should given real testing data scenario encountered with multiple AUTOSAVE rows (one that was blank line), it should return a non-zero primary key value", function () {
+      const encounteredTestData = 
+      [["award-amount-transactions.awardAmountTransactionId","award-amount-transactions.comments","award-amount-transactions.documentNumber","award-amount-transactions.noticeDate","award-amount-transactions.awardNumber","award-amount-transactions.transactionTypeCode","award-amount-transactions._primaryKey","award-amount-transactions.computedRefreshed","award-amount-transactions.computedIsAutoSaved"],
+      ["","","","","","","","","AUTOSAVE"],
+      ["774598","award 3 - no notice date","2514464","","000000-00000","5","774598","1540180359301",""],
+      ["774599","award 2 - no notice date","2514466","","000000-00000","10","774599","1540180539101",""],
+      ["774600","award 1 no notice date, zero dollar trans","2514467","","000000-00000","1","774600","1540180718759",""],
+      ["774601","award 1 no notice date, zero dollar trans","2514467","","029175-00001","1","774601","",""],
+      ["774604","award 3 - no notice date (2 trans lines)","2514469","","000000-00000","9","774604","1540180900740",""],
+      ["774605","award 3 - no notice date (2 trans lines)","2514469","","029161-00001","9","774605","",""],
+      ["774607","awd2 - adding another Time and Money doc without notice date","2514480","","000000-00000","7","774607","1540216719202",""],
+      ["774608","Award 1 - no notice date entered","2514482","","000000-00000","1","774608","1540182097129",""],
+      ["774609","award 1 no notice date entered, $0 trans entered","2514483","","000000-00000","12","774609","",""],
+      ["774610","award 1 no notice date entered, $0 trans entered","2514483","","029175-00001","12","774610","",""],
+      ["774611","award 2 - t&m no notice date entered","2514485","","000000-00000","5","774611","",""],
+      ["774612","awd 1 - time and money doc missing notice date","2514486","","000000-00000","12","774612","1540216839351",""],
+      ["774614","","2514553","","000000-00000","","774614","1540410904561","AUTOSAVE"],
+      ["774615","awd 3 - T&M no notice date filled out","2514557","","000000-00000","8","774615","",""],
+      ["774616","awd 1 - T&M no notice date entered","2514558","","000000-00000","12","774616","",""],
+      ["774617","","2515442","","029177-00001","4","774617","",""],
+      ["774618","second tandm doc on new ZF awd missing notice date (first auto-saved, then saved, then submitted)","2515467","","000000-00000","6","774618","1540404219578",""],
+      ["774619","second tandm doc on new ZF awd missing notice date (first auto-saved, then saved, then submitted)","2515467","","029177-00001","6","774619","",""],
+      ["774620","","2515472","","029179-00001","4","774620","",""],
+      ["774621","second time and money - no notice dates","2515474","","000000-00000","99","774621","1540406201429",""],
+      ["774622","","2515511","","000000-00000","","774622","1540410879024","AUTOSAVE"],
+      ["774623","time and money without a notice date entered in","2515514","","000000-00000","7","774623","",""],
+      ["774624","","2515544","","000000-00000","","774624","","AUTOSAVE"],
+      ["774625","tnm w/o notice date entered","2515677","","000000-00000","12","774625","",""],
+      ["774626","","2515684","","000000-00000","","774626","","AUTOSAVE"],
+      ["774627","","2515685","","000000-00000","","774627","","AUTOSAVE"]];    
+ 
+      const retVal = queries.getPrimaryKeyOfAutoSavedRowWOldestRefreshDate("award-amount-transactions._primaryKey","award-amount-transactions.computedRefreshed","award-amount-transactions.computedIsAutoSaved",
+        encounteredTestData);
+        
+      retVal.should.not.be.eql("0");
+      retVal.should.be.eql("774624"); //of the 3 rows with no refresh timestamp, it is the lowest primary key value
+    });
     
+
   });  
   
   describe("#overwriteRowMatchingPrimaryKeyWithApiReturnedData()", function() { 

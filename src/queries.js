@@ -196,12 +196,13 @@ module.exports = {
   */    
   getPrimaryKeyOfAutoSavedRowWOldestRefreshDate: (primKeyColName, lastRefreshDateColName, isAutoSavedColName, twoDArrWHeader) => {
     log.trace(`queries getPrimaryKeyOfAutoSavedRowWOldestRefreshDate: (${primKeyColName}, ${lastRefreshDateColName}, ${isAutoSavedColName}, ${JSON.stringify(twoDArrWHeader)}) called...`);
-    // make sure the passed in 2d array has at least a header row and data rows
+    // make sure the passed in 2d array has at least a header row and data rows - note added check for non blank primary key column to fix issue with blank rows but may be able to remove later when we switch to pulling in document statuses
     if (twoDArrWHeader && twoDArrWHeader.length > 1) {
       const resultsTwoDimArrFromSelectQuery = alasqlUtils.selectFromTwoDimArr(
                                               `SELECT MIN([${primKeyColName}]) AS minPriKeyIfMultWSameRefreshDt
                                               FROM tmptbl1 
                                               WHERE [${isAutoSavedColName}] = 'AUTOSAVE'
+                                              AND ([${primKeyColName}] <> '' AND [${primKeyColName}] > 0)
                                               AND CAST([${lastRefreshDateColName}] AS NUMBER) = 
                                                 (
                                                   SELECT MIN(CAST([${lastRefreshDateColName}] AS NUMBER))
@@ -291,7 +292,11 @@ module.exports = {
                                       FROM tmptbl1
                                       `, twoDArrWHeader);
     return twoDArrWHeaderWUpdatedRow;
-  } 
+  },
+  
+  
+  
+  
   
 
 };  
