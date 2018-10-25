@@ -71,6 +71,7 @@ module.exports = {
 
         //get the endpoint name from the API path (for example "award-types" from "award/api/v1/award-types/")
         const endpointName = module.exports.extractApiEndpointNameFromUri(relativeUriPath);
+        //TODO: maybe later for the bypassCache feature (if needed) we might instead create a second bound function to delete the specific cache entry for that URL/endpoint that would be called before calling the normal enpoint API bound function (and get rid of the preventCaching part all together), that way the updated value would again be cached under the normal URL in case its called by a future different sheet
         //if the optional bypassCache paramater is true, add additional ?preventCaching=<current date/timestamp> to end of the URL to force the caching is bypassed (works by changing the endpoint URL each time with the new date/timestamp)
         if (bypassCache) {
             //use apiGetCallKr to actually make the API call and format the data returned (depending on the API called will either be a js object or an array of js objects)
