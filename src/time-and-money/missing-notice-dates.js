@@ -66,6 +66,12 @@ module.exports = {
         log.trace(`newApiCallsTwoDimArrWHeader: ${JSON.stringify(newApiCallsTwoDimArrWHeader)}`);
         
         //4a. (for now using the quick and dirty checking if transactionTypeCode is null/blank as it is required, to confirm if its a pending or final document, rather than calling 2nd API - but may later) join in document statuses on those records that do not yet have it
+        //TODO: use relative endpoint strings defined above like the other url - for now just hard coding here for simplicity...
+        //Note: since we would need to make the API calls on a single row at a time, may make more sense to integrate this part into the updateRefreshOnePendingRowInSheet scheduled function below - or may need to break apart gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys above into separate steps (possibly by taking away the internal loop and have it just add one row at a time each time it runs)
+        //NEW rought code 12/13/18 4aa. for the current award-amount-transaction row, query the research-sys/api/v1/document-route-header-values/ API endpoint based on the award-amount-transaction document number (the _ function automatically prepends the endpoint names with the dots)
+        //const currDocIdDocRouteHeaderVals = apiUtils.apiGetCallKr(`research-sys/api/v1/document-route-header-values/` + `2490764`, false);
+        //4ab. next we need to smoosh/join together the original award-amount-trasnaction row object with the new document-route-header-values endpoint object returned
+        //Object.assign({}, <<<obj for current row, which we dont have right now the way latestByPrimaryKey.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys is>>>, currDocIdDocRouteHeaderVals);
         //4b. filter on just rows where the document status is FINAL
         
         //4c. filter on just the rows/records where the noticeDate is NULL/missing        
@@ -94,6 +100,12 @@ module.exports = {
     },
     
     
+
+
+
+
+
+
     
     
     /** 
@@ -133,7 +145,7 @@ module.exports = {
             
             // 5. make sure the API did not return an error - usually it should not since the document should exist but there could always be network errors, etc assuming that there is valid data, go on to next step
             log.trace(`5. make sure the API did not return an error <(updateRefreshOnePendingRowInSheet func)>)`);
-            if (apiUtils.hasErrorProperty(apiResultSinglePrimKeyJsObj)) 
+            if (apiUtils.hasErrorProperty(apiResultSinglePrimKeyJsObj)) // TODO: below may want to also log/trace something about the apiResultsSinglePrimKeyJsObj object
                 return; //if inspecting the results of the API call indicate an error was thrown (such as a network error) exit without doing/updating anything in the sheet - will hopefully update the row in a future run when the APIs are functioning again
             //otherwise if the API call succeeded in bringing back data in KR for the autosave row specified, proceed with trying to get that row updated in the sheet
             else {
