@@ -9,6 +9,8 @@ const log = require("../src/log-utils.js");
 
 module.exports = {
 
+//TODO: set up some kind of parameter that will have it only check the next 100/whatever award amount transactions and then stop (gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys) - so that we dont hit the limit of how long scheduled tasks can run - if the program doesnt run for a while and then suddenly is checking 1000 new transactions, it might time out each time after the 3 mins without getting to update the google sheet at all
+
 //Note: getAwardAmountTransactionByPrimaryKey inside the api-utils.js module (for reasons of getting the testing/rewire mocks to work)
     
 

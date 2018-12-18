@@ -12,6 +12,7 @@ latestByPrimaryKey.__set__("apiUtils", {
     apiGetCallKr: function (relativeApiUri) {
                                                           //console.log(`inside rewiring of latestByPrimaryKey calls of apiUtils.apiGetCallKr, relativeApiUri detected as: ${relativeApiUri}`)      
       switch (relativeApiUri) {
+      //award amount transaction api mock data  
       case "/award/api/v1/award-amount-transactions/" + "1":
         return JSON.parse('{"award-amount-transactions.testCol1":"A","award-amount-transactions._primaryKey":"1"}');
       case "/award/api/v1/award-amount-transactions/" + "2":
@@ -26,6 +27,13 @@ latestByPrimaryKey.__set__("apiUtils", {
         return JSON.parse('{"award-amount-transactions.awardAmountTransactionId":773752,"award-amount-transactions.comments":null,"award-amount-transactions.documentNumber":"2455803","award-amount-transactions.noticeDate":1525233600000,"award-amount-transactions.awardNumber":"029054-00001","award-amount-transactions.transactionTypeCode":4,"award-amount-transactions._primaryKey":"773752"}');     
       case "/award/api/v1/award-amount-transactions/" + "773753":
         return JSON.parse('{"Error":{"errors":["not found for key 773753"]}}');
+      //document route header values (status) api mock data
+      case "/research-sys/api/v1/document-route-header-values/" + "1":
+        return JSON.parse(`{"documentId":"88888888","_primaryKey":"88888888"}`);
+      case "/research-sys/api/v1/document-route-header-values/" + "2455782":
+        return JSON.parse(`{"document-route-header-values.finalizedDate":1525267469000,"document-route-header-values.appDocStatus":"","document-route-header-values.routeStatusDate":1525267469000,"document-route-header-values.documentTypeId":"2326828","document-route-header-values.dateModified":1525267469000,"document-route-header-values.docTitle":"KC TimeAndMoney - SAB","document-route-header-values.appDocId":null,"document-route-header-values.approvedDate":1525267468000,"document-route-header-values.appDocStatusDate":null,"document-route-header-values.docRouteStatus":"F","document-route-header-values.initiatorWorkflowId":"113187162","document-route-header-values.documentId":"2455782","document-route-header-values._primaryKey":"2455782","document-route-header-values.docRouteLevel":0,"document-route-header-values.docVersion":1,"document-route-header-values.createDate":1525267431000,"document-route-header-values.routedByUserWorkflowId":"113187162"}`);
+      case "/research-sys/api/v1/document-route-header-values/" + "2455803":
+        return JSON.parse(`{"document-route-header-values.finalizedDate":1525269344000,"document-route-header-values.appDocStatus":"","document-route-header-values.routeStatusDate":1525269344000,"document-route-header-values.documentTypeId":"2326828","document-route-header-values.dateModified":1525269344000,"document-route-header-values.docTitle":"KC TimeAndMoney - SAB","document-route-header-values.appDocId":null,"document-route-header-values.approvedDate":1525269344000,"document-route-header-values.appDocStatusDate":null,"document-route-header-values.docRouteStatus":"F","document-route-header-values.initiatorWorkflowId":"113187162","document-route-header-values.documentId":"2455803","document-route-header-values._primaryKey":"2455803","document-route-header-values.docRouteLevel":0,"document-route-header-values.docVersion":1,"document-route-header-values.createDate":1525269293000,"document-route-header-values.routedByUserWorkflowId":"113187162"}`);
       }
     },
     //call the real versions of the below functions in apiUtils (we don't want to mock these ones)
