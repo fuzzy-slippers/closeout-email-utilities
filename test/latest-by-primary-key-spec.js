@@ -14,9 +14,9 @@ latestByPrimaryKey.__set__("apiUtils", {
       switch (relativeApiUri) {
       //award amount transaction api mock data  
       case "/award/api/v1/award-amount-transactions/" + "1":
-        return JSON.parse('{"award-amount-transactions.testCol1":"A","award-amount-transactions._primaryKey":"1"}');
+        return JSON.parse('{"award-amount-transactions.testCol1":"A","award-amount-transactions._primaryKey":"1","award-amount-transactions.documentNumber":"88888888"}');
       case "/award/api/v1/award-amount-transactions/" + "2":
-        return JSON.parse('{"award-amount-transactions.testCol1":"B","award-amount-transactions._primaryKey":"2"}');
+        return JSON.parse('{"award-amount-transactions.testCol1":"B","award-amount-transactions._primaryKey":"2","award-amount-transactions.documentNumber":"88888888"}');
       case "/award/api/v1/award-amount-transactions/" + "3":
         return JSON.parse('{"Error":{"errors":["not found for key 3"]}}');
       case "/award/api/v1/award-amount-transactions/" + "773750":
@@ -29,7 +29,7 @@ latestByPrimaryKey.__set__("apiUtils", {
         return JSON.parse('{"Error":{"errors":["not found for key 773753"]}}');
       //document route header values (status) api mock data
       case "/research-sys/api/v1/document-route-header-values/" + "1":
-        return JSON.parse(`{"documentId":"88888888","_primaryKey":"88888888"}`);
+        return JSON.parse(`{"document-route-header-values.documentId":"88888888","document-route-header-values._primaryKey":"88888888"}`);
       case "/research-sys/api/v1/document-route-header-values/" + "2455782":
         return JSON.parse(`{"document-route-header-values.finalizedDate":1525267469000,"document-route-header-values.appDocStatus":"","document-route-header-values.routeStatusDate":1525267469000,"document-route-header-values.documentTypeId":"2326828","document-route-header-values.dateModified":1525267469000,"document-route-header-values.docTitle":"KC TimeAndMoney - SAB","document-route-header-values.appDocId":null,"document-route-header-values.approvedDate":1525267468000,"document-route-header-values.appDocStatusDate":null,"document-route-header-values.docRouteStatus":"F","document-route-header-values.initiatorWorkflowId":"113187162","document-route-header-values.documentId":"2455782","document-route-header-values._primaryKey":"2455782","document-route-header-values.docRouteLevel":0,"document-route-header-values.docVersion":1,"document-route-header-values.createDate":1525267431000,"document-route-header-values.routedByUserWorkflowId":"113187162"}`);
       case "/research-sys/api/v1/document-route-header-values/" + "2455803":
@@ -74,12 +74,12 @@ describe("latest-by-primary-key", function() {
   
   describe("#apiCallOnNextHigherPrimaryKey()", function() {
     it("should given a passed in previous primary key of 1 return the mocked up object data for primary key 2", function () {
-      const jsObjVersionOfApiDataForPrimaryKey2 = JSON.parse('{"award-amount-transactions.testCol1":"B","award-amount-transactions._primaryKey":"2"}');
+      const jsObjVersionOfApiDataForPrimaryKey2 = JSON.parse('{"award-amount-transactions.testCol1":"B","award-amount-transactions._primaryKey":"2","award-amount-transactions.documentNumber":"88888888"}');
       latestByPrimaryKey.apiCallOnNextHigherPrimaryKey("1", "/award/api/v1/award-amount-transactions/").should.be.eql(jsObjVersionOfApiDataForPrimaryKey2);
     }); 
     
     it("should given a passed in previous primary key of a string value of 1 return the mocked up object data for primary key 2", function () {
-      const jsObjVersionOfApiDataForPrimaryKey2 = JSON.parse('{"award-amount-transactions.testCol1":"B","award-amount-transactions._primaryKey":"2"}');
+      const jsObjVersionOfApiDataForPrimaryKey2 = JSON.parse('{"award-amount-transactions.testCol1":"B","award-amount-transactions._primaryKey":"2","award-amount-transactions.documentNumber":"88888888"}');
       latestByPrimaryKey.apiCallOnNextHigherPrimaryKey("1", "/award/api/v1/award-amount-transactions/").should.be.eql(jsObjVersionOfApiDataForPrimaryKey2);
     });  
     
@@ -90,7 +90,7 @@ describe("latest-by-primary-key", function() {
   
   describe("#gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys()", function() {
     it("should given a passed in previous max primary key of 1 return the mocked up 2d array with header row data for primary key 2 but stop at the mocked up error on primary key 3 (based on rewire sample data primary key 3 not found)", function () {
-      latestByPrimaryKey.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys("1", "/award/api/v1/award-amount-transactions/").should.be.eql([["award-amount-transactions.testCol1", "award-amount-transactions._primaryKey"], ["B", "2"]]);
+      latestByPrimaryKey.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys("1", "/award/api/v1/award-amount-transactions/").should.be.eql([["award-amount-transactions.testCol1", "award-amount-transactions._primaryKey","award-amount-transactions.documentNumber"], ["B", "2","88888888"]]);
     });  
     
     it("should given a passed in previous max primary key of string 2 return an empty array (based on rewire sample data primary key 3 not found/API returns error object)", function () {
