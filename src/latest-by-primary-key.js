@@ -105,19 +105,30 @@ module.exports = {
         log.trace(`latest-by-primary-key apiCallsOnNextHigherPrimaryKey: (${previouslyUsedPrimaryKey}, ${firstApiCallRelativeUriPath}, ${propFromFirstApiResultsUseAsSecondApiCallParam}, ${secApiCallRelativeUriPath}) called...`);
         //query the first api based on the next primary key value
         const jsonObjFirstApiResult = apiUtils.apiGetCallKr(firstApiCallRelativeUriPath + (Number(previouslyUsedPrimaryKey) + 1));
-        console.log(`#################jsonObjFirstApiResult: ${JSON.stringify(jsonObjFirstApiResult)}###############`);
-        //TODO: handle errors in the first API call............
-        //query the second api using the value of a property (such as doc number) from the first Api results
-        console.log(`#################jsonObjFirstApiResult[propFromFirstApiResultsUseAsSecondApiCallParam]: ${JSON.stringify(jsonObjFirstApiResult[propFromFirstApiResultsUseAsSecondApiCallParam])}###############`); 
-        console.log(`#################apiUtils.apiGetCallKr(secApiCallRelativeUriPath + jsonObjFirstApiResult[propFromFirstApiResultsUseAsSecondApiCallParam]): ${JSON.stringify(apiUtils.apiGetCallKr(secApiCallRelativeUriPath + jsonObjFirstApiResult[propFromFirstApiResultsUseAsSecondApiCallParam]))}###############`);
-        console.log(`#################propFromFirstApiResultsUseAsSecondApiCallParam: ${propFromFirstApiResultsUseAsSecondApiCallParam}###############`);   
-        const jsonObjSecApiResult = apiUtils.apiGetCallKr(secApiCallRelativeUriPath + jsonObjFirstApiResult[propFromFirstApiResultsUseAsSecondApiCallParam]);
-        console.log(`#################jsonObjSecApiResult: ${JSON.stringify(jsonObjSecApiResult)}###############`);        
-        const arrOfReturnValueObjsFromBothApiCalls = [jsonObjFirstApiResult,jsonObjSecApiResult];
-        console.log(`#################arrOfReturnValueObjsFromBothApiCalls: ${JSON.stringify(arrOfReturnValueObjsFromBothApiCalls)}###############`);             
-        //merge the 2 objects into one object with properties from both (has properties/data returned from both api calls)
-        console.log(`#################objUtils.mergeObjArrIntoSingleObj(arrOfReturnValueObjsFromBothApiCalls): ${JSON.stringify(objUtils.mergeObjArrIntoSingleObj(arrOfReturnValueObjsFromBothApiCalls))}###############`);             
-        return objUtils.mergeObjArrIntoSingleObj(arrOfReturnValueObjsFromBothApiCalls);
+        //if the first api call returns an error object, return back that error/object
+        if (apiUtils.hasErrorProperty(jsonObjFirstApiResult))
+            return jsonObjFirstApiResult;
+        else {
+            console.log(`#################jsonObjFirstApiResult: ${JSON.stringify(jsonObjFirstApiResult)}###############`);
+            //TODO: handle errors in the first API call............
+            //query the second api using the value of a property (such as doc number) from the first Api results
+            console.log(`#################jsonObjFirstApiResult[propFromFirstApiResultsUseAsSecondApiCallParam]: ${JSON.stringify(jsonObjFirstApiResult[propFromFirstApiResultsUseAsSecondApiCallParam])}###############`); 
+            console.log(`#################apiUtils.apiGetCallKr(secApiCallRelativeUriPath + jsonObjFirstApiResult[propFromFirstApiResultsUseAsSecondApiCallParam]): ${JSON.stringify(apiUtils.apiGetCallKr(secApiCallRelativeUriPath + jsonObjFirstApiResult[propFromFirstApiResultsUseAsSecondApiCallParam]))}###############`);
+            console.log(`#################propFromFirstApiResultsUseAsSecondApiCallParam: ${propFromFirstApiResultsUseAsSecondApiCallParam}###############`);   
+            const jsonObjSecApiResult = apiUtils.apiGetCallKr(secApiCallRelativeUriPath + jsonObjFirstApiResult[propFromFirstApiResultsUseAsSecondApiCallParam]);
+            // if the second api call returns an error object - again return the error back
+            if (apiUtils.hasErrorProperty(jsonObjSecApiResult))
+                return jsonObjSecApiResult;
+            // if both api calls appear to have succeeded, merge the data from both into a single object and return that
+            else {
+                console.log(`#################jsonObjSecApiResult: ${JSON.stringify(jsonObjSecApiResult)}###############`);        
+                const arrOfReturnValueObjsFromBothApiCalls = [jsonObjFirstApiResult,jsonObjSecApiResult];
+                console.log(`#################arrOfReturnValueObjsFromBothApiCalls: ${JSON.stringify(arrOfReturnValueObjsFromBothApiCalls)}###############`);             
+                //merge the 2 objects into one object with properties from both (has properties/data returned from both api calls)
+                console.log(`#################objUtils.mergeObjArrIntoSingleObj(arrOfReturnValueObjsFromBothApiCalls): ${JSON.stringify(objUtils.mergeObjArrIntoSingleObj(arrOfReturnValueObjsFromBothApiCalls))}###############`);             
+                return objUtils.mergeObjArrIntoSingleObj(arrOfReturnValueObjsFromBothApiCalls);
+            }
+        }
     }
     
      
