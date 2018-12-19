@@ -28,7 +28,7 @@ latestByPrimaryKey.__set__("apiUtils", {
       case "/award/api/v1/award-amount-transactions/" + "773753":
         return JSON.parse('{"Error":{"errors":["not found for key 773753"]}}');
       //document route header values (status) api mock data
-      case "/research-sys/api/v1/document-route-header-values/" + "1":
+      case "/research-sys/api/v1/document-route-header-values/" + "88888888":
         return JSON.parse(`{"document-route-header-values.documentId":"88888888","document-route-header-values._primaryKey":"88888888"}`);
       case "/research-sys/api/v1/document-route-header-values/" + "2455782":
         return JSON.parse(`{"document-route-header-values.finalizedDate":1525267469000,"document-route-header-values.appDocStatus":"","document-route-header-values.routeStatusDate":1525267469000,"document-route-header-values.documentTypeId":"2326828","document-route-header-values.dateModified":1525267469000,"document-route-header-values.docTitle":"KC TimeAndMoney - SAB","document-route-header-values.appDocId":null,"document-route-header-values.approvedDate":1525267468000,"document-route-header-values.appDocStatusDate":null,"document-route-header-values.docRouteStatus":"F","document-route-header-values.initiatorWorkflowId":"113187162","document-route-header-values.documentId":"2455782","document-route-header-values._primaryKey":"2455782","document-route-header-values.docRouteLevel":0,"document-route-header-values.docVersion":1,"document-route-header-values.createDate":1525267431000,"document-route-header-values.routedByUserWorkflowId":"113187162"}`);
@@ -73,36 +73,36 @@ describe("latest-by-primary-key", function() {
   });  
   
   describe("#apiCallOnNextHigherPrimaryKey()", function() {
-    it("should given a passed in previous primary key of 1 return the mocked up object data for primary key 2", function () {
-      const jsObjVersionOfApiDataForPrimaryKey2 = JSON.parse('{"award-amount-transactions.testCol1":"B","award-amount-transactions._primaryKey":"2","award-amount-transactions.documentNumber":"88888888"}');
-      latestByPrimaryKey.apiCallOnNextHigherPrimaryKey("1", "/award/api/v1/award-amount-transactions/").should.be.eql(jsObjVersionOfApiDataForPrimaryKey2);
+    it("should given a passed in previous primary key of 1 return the mocked up object data for primary key 2 (including info from document status api call with matching document id 88888888)", function () {
+      const jsObjVersionOfApiDataForPrimaryKey2 = JSON.parse('{"award-amount-transactions.testCol1":"B","award-amount-transactions._primaryKey":"2","award-amount-transactions.documentNumber":"88888888", "document-route-header-values.documentId":"88888888","document-route-header-values._primaryKey":"88888888"}');
+      latestByPrimaryKey.apiCallsOnNextHigherPrimaryKey("1", "/award/api/v1/award-amount-transactions/", "award-amount-transactions.documentNumber", "/research-sys/api/v1/document-route-header-values/").should.be.eql(jsObjVersionOfApiDataForPrimaryKey2);
     }); 
     
-    it("should given a passed in previous primary key of a string value of 1 return the mocked up object data for primary key 2", function () {
-      const jsObjVersionOfApiDataForPrimaryKey2 = JSON.parse('{"award-amount-transactions.testCol1":"B","award-amount-transactions._primaryKey":"2","award-amount-transactions.documentNumber":"88888888"}');
-      latestByPrimaryKey.apiCallOnNextHigherPrimaryKey("1", "/award/api/v1/award-amount-transactions/").should.be.eql(jsObjVersionOfApiDataForPrimaryKey2);
+    it("should given a passed in previous primary key of a string value of 1 return the mocked up object data for primary key 2 (including info from document status api call with matching document id 88888888)", function () {
+      const jsObjVersionOfApiDataForPrimaryKey2 = JSON.parse('{"award-amount-transactions.testCol1":"B","award-amount-transactions._primaryKey":"2","award-amount-transactions.documentNumber":"88888888", "document-route-header-values.documentId":"88888888","document-route-header-values._primaryKey":"88888888"}');
+      latestByPrimaryKey.apiCallsOnNextHigherPrimaryKey("1", "/award/api/v1/award-amount-transactions/", "award-amount-transactions.documentNumber", "/research-sys/api/v1/document-route-header-values/").should.be.eql(jsObjVersionOfApiDataForPrimaryKey2);
     });  
     
     it("should given a passed in previous primary key of 2 return the an empty object (would look up primary key 3 which does not exist yet in our mocked data)", function () {
-      latestByPrimaryKey.apiCallOnNextHigherPrimaryKey("2", "/award/api/v1/award-amount-transactions/").should.be.eql({"Error":{"errors":["not found for key 3"]}});
+      latestByPrimaryKey.apiCallsOnNextHigherPrimaryKey("2", "/award/api/v1/award-amount-transactions/", "award-amount-transactions.documentNumber", "/research-sys/api/v1/document-route-header-values/").should.be.eql({"Error":{"errors":["not found for key 3"]}});
     });    
   });    
   
   describe("#gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys()", function() {
     it("should given a passed in previous max primary key of 1 return the mocked up 2d array with header row data for primary key 2 but stop at the mocked up error on primary key 3 (based on rewire sample data primary key 3 not found)", function () {
-      latestByPrimaryKey.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys("1", "/award/api/v1/award-amount-transactions/").should.be.eql([["award-amount-transactions.testCol1", "award-amount-transactions._primaryKey","award-amount-transactions.documentNumber"], ["B", "2","88888888"]]);
+      latestByPrimaryKey.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys("1", "/award/api/v1/award-amount-transactions/", "award-amount-transactions.documentNumber", "/research-sys/api/v1/document-route-header-values/").should.be.eql([["award-amount-transactions.testCol1", "award-amount-transactions._primaryKey","award-amount-transactions.documentNumber"], ["B", "2","88888888"]]);
     });  
     
     it("should given a passed in previous max primary key of string 2 return an empty array (based on rewire sample data primary key 3 not found/API returns error object)", function () {
-      latestByPrimaryKey.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys("2", "/award/api/v1/award-amount-transactions/").should.be.eql([]);
+      latestByPrimaryKey.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys("2", "/award/api/v1/award-amount-transactions/", "award-amount-transactions.documentNumber", "/research-sys/api/v1/document-route-header-values/").should.be.eql([]);
     });    
     
     it("should given a passed in previous max primary key null which is the value that the google property store will return if the cached property does not exist yet (so when we have an empty sheet plus no cached last highest primary key value) should return back an empty array", function () {
-      latestByPrimaryKey.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys("2", "/award/api/v1/award-amount-transactions/").should.be.eql([]);
+      latestByPrimaryKey.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys("2", "/award/api/v1/award-amount-transactions/", "award-amount-transactions.documentNumber", "/research-sys/api/v1/document-route-header-values/").should.be.eql([]);
     });     
 
     it("should given a passed in previous max primary key of 773750 return the mocked up data for primary key 773751 and 773752 but stop at the mocked up error on primary key 773753 (based on rewire sample data primary key 773753 not found)", function () {
-      latestByPrimaryKey.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys("773750", "/award/api/v1/award-amount-transactions/")
+      latestByPrimaryKey.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys("773750", "/award/api/v1/award-amount-transactions/", "award-amount-transactions.documentNumber", "/research-sys/api/v1/document-route-header-values/")
       .should.be.eql(
           [
             ["award-amount-transactions.awardAmountTransactionId","award-amount-transactions.comments","award-amount-transactions.documentNumber","award-amount-transactions.noticeDate","award-amount-transactions.awardNumber","award-amount-transactions.transactionTypeCode","award-amount-transactions._primaryKey"],

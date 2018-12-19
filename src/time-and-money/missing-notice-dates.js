@@ -52,7 +52,10 @@ module.exports = {
         //since we are specifically looking for missing notice dates, this data comes from the award-amount-transactions API endpoint so we are hard coding that path within the function
         const endpointUriStr = "/award/api/v1/award-amount-transactions/";
         const endpointNameOnly = apiUtils.extractApiEndpointNameFromUri(endpointUriStr);
+        const docStatusEndpointUriStr = "research-sys/api/v1/document-route-header-values";
+        //may not be needed // const docStatusEndpointNameOnly = apiUtils.extractApiEndpointNameFromUri(docStatusEndpointUriStr);
         log.trace(`endpointNameOnly: ${endpointNameOnly}`);
+        //may not be needed // log.trace(`docStatusEndpointNameOnly: ${docStatusEndpointNameOnly}`);
         
         //2b. determine the highest primary key in the google sheet data read in (before the update)
         log.trace(`2b. determine the highest primary key in the google sheet data read in (before the update)`); 
@@ -62,7 +65,7 @@ module.exports = {
         //3. query data by increasing primary key values until we hit an error with the message that that primary key is not found 
         log.trace(`3. query data by increasing primary key values until we hit an error with the message that that primary key is not found`);
         //note: later may want to improve so that we can handle gaps in primary keys (wait until the 3rd error on the 3rd primary key past the last one for example, but for now stopping on first error)
-        const newApiCallsTwoDimArrWHeader = latestByPrimaryKey.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys(prevSheetMaxPrimaryKeyVal, endpointUriStr); 
+        const newApiCallsTwoDimArrWHeader = latestByPrimaryKey.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys(prevSheetMaxPrimaryKeyVal, endpointUriStr, `${endpointNameOnly}._primaryKey`, docStatusEndpointUriStr, `${endpointNameOnly}.documentNumber`); 
         log.trace(`newApiCallsTwoDimArrWHeader: ${JSON.stringify(newApiCallsTwoDimArrWHeader)}`);
         
         //4a. (for now using the quick and dirty checking if transactionTypeCode is null/blank as it is required, to confirm if its a pending or final document, rather than calling 2nd API - but may later) join in document statuses on those records that do not yet have it
