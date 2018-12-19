@@ -119,6 +119,12 @@ describe("latest-by-primary-key", function() {
           ]
         );
     });  
+
+    it("should given a passed in previous max primary key of 7000, which finds a award-amount-transaction of 7001 but then cant find a document status via the second api, should return an error", function () {
+      latestByPrimaryKey.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys("7000", "/award/api/v1/award-amount-transactions/", "award-amount-transactions._primaryKey", "/research-sys/api/v1/document-route-header-values/", "award-amount-transactions.documentNumber")
+      .should.be.eql([]);
+    });    
+    
   });   
 
 
