@@ -118,6 +118,10 @@ module.exports = {
         const primaryKeyColName = `${endpointNameOnly}._primaryKey`;
         const lastRefreshDateColName = `${endpointNameOnly}.computedRefreshed`;
         const isAutoSavedColName = `${endpointNameOnly}.computedIsAutoSaved`;
+        const firstEndpointDocNumColName = `${endpointNameOnly}.documentNumber`;       
+        const docStatusEndpointUriStr = "/research-sys/api/v1/document-route-header-values/";
+
+        
         
         // //1. read data from sheet
         log.trace(`1. read data from sheet <(updateRefreshOnePendingRowInSheet func)>)`); 
@@ -134,9 +138,9 @@ module.exports = {
             return; //if primary key value returned is 0 (false) exit without doing/updating anything in the sheet - for now just returning undefined but may later want to come up with a value to return when the sheet is not updated
         //otherwise if the primary key of one of the AUTOSAVE rows was returned, proceed with refreshing that row in the sheet/data
         else {        
-            // 4. Make API call to get current values in KR for AUTOSAVED row using primary key from previous step - setting the bypassCache parameter to TRUE as we need uncached results from KR (there is no point in updating with cached data over and over, the sheet will never change)
-            log.trace(`4. Make API call to get current values in KR for AUTOSAVED row using primary key from previous step <(updateRefreshOnePendingRowInSheet func)>)`); 
-            const apiResultSinglePrimKeyJsObj = apiUtils.apiGetCallKr(endpointUriStr + primKeyAutoSaveRowToUpdate, true);
+            // 4. Make API call to get current values in KR for AUTOSAVED row using primary key from previous step (using function to query both awardAmtInfo and docStatus APIs and join result data) - setting the bypassCache parameter to TRUE as we need uncached results from KR (there is no point in updating with cached data over and over, the sheet will never change)
+            log.trace(`4. Make API calls to get current values in KR for AUTOSAVED row using primary key from previous step <(updateRefreshOnePendingRowInSheet func)>) - using function to query apis for both awardAmtInfo and docStatus api data and join result data`); 
+            const apiResultSinglePrimKeyJsObj = latestByPrimaryKey.callApiThenSecondApiJoinOnPropVal(endpointUriStr, primKeyAutoSaveRowToUpdate, firstEndpointDocNumColName, docStatusEndpointUriStr, true);         //no longer querying on just the single api - now querying both the award amount trans and doc status endpoints joied, which matches the sheet data //apiUtils.apiGetCallKr(endpointUriStr + primKeyAutoSaveRowToUpdate, true);
             
             // 5. make sure the API did not return an error - usually it should not since the document should exist but there could always be network errors, etc assuming that there is valid data, go on to next step
             log.trace(`5. make sure the API did not return an error <(updateRefreshOnePendingRowInSheet func)>)`);
