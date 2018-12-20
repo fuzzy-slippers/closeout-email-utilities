@@ -120,7 +120,7 @@ module.exports = {
         const isAutoSavedColName = `${endpointNameOnly}.computedIsAutoSaved`;
         const firstEndpointDocNumColName = `${endpointNameOnly}.documentNumber`;       
         const docStatusEndpointUriStr = "/research-sys/api/v1/document-route-header-values/";
-
+        const docStatusEndpointNameOnly = apiUtils.extractApiEndpointNameFromUri(docStatusEndpointUriStr);
         
         
         // //1. read data from sheet
@@ -152,9 +152,9 @@ module.exports = {
                 log.trace(`6. query function updates the chosen AUTOSAVE row with  1) the data returned by the API call and 2) refresh the computedRefreshed date/time to the current date/time <(updateRefreshOnePendingRowInSheet func)>)`);
                 const twoDArrWHeaderUpdatedChosenAutoSaveRow = queries.overwriteRowMatchingPrimaryKeyWithApiReturnedData(apiResultSinglePrimKeyJsObj, primaryKeyColName, lastRefreshDateColName, prevSheetDataTwoDimArrWHeader);
                     
-                // 7. update the auto save columns - clear that column and recalculate which rows should be set to AUTOSAVE based on the column that indicates if its a final document (if required field is blank, has PENDING value, etc)
-                log.trace(`7. update the auto save columns - clear that column and recalculate which rows should be set to AUTOSAVE <(updateRefreshOnePendingRowInSheet func)>)`);
-                const twoDArrWHeaderAutoSaveColRefreshed = queries.refreshAllAutosaveColumnData(isAutoSavedColName, `${endpointNameOnly}.transactionTypeCode`, "", twoDArrWHeaderUpdatedChosenAutoSaveRow);
+                // 7. update the auto save columns - clear that column and recalculate which rows should be set to AUTOSAVE based on the column that indicates if its a final document (the criteria we are using is the doc status api showing a docRouteStatus of S indicates its in SAVED state which we are calling AUTOSAVED)
+                log.trace(`7. update the auto save columns - clear that column and recalculate which rows should be set to AUTOSAVE (the criteria we are using is the doc status api showing a docRouteStatus of S indicates its in SAVED state which we are calling AUTOSAVED)`);
+                const twoDArrWHeaderAutoSaveColRefreshed = queries.refreshAllAutosaveColumnData(isAutoSavedColName, `${docStatusEndpointNameOnly}.docRouteStatus`, "S", twoDArrWHeaderUpdatedChosenAutoSaveRow);
                 
                 // 8. run the filter function again to filter out null notice dates now that data was changed (in case the updated row now no longer has a null notice date)
                 log.trace(`8. run the filter function again to filter out null notice dates now that data was changed <(updateRefreshOnePendingRowInSheet func)>)`);
