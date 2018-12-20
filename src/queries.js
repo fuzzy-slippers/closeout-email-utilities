@@ -280,27 +280,27 @@ module.exports = {
                                       FROM tmptbl1
                                       `, twoDArrWHeaderCellsTrimmed);
     return twoDArrWHeaderWUpdatedRow;
-  },
+  }
   
   
   
-  /** MAY BE ABLE TO REPLACE WITH CALL TO refreshAllAutosaveColumnData?
-  * adds a new column to a 2d array with header that adds a new column (name specified) that auto-populates a value of AUTOSAVE for all rows that appear to be non-final documents (does this by checking for an empty value in the second column name specified which is presumably a required field)
-  * 
-  * @param {string} the column name (for the header row) of the column being added which will list AUTOSAVE for pending documents
-  * @param {string} the column name of the required column to check for blank values that will indicate if a row/document is in AUTOSAVE status
-  * @param {string[][]} a 2d array with a header row without the column, that should have the new column added
-  * @return {string[][]} a 2d array with a header that is the initial 2d array with the additional column added (with the AUTOSAVE values added) on the righthand side
-  */    
-  addColumnComputedAutoSave: (colNameToAdd, colNameRequiredColToCheckForBlankValues, twoDArrWHeader) => {
-    log.trace(`queries addColumnComputedLastUpdated: (${colNameToAdd}, ${colNameRequiredColToCheckForBlankValues}, ${JSON.stringify(twoDArrWHeader)}) called...`);
-    return module.exports.refreshAllAutosaveColumnData(colNameToAdd, colNameRequiredColToCheckForBlankValues, "", twoDArrWHeader);
-/*
-    //in order to accurately match if the transaction type code (required) column is blank and therefore indicating the TNM doc is pending, need to trim each cell (there is a bug in the alaSql trim function)
-    const twoDArrWHeaderCellsTrimmed = arrayUtils.trimAllCellsInTwoDimArr(twoDArrWHeader);
-    return alasqlUtils.selectFromTwoDimArr(`SELECT ${module.exports.generateListOfColumnNamesInAlaSqlSelectFormat(twoDArrWHeaderCellsTrimmed)}, CASE WHEN [${colNameRequiredColToCheckForBlankValues}] = '' THEN 'AUTOSAVE' ELSE '' END AS [${colNameToAdd}] FROM tmptbl1`, twoDArrWHeaderCellsTrimmed);
-*/
-  },    
+//   /** MAY BE ABLE TO REPLACE WITH CALL TO refreshAllAutosaveColumnData?
+//   * adds a new column to a 2d array with header that adds a new column (name specified) that auto-populates a value of AUTOSAVE for all rows that appear to be non-final documents (does this by checking for an empty value in the second column name specified which is presumably a required field)
+//   * 
+//   * @param {string} the column name (for the header row) of the column being added which will list AUTOSAVE for pending documents
+//   * @param {string} the column name of the required column to check for blank values that will indicate if a row/document is in AUTOSAVE status
+//   * @param {string[][]} a 2d array with a header row without the column, that should have the new column added
+//   * @return {string[][]} a 2d array with a header that is the initial 2d array with the additional column added (with the AUTOSAVE values added) on the righthand side
+//   */    
+//   addColumnComputedAutoSave: (colNameToAdd, colNameRequiredColToCheckForBlankValues, twoDArrWHeader) => {
+//     log.trace(`queries addColumnComputedLastUpdated: (${colNameToAdd}, ${colNameRequiredColToCheckForBlankValues}, ${JSON.stringify(twoDArrWHeader)}) called...`);
+//     return module.exports.refreshAllAutosaveColumnData(colNameToAdd, colNameRequiredColToCheckForBlankValues, "", twoDArrWHeader);
+// /*
+//     //in order to accurately match if the transaction type code (required) column is blank and therefore indicating the TNM doc is pending, need to trim each cell (there is a bug in the alaSql trim function)
+//     const twoDArrWHeaderCellsTrimmed = arrayUtils.trimAllCellsInTwoDimArr(twoDArrWHeader);
+//     return alasqlUtils.selectFromTwoDimArr(`SELECT ${module.exports.generateListOfColumnNamesInAlaSqlSelectFormat(twoDArrWHeaderCellsTrimmed)}, CASE WHEN [${colNameRequiredColToCheckForBlankValues}] = '' THEN 'AUTOSAVE' ELSE '' END AS [${colNameToAdd}] FROM tmptbl1`, twoDArrWHeaderCellsTrimmed);
+// */
+//   },    
   
 
 };  

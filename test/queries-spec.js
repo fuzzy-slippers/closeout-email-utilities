@@ -295,27 +295,6 @@ describe("queries", function() {
   });  
   
   
-  describe("#addColumnComputedAutoSave()", function() {
-    it("should given a passed in 2d array without the new auto save column, in the result 2d array the header should now have a column that matches the name passed in for the auto save/pending (far right)", function () {
-      queries.addColumnComputedAutoSave("endPointName.computedAutoSave", "endPointName.transactionTypeCode", [["Col1", "Col2", "endPointName.transactionTypeCode"], ["A","AA", "AAA"], ["B", "BB", "BBB"], ["C", "CC", "CCC"]])[0]
-      .should.eql(["Col1", "Col2", "endPointName.transactionTypeCode","endPointName.computedAutoSave"]);
-    });  
-    it("should given a passed in 2d array with the new auto save column and a endPointName.transactionTypeCode column, the auto save column is filled out based on the empty status of the endPointName.transactionTypeCode column", function () {
-      queries.addColumnComputedAutoSave("endPointName.computedAutoSave", "endPointName.transactionTypeCode", [["Col1", "Col2", "endPointName.transactionTypeCode"], ["A","AA", ""], ["B", "BB", "2"], ["C", "CC", " "]])
-      .should.eql([["Col1", "Col2", "endPointName.transactionTypeCode","endPointName.computedAutoSave"], ["A","AA", "", "AUTOSAVE"], ["B", "BB", "2",""], ["C", "CC", "","AUTOSAVE"]])     
-    }); 
-    it("should given a passed in 2d array with the new auto save column and a endPointName.transactionTypeCode column name but none of the header rows matching the endPointName.transactionTypeCode column name, add the additional row but never fill out AUTOSAVE as there is nothing to base the logic on", function () {
-      queries.addColumnComputedAutoSave("endPointName.computedAutoSave", "endPointName.transactionTypeCode", [["Col1", "Col2", "noColWithTransCodes"], ["A","AA", ""], ["B", "BB", "2"], ["C", "CC", ""]])
-      .should.eql([["Col1", "Col2", "noColWithTransCodes", "endPointName.computedAutoSave"], ["A","AA", "", ""], ["B", "BB", "2",""], ["C", "CC", "",""]]);     
-    });     
-    it("should given a passed in 2d array with the auto save column already present, the returned 2D array should be returned unchanged", function () {
-      queries.addColumnComputedAutoSave("endPointName.computedAutoSave", "endPointName.transactionTypeCode", [["Col1", "Col2", "endPointName.transactionTypeCode","endPointName.computedAutoSave"], ["A","AA", "", "AUTOSAVE"], ["B", "BB", "2",""], ["C", "CC", "","AUTOSAVE"]])
-      .should.eql([["Col1", "Col2", "endPointName.transactionTypeCode","endPointName.computedAutoSave"], ["A","AA", "", "AUTOSAVE"], ["B", "BB", "2",""], ["C", "CC", "","AUTOSAVE"]])     
-    }); 
- 
-  });   
-  
-  
   describe("#generateListOfColumnNamesInAlaSqlSelectFormat()", function() {
     it("should given a 2d array with a header row with 3 column names and no data rows, return a string with just those column names in a format that works for alaSQL Select explicit column listings", function () {
       queries.generateListOfColumnNamesInAlaSqlSelectFormat([["Col1", "Col2", "Col3"]])
@@ -877,6 +856,27 @@ describe("queries", function() {
     });     
   
   });  
+  
+  // previously addColumnComputedAutoSave() tests that have been repurposed as refreshAllAutosaveColumnData() tests now that refreshAllAutosaveColumnData has replaced addColumnComputedAutoSave due to them being able to be used interchangably
+  describe("#refreshAllAutosaveColumnData() but previously #addColumnComputedAutoSave() tests", function() {
+    it("should given a passed in 2d array without the new auto save column, in the result 2d array the header should now have a column that matches the name passed in for the auto save/pending (far right)", function () {
+      const tmpRetVal = queries.refreshAllAutosaveColumnData("endPointName.computedAutoSave", "endPointName.transactionTypeCode", "", [["Col1", "Col2", "endPointName.transactionTypeCode"], ["A","AA", "AAA"], ["B", "BB", "BBB"], ["C", "CC", "CCC"]])[0];
+      tmpRetVal.should.eql(["Col1", "Col2", "endPointName.transactionTypeCode","endPointName.computedAutoSave"]);
+    });  
+    it("should given a passed in 2d array with the new auto save column and a endPointName.transactionTypeCode column, the auto save column is filled out based on the empty status of the endPointName.transactionTypeCode column", function () {
+      const tmpRetVal = queries.refreshAllAutosaveColumnData("endPointName.computedAutoSave", "endPointName.transactionTypeCode", "", [["Col1", "Col2", "endPointName.transactionTypeCode"], ["A","AA", ""], ["B", "BB", "2"], ["C", "CC", " "]]);
+      tmpRetVal.should.eql([["Col1", "Col2", "endPointName.transactionTypeCode","endPointName.computedAutoSave"], ["A","AA", "", "AUTOSAVE"], ["B", "BB", "2",""], ["C", "CC", "","AUTOSAVE"]]);
+    }); 
+    it("should given a passed in 2d array with the new auto save column and a endPointName.transactionTypeCode column name but none of the header rows matching the endPointName.transactionTypeCode column name, add the additional row but never fill out AUTOSAVE as there is nothing to base the logic on", function () {
+      const tmpRetVal = queries.refreshAllAutosaveColumnData("endPointName.computedAutoSave", "endPointName.transactionTypeCode", "", [["Col1", "Col2", "noColWithTransCodes"], ["A","AA", ""], ["B", "BB", "2"], ["C", "CC", ""]]);
+      tmpRetVal.should.eql([["Col1", "Col2", "noColWithTransCodes", "endPointName.computedAutoSave"], ["A","AA", "", ""], ["B", "BB", "2",""], ["C", "CC", "",""]]);     
+    });     
+    it("should given a passed in 2d array with the auto save column already present, the returned 2D array should be returned unchanged", function () {
+      const tmpRetVal = queries.refreshAllAutosaveColumnData("endPointName.computedAutoSave", "endPointName.transactionTypeCode", "", [["Col1", "Col2", "endPointName.transactionTypeCode","endPointName.computedAutoSave"], ["A","AA", "", "AUTOSAVE"], ["B", "BB", "2",""], ["C", "CC", "","AUTOSAVE"]]);
+      tmpRetVal.should.eql([["Col1", "Col2", "endPointName.transactionTypeCode","endPointName.computedAutoSave"], ["A","AA", "", "AUTOSAVE"], ["B", "BB", "2",""], ["C", "CC", "","AUTOSAVE"]]);  
+    }); 
+ 
+  });    
   
   
   

@@ -86,7 +86,7 @@ module.exports = {
 
         //7. add "award-amount-transactions.computedIsAutoSaved"" column        
         log.trace(`7. add "award-amount-transactions.computedIsAutoSaved"" column `);
-        const twoDArrDataWithComputedAutoSavedColumnAdded = queries.addColumnComputedAutoSave(`${endpointNameOnly}.computedIsAutoSaved`, `${endpointNameOnly}.transactionTypeCode`,  twoDArrDataWithComputedRefreshedColumnAdded);
+        const twoDArrDataWithComputedAutoSavedColumnAdded = queries.refreshAllAutosaveColumnData(`${endpointNameOnly}.computedIsAutoSaved`, `${endpointNameOnly}.transactionTypeCode`, "", twoDArrDataWithComputedRefreshedColumnAdded);   ///no switched from old function to equivalent newer update function //queries.addColumnComputedAutoSave(`${endpointNameOnly}.computedIsAutoSaved`, `${endpointNameOnly}.transactionTypeCode`,  twoDArrDataWithComputedRefreshedColumnAdded);
         log.trace(`twoDArrDataWithComputedAutoSavedColumnAdded: ${JSON.stringify(twoDArrDataWithComputedAutoSavedColumnAdded)}`);        
         //TODO!!!!!!!!: later need a separate function (take logic out of above) that goes through and sets/refreshes which columns have the AUTOSAVE flag (using an update alasql query - blanks, then sets...this will allow the AUTOSAVE marking logic to be decoupled from all the other steps and could potentially be updated or reused for other types of validations)
         
