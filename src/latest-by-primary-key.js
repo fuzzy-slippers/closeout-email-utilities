@@ -103,8 +103,28 @@ module.exports = {
      */
     apiCallsOnNextHigherPrimaryKey: (previouslyUsedPrimaryKey, firstApiCallRelativeUriPath, propFromFirstApiResultsUseAsSecondApiCallParam, secApiCallRelativeUriPath) => {
         log.trace(`latest-by-primary-key apiCallsOnNextHigherPrimaryKey: (${previouslyUsedPrimaryKey}, ${firstApiCallRelativeUriPath}, ${propFromFirstApiResultsUseAsSecondApiCallParam}, ${secApiCallRelativeUriPath}) called...`);
+        const nextPrimKeyVal = (Number(previouslyUsedPrimaryKey) + 1);
+        //moved most of the logic to the callApiThenSecondApiJoinOnPropVal function but since we need to call it with a primary key plus 1 in this case, still keeping this function as a special case (and all tests)
+        return module.exports.callApiThenSecondApiJoinOnPropVal(firstApiCallRelativeUriPath, nextPrimKeyVal, propFromFirstApiResultsUseAsSecondApiCallParam, secApiCallRelativeUriPath);
+       
+    },
+    
+    //NOTE: only putting this in latest-by-primary-key because the mocking of api data in the testing is easier (ideally would move to another library but the tests cant mock 2 modules deep and so becomes more complicated)
+    /**
+     * makes two api calls, the first one with the key (and column name for that key), specified, the second api call specifies a value (typically document number) from the data in the first api call results (property name that contains that data from the first api call specified as a parameter too) - then the js objects of both api results are joined together into a single js object with all properties (names are qualified with the dot notation since apiGetCallKr is used for the api calls)
+     * 
+     * @param {string} the relative endpoint name/path of the first API call to make
+     * @param {string} the value to use as the filtering key on the first api call (ex. "/awards/X")
+     * @param {string} the column/property name from the first API results that we should then use as the parameter name and value as query params when calling the second API  
+     * @param {string} the relative endpoint name/path of the second API call to make
+     * @return {obj} is a js object that contains a combination of all the properties (remember they are in the format [endpointname].[colname]) from the first api combined with all the properties from the data returned from the second api call - all merged into a single js object all at the top level
+     * 
+     */      
+    callApiThenSecondApiJoinOnPropVal(firstApiCallRelativeUriPath, valOfKeyToUseFirstApiCall, propFromFirstApiResultsUseAsSecondApiCallParam, secApiCallRelativeUriPath) {
+        log.trace(`join-utils callApiThenSecondApiJoinOnPropVal: (${firstApiCallRelativeUriPath}, ${valOfKeyToUseFirstApiCall}, ${propFromFirstApiResultsUseAsSecondApiCallParam}, ${secApiCallRelativeUriPath}) called...`);
+
         //query the first api based on the next primary key value
-        const jsonObjFirstApiResult = apiUtils.apiGetCallKr(firstApiCallRelativeUriPath + (Number(previouslyUsedPrimaryKey) + 1));
+        const jsonObjFirstApiResult = apiUtils.apiGetCallKr(firstApiCallRelativeUriPath + valOfKeyToUseFirstApiCall);
         //if the first api call returns an error object, return back that error/object
         if (apiUtils.hasErrorProperty(jsonObjFirstApiResult))
             return jsonObjFirstApiResult;
@@ -127,8 +147,9 @@ module.exports = {
                                                                                         // console.log(`#################objUtils.mergeObjArrIntoSingleObj(arrOfReturnValueObjsFromBothApiCalls): ${JSON.stringify(objUtils.mergeObjArrIntoSingleObj(arrOfReturnValueObjsFromBothApiCalls))}###############`);             
                 return objUtils.mergeObjArrIntoSingleObj(arrOfReturnValueObjsFromBothApiCalls);
             }
-        }
-    }
+        }    
+    },    
+        
     
      
 

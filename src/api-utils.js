@@ -18,6 +18,8 @@ module.exports = {
      */
     hasErrorProperty: (jsObj) => jsObj.hasOwnProperty("Error"),    
 
+    aaa: () => true,
+
     /**
      * DEPRICATED (ZF) - use apiGetCallKrWDotEndpointNames (which calls this helper function) for most if not all situations as we want all sheet columns to have the API endpoint name prepended before the column name for good joins and no overwriting column names that are the same from different API endpoints 
      * utility function that calls the wrapped callKrGetApiWithWait method and converts the results from JSON into a js object (or return a js object with an Error property if there was any kind of error with the API call or parsing the results as JSON)
@@ -101,7 +103,7 @@ module.exports = {
      * @return {string} is a js object (or array of objects) of the JSON returned by the API GET call with properties (but with enpoint names and dots prepended to property names) or a js object with an Error property if there were any errors encountered (however all errors are caught so the program execution continues)
      * 
      */      
-    extractApiEndpointNameFromUri(partialOrFullUriString) {
+    extractApiEndpointNameFromUri: (partialOrFullUriString) => {
         log.trace(`api-utils extractApiEndpointNameFromUri(${partialOrFullUriString}) called...`);        
         //utilize the older node built in url (url.parse) module (imported/required above)
         const whatwgUrlObject = url.parse(partialOrFullUriString);
@@ -112,7 +114,49 @@ module.exports = {
         var arrRegexMatchesNonNumericWDashes = onlyPathPortion.match(regex);
         //once numbers and empty strings at the end are filterd out, the last portion of the path should be the endpoint name
         return arrRegexMatchesNonNumericWDashes[arrRegexMatchesNonNumericWDashes.length - 1];
-    },    
+    },   
+    
+    
+    /**
+     * makes two api calls, the first one with the key (and column name for that key), specified, the second api call specifies a value (typically document number) from the data in the first api call results (property name that contains that data from the first api call specified as a parameter too) - then the js objects of both api results are joined together into a single js object with all properties (names are qualified with the dot notation since apiGetCallKr is used for the api calls)
+     * 
+     * @param {string} the relative endpoint name/path of the first API call to make
+     * @param {string} the value to use as the filtering key on the first api call (ex. "/awards/X")
+     * @param {string} the column/property name from the first API results that we should then use as the parameter name and value as query params when calling the second API  
+     * @param {string} the relative endpoint name/path of the second API call to make
+     * @return {obj} is a js object that contains a combination of all the properties (remember they are in the format [endpointname].[colname]) from the first api combined with all the properties from the data returned from the second api call - all merged into a single js object all at the top level
+     * 
+     */      
+    callApiThenSecondApiJoinOnPropVal(firstApiCallRelativeUriPath, valOfKeyToUseFirstApiCall, propFromFirstApiResultsUseAsSecondApiCallParam, secApiCallRelativeUriPath) {
+        log.trace(`api-utils callApiThenSecondApiJoinOnPropVal: (${firstApiCallRelativeUriPath}, ${valOfKeyToUseFirstApiCall}, ${propFromFirstApiResultsUseAsSecondApiCallParam}, ${secApiCallRelativeUriPath}) called...`);
+
+        //query the first api based on the next primary key value
+        const jsonObjFirstApiResult = module.exports.apiGetCallKr(firstApiCallRelativeUriPath + valOfKeyToUseFirstApiCall);
+        //if the first api call returns an error object, return back that error/object
+        if (module.exports.hasErrorProperty(jsonObjFirstApiResult))
+            return jsonObjFirstApiResult;
+        else {
+                                                                                        //console.log(`#################jsonObjFirstApiResult: ${JSON.stringify(jsonObjFirstApiResult)}###############`);
+            //query the second api using the value of a property (such as doc number) from the first Api results
+                                                                                        // console.log(`#################jsonObjFirstApiResult[propFromFirstApiResultsUseAsSecondApiCallParam]: ${JSON.stringify(jsonObjFirstApiResult[propFromFirstApiResultsUseAsSecondApiCallParam])}###############`); 
+                                                                                        // console.log(`#################apiUtils.apiGetCallKr(secApiCallRelativeUriPath + jsonObjFirstApiResult[propFromFirstApiResultsUseAsSecondApiCallParam]): ${JSON.stringify(apiUtils.apiGetCallKr(secApiCallRelativeUriPath + jsonObjFirstApiResult[propFromFirstApiResultsUseAsSecondApiCallParam]))}###############`);
+                                                                                        // console.log(`#################propFromFirstApiResultsUseAsSecondApiCallParam: ${propFromFirstApiResultsUseAsSecondApiCallParam}###############`);   
+            const jsonObjSecApiResult = module.exports.apiGetCallKr(secApiCallRelativeUriPath + jsonObjFirstApiResult[propFromFirstApiResultsUseAsSecondApiCallParam]);
+            // if the second api call returns an error object - again return the error back
+            if (module.exports.hasErrorProperty(jsonObjSecApiResult))
+                return jsonObjSecApiResult;
+            // if both api calls appear to have succeeded, merge the data from both into a single object and return that
+            else {
+                                                                                        // console.log(`#################jsonObjSecApiResult: ${JSON.stringify(jsonObjSecApiResult)}###############`);        
+                const arrOfReturnValueObjsFromBothApiCalls = [jsonObjFirstApiResult,jsonObjSecApiResult];
+                                                                                        // console.log(`#################arrOfReturnValueObjsFromBothApiCalls: ${JSON.stringify(arrOfReturnValueObjsFromBothApiCalls)}###############`);             
+                //merge the 2 objects into one object with properties from both (has properties/data returned from both api calls)
+                                                                                        // console.log(`#################objUtils.mergeObjArrIntoSingleObj(arrOfReturnValueObjsFromBothApiCalls): ${JSON.stringify(objUtils.mergeObjArrIntoSingleObj(arrOfReturnValueObjsFromBothApiCalls))}###############`);             
+                return objUtils.mergeObjArrIntoSingleObj(arrOfReturnValueObjsFromBothApiCalls);
+            }
+        }    
+    },   
+
     
 // // Note: although it would logically be better to have the below functions inside the library for each validation, etc like the getAwardAmountTransactionByPrimaryKey inside missing-notice-dates
 // // due to a quirk that when testing these specific api call with url functions we cant mock out the api call function if the module its in is required/imported, rather than in the module being tested - so combining them into a big module so the API call function apiGetCallKr cant be overwridden when testing any of the specific functions for each specific API url
