@@ -52,7 +52,7 @@ module.exports = {
         //since we are specifically looking for missing notice dates, this data comes from the award-amount-transactions API endpoint so we are hard coding that path within the function
         const endpointUriStr = "/award/api/v1/award-amount-transactions/";
         const endpointNameOnly = apiUtils.extractApiEndpointNameFromUri(endpointUriStr);
-        const docStatusEndpointUriStr = "research-sys/api/v1/document-route-header-values";
+        const docStatusEndpointUriStr = "/research-sys/api/v1/document-route-header-values/";
         //may not be needed // const docStatusEndpointNameOnly = apiUtils.extractApiEndpointNameFromUri(docStatusEndpointUriStr);
         log.trace(`endpointNameOnly: ${endpointNameOnly}`);
         //may not be needed // log.trace(`docStatusEndpointNameOnly: ${docStatusEndpointNameOnly}`);
@@ -68,17 +68,9 @@ module.exports = {
         const newApiCallsTwoDimArrWHeader = latestByPrimaryKey.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys(prevSheetMaxPrimaryKeyVal, endpointUriStr, `${endpointNameOnly}._primaryKey`, docStatusEndpointUriStr, `${endpointNameOnly}.documentNumber`); 
         log.trace(`newApiCallsTwoDimArrWHeader: ${JSON.stringify(newApiCallsTwoDimArrWHeader)}`);
         
-        //4a. (for now using the quick and dirty checking if transactionTypeCode is null/blank as it is required, to confirm if its a pending or final document, rather than calling 2nd API - but may later) join in document statuses on those records that do not yet have it
-        //TODO: use relative endpoint strings defined above like the other url - for now just hard coding here for simplicity...
-        //Note: since we would need to make the API calls on a single row at a time, may make more sense to integrate this part into the updateRefreshOnePendingRowInSheet scheduled function below - or may need to break apart gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys above into separate steps (possibly by taking away the internal loop and have it just add one row at a time each time it runs)
-        //NEW rought code 12/13/18 4aa. for the current award-amount-transaction row, query the research-sys/api/v1/document-route-header-values/ API endpoint based on the award-amount-transaction document number (the _ function automatically prepends the endpoint names with the dots)
-        //const currDocIdDocRouteHeaderVals = apiUtils.apiGetCallKr(`research-sys/api/v1/document-route-header-values/` + `2490764`, false);
-        //4ab. next we need to smoosh/join together the original award-amount-trasnaction row object with the new document-route-header-values endpoint object returned
-        //Object.assign({}, <<<obj for current row, which we dont have right now the way latestByPrimaryKey.gatherAdditionalRowsBasedOnTryingApiCallsWithIncreasingPrimaryKeys is>>>, currDocIdDocRouteHeaderVals);
-        //4b. filter on just rows where the document status is FINAL
         
-        //4c. filter on just the rows/records where the noticeDate is NULL/missing        
-        log.trace(`4c. filter on just the rows/records where the noticeDate is NULL/missing`);
+        //4. filter on just the rows/records where the noticeDate is NULL/missing        
+        log.trace(`4. filter on just the rows/records where the noticeDate is NULL/missing`);
         const justRowsNullNoticeDatesTwoDimArrWHeader = queries.filterJustRowsWhereColIsNullOrBlank(`${endpointNameOnly}.noticeDate`, newApiCallsTwoDimArrWHeader); 
         log.trace(`justRowsNullNoticeDatesTwoDimArrWHeader: ${justRowsNullNoticeDatesTwoDimArrWHeader}`);
         
