@@ -188,7 +188,7 @@ module.exports = {
                                               `SELECT MIN([${primKeyColName}]) AS minPriKeyIfMultWSameRefreshDt
                                               FROM tmptbl1 
                                               WHERE [${isAutoSavedColName}] = 'AUTOSAVE'
-                                              AND ([${primKeyColName}] <> '' AND [${primKeyColName}] > 0)
+                                              AND [${primKeyColName}] <> 0
                                               AND CAST([${lastRefreshDateColName}] AS NUMBER) = 
                                                 (
                                                   SELECT MIN(CAST([${lastRefreshDateColName}] AS NUMBER))
@@ -196,6 +196,7 @@ module.exports = {
                                                   WHERE [${isAutoSavedColName}] = 'AUTOSAVE' 
                                                 )
                                               `, twoDArrWHeader);
+                                              //took this out of the where clause - no longer the criteria and not using this funciton to filter on rows that should be autosave now - AND ([${primKeyColName}] <> '' AND [${primKeyColName}] > 0)
                                               //                             console.log(`@@@@@@@@@@@@@@@@ sql query used: 
                                               // SELECT MIN([${primKeyColName}]) AS minPriKeyIfMultWSameRefreshDt
                                               // FROM tmptbl1 
