@@ -109,7 +109,7 @@ module.exports = {
        
     },
     
-    //NOTE: only putting this in latest-by-primary-key because the mocking of api data in the testing is easier (ideally would move to another library but the tests cant mock 2 modules deep and so becomes more complicated)
+    //NOTE: only putting this func in latest-by-primary-key module because the mocking of api data in the testing is easier (ideally would move to another library but the tests cant mock 2 modules deep and so becomes more complicated)
     /**
      * makes two api calls, the first one with the key (and column name for that key), specified, the second api call specifies a value (typically document number) from the data in the first api call results (property name that contains that data from the first api call specified as a parameter too) - then the js objects of both api results are joined together into a single js object with all properties (names are qualified with the dot notation since apiGetCallKr is used for the api calls)
      * 
@@ -117,14 +117,15 @@ module.exports = {
      * @param {string} the value to use as the filtering key on the first api call (ex. "/awards/X")
      * @param {string} the column/property name from the first API results that we should then use as the parameter name and value as query params when calling the second API  
      * @param {string} the relative endpoint name/path of the second API call to make
+     * @param {boolean} optional way to bypass caching features in case we are trying to call the same APIs endpoint/key combo over and over to see if the record in KR has changed over time, allows us to bypass our caching mechanism and request fresh results (should be used sparingly only when absolutely needed for checking on new results)
      * @return {obj} is a js object that contains a combination of all the properties (remember they are in the format [endpointname].[colname]) from the first api combined with all the properties from the data returned from the second api call - all merged into a single js object all at the top level
      * 
      */      
-    callApiThenSecondApiJoinOnPropVal(firstApiCallRelativeUriPath, valOfKeyToUseFirstApiCall, propFromFirstApiResultsUseAsSecondApiCallParam, secApiCallRelativeUriPath) {
-        log.trace(`join-utils callApiThenSecondApiJoinOnPropVal: (${firstApiCallRelativeUriPath}, ${valOfKeyToUseFirstApiCall}, ${propFromFirstApiResultsUseAsSecondApiCallParam}, ${secApiCallRelativeUriPath}) called...`);
+    callApiThenSecondApiJoinOnPropVal(firstApiCallRelativeUriPath, valOfKeyToUseFirstApiCall, propFromFirstApiResultsUseAsSecondApiCallParam, secApiCallRelativeUriPath, bypassCache = false) {
+        log.trace(`latest-by-primary-key callApiThenSecondApiJoinOnPropVal: (${firstApiCallRelativeUriPath}, ${valOfKeyToUseFirstApiCall}, ${propFromFirstApiResultsUseAsSecondApiCallParam}, ${secApiCallRelativeUriPath}) called...`);
 
         //query the first api based on the next primary key value
-        const jsonObjFirstApiResult = apiUtils.apiGetCallKr(firstApiCallRelativeUriPath + valOfKeyToUseFirstApiCall);
+        const jsonObjFirstApiResult = apiUtils.apiGetCallKr(firstApiCallRelativeUriPath + valOfKeyToUseFirstApiCall, bypassCache);
         //if the first api call returns an error object, return back that error/object
         if (apiUtils.hasErrorProperty(jsonObjFirstApiResult))
             return jsonObjFirstApiResult;
@@ -134,7 +135,7 @@ module.exports = {
                                                                                         // console.log(`#################jsonObjFirstApiResult[propFromFirstApiResultsUseAsSecondApiCallParam]: ${JSON.stringify(jsonObjFirstApiResult[propFromFirstApiResultsUseAsSecondApiCallParam])}###############`); 
                                                                                         // console.log(`#################apiUtils.apiGetCallKr(secApiCallRelativeUriPath + jsonObjFirstApiResult[propFromFirstApiResultsUseAsSecondApiCallParam]): ${JSON.stringify(apiUtils.apiGetCallKr(secApiCallRelativeUriPath + jsonObjFirstApiResult[propFromFirstApiResultsUseAsSecondApiCallParam]))}###############`);
                                                                                         // console.log(`#################propFromFirstApiResultsUseAsSecondApiCallParam: ${propFromFirstApiResultsUseAsSecondApiCallParam}###############`);   
-            const jsonObjSecApiResult = apiUtils.apiGetCallKr(secApiCallRelativeUriPath + jsonObjFirstApiResult[propFromFirstApiResultsUseAsSecondApiCallParam]);
+            const jsonObjSecApiResult = apiUtils.apiGetCallKr(secApiCallRelativeUriPath + jsonObjFirstApiResult[propFromFirstApiResultsUseAsSecondApiCallParam], bypassCache);
             // if the second api call returns an error object - again return the error back
             if (apiUtils.hasErrorProperty(jsonObjSecApiResult))
                 return jsonObjSecApiResult;
