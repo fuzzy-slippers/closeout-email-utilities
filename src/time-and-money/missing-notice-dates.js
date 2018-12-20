@@ -53,9 +53,9 @@ module.exports = {
         const endpointUriStr = "/award/api/v1/award-amount-transactions/";
         const endpointNameOnly = apiUtils.extractApiEndpointNameFromUri(endpointUriStr);
         const docStatusEndpointUriStr = "/research-sys/api/v1/document-route-header-values/";
-        //may not be needed // const docStatusEndpointNameOnly = apiUtils.extractApiEndpointNameFromUri(docStatusEndpointUriStr);
+        const docStatusEndpointNameOnly = apiUtils.extractApiEndpointNameFromUri(docStatusEndpointUriStr);
         log.trace(`endpointNameOnly: ${endpointNameOnly}`);
-        //may not be needed // log.trace(`docStatusEndpointNameOnly: ${docStatusEndpointNameOnly}`);
+        log.trace(`docStatusEndpointNameOnly: ${docStatusEndpointNameOnly}`);
         
         //2b. determine the highest primary key in the google sheet data read in (before the update)
         log.trace(`2b. determine the highest primary key in the google sheet data read in (before the update)`); 
@@ -86,10 +86,10 @@ module.exports = {
 
         //7. add "award-amount-transactions.computedIsAutoSaved"" column        
         log.trace(`7. add "award-amount-transactions.computedIsAutoSaved"" column `);
-        const twoDArrDataWithComputedAutoSavedColumnAdded = queries.refreshAllAutosaveColumnData(`${endpointNameOnly}.computedIsAutoSaved`, `${endpointNameOnly}.transactionTypeCode`, "", twoDArrDataWithComputedRefreshedColumnAdded);   ///no switched from old function to equivalent newer update function //queries.addColumnComputedAutoSave(`${endpointNameOnly}.computedIsAutoSaved`, `${endpointNameOnly}.transactionTypeCode`,  twoDArrDataWithComputedRefreshedColumnAdded);
+        // found that we were able to initially add the award-amount-transactions.computedIsAutoSaved column with the refresh function as they work the same way - so only maintaining one function which can both add the column initially and refresh the autosave values
+        // in my testing so far, a document-route-header-values.docRouteStatus of `S` appears to indicate a saved document - if others are found, we may need to change the function logic to anything but an F status indicates autosave
+        const twoDArrDataWithComputedAutoSavedColumnAdded = queries.refreshAllAutosaveColumnData(`${endpointNameOnly}.computedIsAutoSaved`, `${docStatusEndpointNameOnly}.docRouteStatus`, "S", twoDArrDataWithComputedRefreshedColumnAdded);   ///no switched from old function to equivalent newer update function //queries.addColumnComputedAutoSave(`${endpointNameOnly}.computedIsAutoSaved`, `${endpointNameOnly}.transactionTypeCode`,  twoDArrDataWithComputedRefreshedColumnAdded);
         log.trace(`twoDArrDataWithComputedAutoSavedColumnAdded: ${JSON.stringify(twoDArrDataWithComputedAutoSavedColumnAdded)}`);        
-        //TODO!!!!!!!!: later need a separate function (take logic out of above) that goes through and sets/refreshes which columns have the AUTOSAVE flag (using an update alasql query - blanks, then sets...this will allow the AUTOSAVE marking logic to be decoupled from all the other steps and could potentially be updated or reused for other types of validations)
-        
         
         return twoDArrDataWithComputedAutoSavedColumnAdded;
     },
