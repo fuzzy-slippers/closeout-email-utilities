@@ -94,7 +94,7 @@ module.exports = {
         log.trace(`twoDArrDataWithComputedRefreshedColumnAdded: ${JSON.stringify(twoDArrDataWithComputedRefreshedColumnAdded)}`);
 
         //7. add "award-amount-transactions.computedIsAutoSaved"" column        
-        log.trace(`7. add "award-amount-transactions.computedIsAutoSaved"" column `);
+        log.trace(`7. add "award-amount-transactions.computedIsAutoSaved" column `);
         // found that we were able to initially add the award-amount-transactions.computedIsAutoSaved column with the refresh function as they work the same way - so only maintaining one function which can both add the column initially and refresh the autosave values
         // in my testing so far, a document-route-header-values.docRouteStatus of `S` appears to indicate a saved document - if others are found, we may need to change the function logic to anything but an F status indicates autosave
         const twoDArrDataWithComputedAutoSavedColumnAdded = queries.refreshAllAutosaveColumnData(`${endpointNameOnly}.computedIsAutoSaved`, `${docStatusEndpointNameOnly}.docRouteStatus`, "S", twoDArrDataWithComputedRefreshedColumnAdded);   ///no switched from old function to equivalent newer update function //queries.addColumnComputedAutoSave(`${endpointNameOnly}.computedIsAutoSaved`, `${endpointNameOnly}.transactionTypeCode`,  twoDArrDataWithComputedRefreshedColumnAdded);
@@ -170,10 +170,16 @@ module.exports = {
                 const twoDArrWHeaderRefilteredOnNullNoticeDateRowsOnly = queries.filterJustRowsWhereColIsNullOrBlank(`${endpointNameOnly}.noticeDate`, twoDArrWHeaderAutoSaveColRefreshed); 
                 
                 // 9a. check if the data has changed (if the 2d arr that we would use to update the sheet is not identical to what we read from the sheet above) 
-                
-                // 9b. if the sheet data has changed, update the google sheet tab (name specified) with the updated results
-                log.trace(`9. update the google sheet tab (tab named "${sheetNameToUpdate}") with the updated results`);
-                googleAppsScriptWrappers.updNamedSheetWArrWHeaderRow(sheetNameToUpdate, twoDArrWHeaderRefilteredOnNullNoticeDateRowsOnly);
+                log.trace(`9a. check if the data has changed (if the 2d arr that we would use to update the sheet is not identical to what we read from the sheet above)`);
+                log.trace(`underscore.isEqual( ${prevSheetDataTwoDimArrWHeader} , ${twoDArrWHeaderRefilteredOnNullNoticeDateRowsOnly} )`);
+                if (!underscore.isEqual(prevSheetDataTwoDimArrWHeader, twoDArrWHeaderRefilteredOnNullNoticeDateRowsOnly)) {
+                    log.trace(`underscore.isEqual found sheet data changed/is different (running updateRefreshOnePendingRowInSheet)`);
+                    // 9b. if the sheet data has changed, update the google sheet tab (name specified) with the updated results
+                    log.trace(`9b. if the sheet data has changed, update the google sheet tab (tab named "${sheetNameToUpdate}") with the updated results`);
+                    googleAppsScriptWrappers.updNamedSheetWArrWHeaderRow(sheetNameToUpdate, twoDArrWHeaderRefilteredOnNullNoticeDateRowsOnly);                    
+                }
+                else
+                    log.trace(`underscore.isEqual found sheet data is identical/would not change (running updateRefreshOnePendingRowInSheet)`);
             }
         }
 
