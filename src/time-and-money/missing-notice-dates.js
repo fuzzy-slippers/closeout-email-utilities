@@ -35,12 +35,17 @@ module.exports = {
         log.trace(`6. result from calling updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates function is combinationOfExistingDataPlusNewApiResults: ${JSON.stringify(combinationOfExistingDataPlusNewApiResults)}`);
         
         //7a. check if the data has changed (if the 2d arr that we would use to update the sheet is not identical to what we read from the sheet above)
-        if (!underscore.isEqual(prevSheetDataTwoDimArrWHeader,combinationOfExistingDataPlusNewApiResults)) {
+        log.trace(`7a.  check if the data has changed (if the 2d arr that we would use to update the sheet is not identical to what we read from the sheet above)`);
+        log.trace(`underscore.isEqual( ${prevSheetDataTwoDimArrWHeader} , ${combinationOfExistingDataPlusNewApiResults} )`);
+        if (!underscore.isEqual(prevSheetDataTwoDimArrWHeader, combinationOfExistingDataPlusNewApiResults)) {
+            log.trace(`underscore.isEqual found sheet data changed/is different`);
             //7b.  if the data has changed, update the google sheet - should be something like the old data in the sheet + the new results/flagged records
-            log.trace(`7.  update sheet with old data in the sheet + the new results/flagged records`);
+            log.trace(`7b.  update sheet with old data in the sheet + the new results/flagged records`);
             googleAppsScriptWrappers.updNamedSheetWArrWHeaderRow(sheetNameToUpdate, combinationOfExistingDataPlusNewApiResults);
             log.trace(`sheetNameToUpdate: ${sheetNameToUpdate}`);
         }
+        else
+            log.trace(`underscore.isEqual found sheet data to be the same`);
     },
     
     /*
