@@ -32,8 +32,9 @@ module.exports = {
         //6. after updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates finishes/returns back results
         log.trace(`6. result from calling updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates function is combinationOfExistingDataPlusNewApiResults: ${JSON.stringify(combinationOfExistingDataPlusNewApiResults)}`);
         
+        //7a. check if the data has changed (if the 2d arr that we would use to update the sheet is not identical to what we read from the sheet above)
         
-        //7.  update sheet with old data in the sheet + the new results/flagged records
+        //7b.  if the data has changed, update the google sheet - should be something like the old data in the sheet + the new results/flagged records
         log.trace(`7.  update sheet with old data in the sheet + the new results/flagged records`);
         googleAppsScriptWrappers.updNamedSheetWArrWHeaderRow(sheetNameToUpdate, combinationOfExistingDataPlusNewApiResults);
         log.trace(`sheetNameToUpdate: ${sheetNameToUpdate}`)
@@ -160,7 +161,9 @@ module.exports = {
                 log.trace(`8. run the filter function again to filter out null notice dates now that data was changed <(updateRefreshOnePendingRowInSheet func)>)`);
                 const twoDArrWHeaderRefilteredOnNullNoticeDateRowsOnly = queries.filterJustRowsWhereColIsNullOrBlank(`${endpointNameOnly}.noticeDate`, twoDArrWHeaderAutoSaveColRefreshed); 
                 
-                // 9. update the google sheet tab (name specified) with the updated results
+                // 9a. check if the data has changed (if the 2d arr that we would use to update the sheet is not identical to what we read from the sheet above) 
+                
+                // 9b. if the sheet data has changed, update the google sheet tab (name specified) with the updated results
                 log.trace(`9. update the google sheet tab (tab named "${sheetNameToUpdate}") with the updated results`);
                 googleAppsScriptWrappers.updNamedSheetWArrWHeaderRow(sheetNameToUpdate, twoDArrWHeaderRefilteredOnNullNoticeDateRowsOnly);
             }
