@@ -9,6 +9,8 @@ const log = require("../../src/log-utils.js");
 const apiUtils = require("../../src/api-utils.js"); 
 //const arrayUtils = require("../../src/array-utils.js");
 
+// using underscore isEqual to compare sheet data bore and after
+const underscore = require("underscore");
 
 module.exports = {
     
@@ -33,11 +35,12 @@ module.exports = {
         log.trace(`6. result from calling updateArrDataAddAdditionalFlaggedEmptyTimeAndMoneyNoticeDates function is combinationOfExistingDataPlusNewApiResults: ${JSON.stringify(combinationOfExistingDataPlusNewApiResults)}`);
         
         //7a. check if the data has changed (if the 2d arr that we would use to update the sheet is not identical to what we read from the sheet above)
-        
-        //7b.  if the data has changed, update the google sheet - should be something like the old data in the sheet + the new results/flagged records
-        log.trace(`7.  update sheet with old data in the sheet + the new results/flagged records`);
-        googleAppsScriptWrappers.updNamedSheetWArrWHeaderRow(sheetNameToUpdate, combinationOfExistingDataPlusNewApiResults);
-        log.trace(`sheetNameToUpdate: ${sheetNameToUpdate}`)
+        if (!underscore.isEqual(prevSheetDataTwoDimArrWHeader,combinationOfExistingDataPlusNewApiResults)) {
+            //7b.  if the data has changed, update the google sheet - should be something like the old data in the sheet + the new results/flagged records
+            log.trace(`7.  update sheet with old data in the sheet + the new results/flagged records`);
+            googleAppsScriptWrappers.updNamedSheetWArrWHeaderRow(sheetNameToUpdate, combinationOfExistingDataPlusNewApiResults);
+            log.trace(`sheetNameToUpdate: ${sheetNameToUpdate}`);
+        }
     },
     
     /*

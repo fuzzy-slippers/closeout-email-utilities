@@ -8,7 +8,8 @@
   "dependencies": {
     "alasql": "^0.4.5",
     "bunyan": "^1.8.12",
-    "lodash": "^4.17.5"
+    "lodash": "^4.17.5",
+    "underscore": "^1.9.1"
   },
   "scripts": {
     "build": "npm run cleanwebpackbundles && ~/workspace/closeout-email-utilities/node_modules/.bin/webpack -p --config ./webpack.config.js",
