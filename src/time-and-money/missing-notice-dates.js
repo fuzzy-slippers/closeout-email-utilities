@@ -13,7 +13,8 @@ const apiUtils = require("../../src/api-utils.js");
 const underscore = require("underscore");
 
 module.exports = {
-    
+   
+// scheduled tast 1 - add new rows to the sheet    
 
     /**
      * the function that actually updates the google sheet (based on the tab/sheet name passed in) with new time and money docs flagged as missing notice dates below the existing (already flagged) data in the sheet
@@ -108,7 +109,7 @@ module.exports = {
 
 
 
-
+// scheduled task 2 - update autosave rows in the existing sheet data
 
     
     
