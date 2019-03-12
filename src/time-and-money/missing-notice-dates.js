@@ -144,8 +144,10 @@ module.exports = {
         
         // 3. if there are no AUTOSAVE rows (no primary key is returned) then exit out of the function without proceeding/updating the sheet
         log.trace(`3. check if there are no AUTOSAVE rows (primKeyAutoSaveRowToUpdate is zero/false) in which case do not update anything and exit the function - primKeyAutoSaveRowToUpdate currently showing: ${primKeyAutoSaveRowToUpdate} <(updateRefreshOnePendingRowInSheet func)>)`); 
-        if (!primKeyAutoSaveRowToUpdate) 
+        if (!primKeyAutoSaveRowToUpdate || primKeyAutoSaveRowToUpdate === 0) {
+            log.trace(`since primKeyAutoSaveRowToUpdate is: ${primKeyAutoSaveRowToUpdate} indicating that there were no autosave rows found, going to exit/return without doing anything further`);
             return; //if primary key value returned is 0 (false) exit without doing/updating anything in the sheet - for now just returning undefined but may later want to come up with a value to return when the sheet is not updated
+        }
         //otherwise if the primary key of one of the AUTOSAVE rows was returned, proceed with refreshing that row in the sheet/data
         else {        
             // 4. Make API call to get current values in KR for AUTOSAVED row using primary key from previous step (using function to query both awardAmtInfo and docStatus APIs and join result data) - setting the bypassCache parameter to TRUE as we need uncached results from KR (there is no point in updating with cached data over and over, the sheet will never change)
