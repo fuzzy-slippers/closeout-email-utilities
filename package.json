@@ -6,9 +6,9 @@
   "repository": "",
   "author": "Zach",
   "dependencies": {
-    "alasql": "^0.4.5",
+    "alasql": "^0.4.11",
     "bunyan": "^1.8.12",
-    "lodash": "^4.17.5",
+    "lodash": "^4.17.11",
     "underscore": "^1.9.1"
   },
   "scripts": {
@@ -23,17 +23,17 @@
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.0",
-    "babel-loader": "^7.1.4",
-    "babel-preset-env": "^1.6.1",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.5",
+    "babel-preset-env": "^1.7.0",
     "babel-register": "^6.26.0",
     "clean-webpack-plugin": "^0.1.19",
-    "core-js": "^2.5.5",
-    "mocha": "^5.0.5",
+    "core-js": "^2.6.5",
+    "mocha": "^5.2.0",
     "rewire": "^4.0.1",
-    "should": "^13.2.1",
-    "webpack": "^4.4.1",
-    "webpack-cli": "^2.0.13",
+    "should": "^13.2.3",
+    "webpack": "^4.29.6",
+    "webpack-cli": "^2.1.5",
     "webpack-node-externals": "^1.7.2"
   }
 }
