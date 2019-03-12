@@ -144,7 +144,7 @@ module.exports = {
         
         // 3. if there are no AUTOSAVE rows (no primary key is returned) then exit out of the function without proceeding/updating the sheet
         log.trace(`3. check if there are no AUTOSAVE rows (primKeyAutoSaveRowToUpdate is zero/false) in which case do not update anything and exit the function - primKeyAutoSaveRowToUpdate currently showing: ${primKeyAutoSaveRowToUpdate} <(updateRefreshOnePendingRowInSheet func)>)`); 
-        if (!primKeyAutoSaveRowToUpdate || primKeyAutoSaveRowToUpdate === 0) {
+        if (!primKeyAutoSaveRowToUpdate || primKeyAutoSaveRowToUpdate === "0") {
             log.trace(`since primKeyAutoSaveRowToUpdate is: ${primKeyAutoSaveRowToUpdate} indicating that there were no autosave rows found, going to exit/return without doing anything further`);
             return; //if primary key value returned is 0 (false) exit without doing/updating anything in the sheet - for now just returning undefined but may later want to come up with a value to return when the sheet is not updated
         }
